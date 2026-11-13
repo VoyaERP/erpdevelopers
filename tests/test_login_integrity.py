@@ -25,6 +25,17 @@ class TestNativeLogin(unittest.TestCase):
                           "document.documentElement.lang =", "wrapper.insertBefore("):
             self.assertNotIn(forbidden, js)
 
+    def test_v16_asset_discovery_markers_exist(self):
+        # frappe v16 esbuild/utils.js is_frappe_app() checks all three files.
+        for filename in ("hooks.py", "modules.txt", "patches.txt"):
+            with self.subTest(filename=filename):
+                self.assertTrue((APP / filename).is_file(), filename)
+
+    def test_existing_site_installer_recognizes_upstream_remote(self):
+        installer = (ROOT / "scripts/install_existing_site_erptest_lightnode.sh").read_text(encoding="utf-8")
+        self.assertIn("for name in upstream origin", installer)
+        self.assertNotIn("remote set-url", installer)
+
     def test_native_sections_remain_unmodified(self):
         js = (APP / "public/js/login_chrome.js").read_text(encoding="utf-8")
         self.assertNotIn("page.querySelectorAll(", js)

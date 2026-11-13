@@ -62,8 +62,17 @@
     test "$(git -C "$APP" branch --show-current)" = "$REF" || {
       echo "STOP: existing app checkout is not on version-16"; exit 2;
     }
-    test "$(git -C "$APP" remote get-url origin)" = "$REPO" || {
-      echo "STOP: unexpected app origin; do not rewrite remotes"; exit 2;
+    # bench get-app uses 'upstream'; manual clones usually use 'origin'.
+    # Verify either without rewriting remote settings.
+    source_remote=""
+    for name in upstream origin; do
+      if [ "$(git -C "$APP" remote get-url "$name" 2>/dev/null || true)" = "$REPO" ]; then
+        source_remote="$name"
+        break
+      fi
+    done
+    test -n "$source_remote" || {
+      echo "STOP: no approved public HTTPS remote found on the app checkout"; exit 2;
     }
     test "$(git -C "$APP" rev-parse HEAD)" = "$remote_sha" || {
       echo "STOP: existing app checkout is not at public branch HEAD; inspect before changing"; exit 2;
