@@ -13,57 +13,9 @@ Green Box reference: VoyaERP/greenbox.com.eg, main branch. Its production login 
 
 The login UI displays navigation and a responsive dark-blue/teal technology story next to the original form. The homepage is a dedicated route named erp-developers-home, avoiding collision with Frappe's /index, and native Frappe navbar/footer blocks are overridden there only to prevent duplicates. Site branding is applied through an **explicit CLI setup helper**, not a global after-install hook. SVG icon is a clean derivative of the approved growth/shield visual direction; replace it with final artwork only after visual sign-off.
 
-## Private GitHub repository — reuse existing SSH key (no duplicate key)
+## Private GitHub source: GitHub App (read-only)
 
-The repository **VoyaERP/erpdevelopers** is private. The GitHub connector authorized in ChatGPT does **not** authenticate Git operations from erptest-lightnode; the server's existing SSH identity must itself have read access to this repository.
-
-- Use the existing private key on the server, under the **Bench owner account**, with a configured GitHub account that has VoyaERP/erpdevelopers repository read permission.
-- Do **not** copy a private key into GitHub, chat, a shell command, repository, site config or CI variables. Only public key material belongs in GitHub's SSH key settings.
-- A GitHub **account SSH key** can access multiple repositories based on the account's permissions. A **repository deploy key** is scoped to one repository and normally cannot be reused for a different repository; if the current key is a deploy key for another repo, use an account key with access or a new repository-specific deploy key after approval.
-- If the key is protected by a passphrase, load it into **ssh-agent** in your current login session; the install helper uses \`BatchMode=yes\` for its preflight so it will stop instead of hanging on a passphrase prompt.
-- **Do not change any existing Frappe/ERPNext remote URLs**. Only this app checkout uses the repository's SSH URL \`git@github.com:VoyaERP/erpdevelopers.git\`.
-
-### Read-only SSH preflight, as \`manakhly\` on erptest-lightnode
-
-~~~bash
-(
-  set +e
-  echo "=== Who owns the Bench ==="
-  stat -c '%U %n' /data/frappe/frappe-bench
-  echo "=== Existing local public-key filenames (safe metadata only) ==="
-  find "$HOME/.ssh" -maxdepth 1 -type f -name '*.pub' -printf '%f\n'
-  echo "=== SSH agent identities ==="
-  ssh-add -l || true
-  echo "=== SSH GitHub account identity ==="
-  ssh -T git@github.com || true
-  echo "=== Actual private repository access ==="
-  git ls-remote --exit-code \
-    git@github.com:VoyaERP/erpdevelopers.git refs/heads/version-16
-)
-~~~
-
-**Success criterion:** \`git ls-remote\` prints one commit SHA for \`refs/heads/version-16\`, not \`Permission denied (publickey)\` or \`Repository not found\`. \`ssh -T git@github.com\` normally returns exit status **1** despite a successful greeting; do not treat that alone as failure.
-
-### If the server already has a passphrase-protected key but no loaded agent
-
-From the **interactive erptest-lightnode shell**, not in a one-off subshell:
-
-~~~bash
-# Only if no useful SSH agent is available:
-eval "$(ssh-agent -s)"
-
-# Check which private-key path actually exists before choosing.
-ls -l "$HOME/.ssh/"*.pub 2>/dev/null || true
-
-# Example ONLY if this is the existing registered key:
-ssh-add "$HOME/.ssh/id_ed25519"
-
-# Verify repository authorization, not merely GitHub SSH identity.
-git ls-remote --exit-code \
-  git@github.com:VoyaERP/erpdevelopers.git refs/heads/version-16
-~~~
-
-If the existing key has a different filename, pass that actual **private** key path to \`ssh-add\`; never paste the key's contents. If the greeting identifies a GitHub account that cannot read \`VoyaERP/erpdevelopers\`, grant that account repository access or configure a permitted repository-specific key. There is no reason to create a duplicate key while the existing account key can be authorized.
+Before running this installer, create and install a GitHub App limited to VoyaERP/erpdevelopers and Contents: Read-only. The first HTTPS clone is described in [GITHUB_APP_DEPLOY.md](GITHUB_APP_DEPLOY.md). No SSH Deploy Key, PAT or token-in-URL is required. The App private key remains off Git and the server uses an on-demand installation token for Git operations.
 
 ## Step 1 — Preflight on the intended server
 
@@ -85,8 +37,9 @@ Log in from your Mac using the SSH alias or IP already configured for erptest-li
   echo "Target folder present?"
   test -e sites/erp-developers.com && echo "YES - STOP fresh install" || echo "No"
   echo "Nginx available?"; command -v nginx || true
-  echo "GitHub SSH access:"
-  git ls-remote --exit-code git@github.com:VoyaERP/erpdevelopers.git refs/heads/version-16 >/dev/null
+  echo "GitHub App helper configured?"
+  test -r "$HOME/.config/erpdevelopers/github_app_credential.py"
+  # Private repo HTTPS access is verified in docs/GITHUB_APP_DEPLOY.md
   echo "Preflight complete"
 )
 ~~~
@@ -95,32 +48,18 @@ Frappe 16 / ERPNext 16 on this server were reported in prior terminal output, bu
 
 ## Step 2 — Install only new app/site
 
-As the existing Bench owner:
+Follow [GITHUB_APP_DEPLOY.md](GITHUB_APP_DEPLOY.md) for the one-time organization GitHub App registration, PEM transfer to the server, helper configuration and first **tokenless HTTPS** clone.
+
+Once `$HOME/erpdevelopers-deploy-source` has been cloned to branch version-16 using that scoped GitHub App helper, execute this as the Bench owner on erptest-lightnode:
 
 ~~~bash
-(
-  set -Eeuo pipefail
-  export PATH="$HOME/.local/bin:$PATH"
-
-  SRC="$HOME/erpdevelopers-deploy-source"
-  if [ -d "$SRC/.git" ]; then
-    test -z "$(git -C "$SRC" status --porcelain)"
-    git -C "$SRC" switch version-16
-    git -C "$SRC" pull --ff-only origin version-16
-  elif [ ! -e "$SRC" ]; then
-    git clone --single-branch --branch version-16 \
-      git@github.com:VoyaERP/erpdevelopers.git "$SRC"
-  else
-    echo "STOP: unexpected source path"; exit 2
-  fi
-
-  bash "$SRC/scripts/install_erptest_lightnode.sh"
-)
+export BENCH="/data/frappe/frappe-bench"
+bash "$HOME/erpdevelopers-deploy-source/scripts/install_erptest_lightnode.sh"
 ~~~
 
-The install helper refuses the wrong host, root execution, non-Frappe-v16 Bench, an existing target site, dirty/conflicting app checkout and low disk space. It runs bench get-app (unless app already present), bench new-site, target-only install/migrate, explicit Website Settings setup, asset build, static tests and cache clearing. Interactive database/Administrator passwords are required, and must not be placed in scripts or Git.
+The installer independently reloads the scoped GitHub App credential helper. It refuses wrong host, root execution, non-Frappe-v16 Bench, an existing target site, dirty/conflicting app checkout and low disk space. It does not modify DNS/SSL/Nginx or restart shared services. Creating the separate site prompts interactively for database and Administrator credentials.
 
-If a step fails after creating a site, it may leave a partial site/database; **do not rerun blindly and do not drop/delete the site automatically**. Inspect the exact failure first.
+If a step fails after site creation, it may leave a partial site/database; inspect the exact failure, and do not delete/recreate automatically.
 
 ## Step 3 — DNS and reverse proxy (manual approval)
 
@@ -190,17 +129,15 @@ curl -I https://erp-developers.com/assets/erpdevelopers/js/login_chrome.js
 
 ## Update flow
 
-From the source checkout, after reviewing a change:
+The target-only update helper sources the GitHub App credential helper itself, but the initial source checkout fast-forward requires the temporary Git credentials from section C of [GITHUB_APP_DEPLOY.md](GITHUB_APP_DEPLOY.md).
+
+After the HTTPS source clone is updated to version-16:
 
 ~~~bash
-cd "$HOME/erpdevelopers-deploy-source"
-git fetch origin version-16
-git switch version-16
-git pull --ff-only origin version-16
-bash scripts/update_erptest_lightnode.sh
+bash "$HOME/erpdevelopers-deploy-source/scripts/update_erptest_lightnode.sh"
 ~~~
 
-This backup-first update script affects the target site/app only, except that asset builds share Bench files. It does not execute bench update, bench restart, uninstall-app, drop-site or database changes on other sites.
+This backup-first update script affects the target site/app only (shared Bench assets are rebuilt). It does not execute bench update, bench restart, uninstall-app, drop-site or database changes on other sites.
 
 ## Important boundaries
 

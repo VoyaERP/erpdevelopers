@@ -8,7 +8,7 @@
   SITE="erp-developers.com"
   BENCH="${BENCH:-/data/frappe/frappe-bench}"
   APP="$BENCH/apps/erpdevelopers"
-  REPO="git@github.com:VoyaERP/erpdevelopers.git"
+  REPO="https://github.com/VoyaERP/erpdevelopers.git"
 
   case "$(uname -n)" in
     erptest-lightnode|erptest-lightnode.*) ;;
@@ -33,12 +33,14 @@
   test -n "$free_kib" && test "$free_kib" -ge $((3 * 1024 * 1024)) || {
     echo "STOP: less than 3GiB free disk"; exit 2;
   }
-  GIT_SSH_COMMAND="ssh -o BatchMode=yes" \
-    git ls-remote --exit-code "$REPO" refs/heads/version-16 >/dev/null || {
-    echo "STOP: SSH key cannot read VoyaERP/erpdevelopers." 
-    echo "Load the EXISTING authorized key with ssh-add (do not create/commit a new key)."
-    echo "Test: git ls-remote --exit-code git@github.com:VoyaERP/erpdevelopers.git refs/heads/version-16"
-    exit 3;
+  # No SSH deploy keys or stored HTTPS tokens. The app issues a short-lived
+  # installation token for this one repository only.
+  source "$(dirname "${BASH_SOURCE[0]}")/github_app_auth.sh"
+  erpdev_enable_github_app_git
+  git ls-remote --exit-code "$REPO" refs/heads/version-16 >/dev/null || {
+    echo "STOP: GitHub App cannot read VoyaERP/erpdevelopers." >&2
+    echo "Verify app installation, Contents:read, app ID and PEM ownership." >&2
+    exit 3
   }
 
   if [ -e "$APP" ]; then
@@ -47,9 +49,11 @@
     test "$(git -C "$APP" branch --show-current)" = version-16 || {
       echo "STOP: unexpected app branch"; exit 2;
     }
-    git -C "$APP" remote -v | grep -Fq 'VoyaERP/erpdevelopers' || {
-      echo "STOP: unexpected app Git remote"; exit 2;
-    }
+    # Existing SSH remotes are NOT rewritten automatically.
+    if ! git -C "$APP" remote -v | grep -Fq "$REPO"; then
+      echo "STOP: existing app must use its HTTPS GitHub remote (no SSH URL)." >&2
+      exit 2
+    fi
   else
     bench get-app --branch version-16 "$REPO"
   fi
