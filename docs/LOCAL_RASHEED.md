@@ -62,6 +62,51 @@ Run inside a subshell on MacVMs; does not delete or modify anything:
 
 ---
 
+## Fourth audit — confirmed disk directory sizes and sites (2026-11-13)
+
+**Updated observations:** `df -h /`: `/dev/vda2` 30G / 25G used / **3.6G free**, **88% used**; `df -i /`: **32% inode usage**; `lsblk`: `vda1` 200M VFAT `/boot`, `vda2` 29.8G ext4 `/` and `/boot/dtbs`. `~/frappe-bench` 6.1G, including `apps` 4.1G, `sites` 981M and `env` 935M. `~/.vscode-server` 3.1G, `~/mobile` 2.2G, `~/.cache` 815M, `/var/cache/pacman/pkg` 890M, `~/.nvm` 1.2G.
+
+**Existing v15 site inventory (names only, no credentials):** `frappiq-cert.local`, `s1.mac.dynamicsforall.com`, `frappe.localhost`, `lg.mac.dynamicsforall.com`. Preserve all.
+
+### Preferred isolation decision (pending host approval)
+
+1. **Safer option:** new Debian 13 / Ubuntu 24.04+ ARM64 VM with adequate CPU/RAM, 60–80GB disk, own validated MariaDB 11.8 and v16 Bench; Mac tunnel for local testing. No disturbance to MacVMs v15.
+2. **On MacVMs:** after an external VM snapshot/verified backup, enlarge the VM's backing virtual disk from 30GB to a proposed 80GB (conditional on host free space); preferably increase RAM to 8GiB if feasible. Existing Arch Linux ARM and MariaDB 12.3 remain extra compatibility risks, so test v16 in an isolated Bench and DB after resizing, not on a live site.
+
+### Non-destructive next inspection
+
+~~~bash
+(
+  set +e
+  echo "=== VM and storage ==="
+  command -v systemd-detect-virt >/dev/null 2>&1 && systemd-detect-virt || true
+  command -v findmnt >/dev/null 2>&1 && findmnt -no SOURCE,FSTYPE,SIZE,AVAIL / || true
+  lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINTS
+  echo "=== Tools to grow (do NOT invoke yet) ==="
+  command -v growpart || true
+  command -v resize2fs || true
+  echo "=== Review optional caches (no deletion) ==="
+  du -x -h -d 1 "$HOME/.vscode-server" 2>/dev/null | sort -h | tail -n 12
+  du -x -h -d 1 "$HOME/.cache" 2>/dev/null | sort -h | tail -n 12
+  if command -v paccache >/dev/null 2>&1; then
+    paccache --dryrun --keep 2
+  else
+    echo "paccache unavailable; no cleanup attempted"
+  fi
+  echo "=== END / no changes made ==="
+)
+~~~
+
+`paccache --dryrun --keep 2` **does not remove anything** and documents possible old package candidates. Use [Arch paccache man page](https://man.archlinux.org/man/paccache.8) before contemplating package-cache retention. Do not delete VS Code remote server files while attached, backup directories or production/legacy site files.
+
+### Conditional partition/FS extension — NOT YET APPROVED
+
+Only **after** (1) an off-VM backup/snapshot; (2) identifying the Mac virtualization provider; (3) increasing virtual disk size in the provider UI while VM stopped or as supported; (4) confirming `lsblk` reports a larger `vda`; (5) checking tooling and `growpart -N` dry-run; can a privileged host-specific runbook expand partition `/dev/vda2` and then the ext4 filesystem. **Do not paste destructive partition commands until all preconditions are verified.**
+
+**Acceptance gate for R0:** usable free space, verified protected v15 sites and separate v16 DB/ports, reproducible Frappe v16 install/build and Mac UAT evidence. No such install has yet occurred.
+
+---
+
 ## Verified host snapshot — 2026-11-13 (from user terminal)
 
 | Property | Observed value | Consequence |

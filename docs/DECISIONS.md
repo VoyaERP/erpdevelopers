@@ -14,7 +14,8 @@
 | ADR-008 | 2026-11-13 | **Mandatory provider gate** | No job scraping; use only permitted third-party APIs/feeds with consent and contracts | LinkedIn Job Posting API requires provider approval; not all jobs integrations are possible |
 | ADR-009 | 2026-11-13 | **Proposed AI gate** | Human-approved, permission-scoped retrieval; no model access to unauthorized documents or automatic privileged side effects | Evaluation, prompt-injection tests, quotas and provenance required |
 | ADR-010 | 2026-11-13 | **Open** | Final public domain, hosting/proxy, business model, markets, payments, user acquisition and AI provider | No guesses, resolve before relevant production phase |
-| ADR-011 | 2026-11-13 | **Open** | Is MacVMs (192.168.64.15) the intended Rasheed host? | Confirm after non-destructive audit before installing or editing sites |
+| ADR-011 | 2026-11-13 | **Observed, scope still to confirm** | MacVMs hosts existing Frappe 15 and `rasheed` app; is this the intended v16 target? | Existing four sites must be preserved; version-16 Bench not installed |
+| ADR-012 | 2026-11-13 | **Open — capacity decision** | Choose separate supported ARM64 VM or expand MacVMs 30GB virtual disk (proposed 80GB) and RAM (proposed 8GiB) | Root only 3.6GB free (88% full); do not install/cleanup until approved and externally backed up |
 
 ## Decision update format
 
