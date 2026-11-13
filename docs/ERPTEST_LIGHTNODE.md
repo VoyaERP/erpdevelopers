@@ -53,6 +53,18 @@ The previous Green Box implementation preserved the **native Frappe login form**
 
 Arabic and English site chrome follow the server-rendered Frappe HTML language. The site-scoped setup enables Frappe's own language picker; the native picker is moved into the branded header, without replacing its event handlers. The app does not overwrite the Frappe language or localize validation/status messages with brittle JavaScript replacements.
 
+## Recovery from missing Bench apps.txt entry (2026-11-14)
+
+Second operator attempt confirmed source recovery to `560b23f0d7588c78848a06e18afa69c1eb2857e3`, valid `get_public_path`, backup with DB and file archives, and **12/12 source contract tests passed**. The next error was:
+
+~~~text
+An error occurred while installing erpdevelopers: App erpdevelopers not in apps.txt
+~~~
+
+Frappe [installer.py (v16.56.0)](https://github.com/frappe/frappe/blob/v16.56.0/frappe/installer.py#L295-L318) refuses installation until the app is in the Bench-wide `sites/apps.txt`. The first failed `bench get-app` happened when `patches.txt` was missing, so [Bench 5.31 `BenchApps.sync`](https://github.com/frappe/bench/blob/v5.31.0/bench/bench.py#L264-L289) did not discover this app. The new recovery helper invokes **Bench's own registration sync**, after checking that the discovered apps are precisely the previously registered list plus `erpdevelopers`. It saves Bench `apps.txt` and optional `apps.json` copies in the existing site's private backup directory, and refuses unexpected app changes.
+
+**Do not manually add the app to a specific site's installed-app list**, run `bench new-site`, or delete the checkout. Fast-forward both source and Bench checkouts to the tested fix commit and rerun the *existing-site installer*. It takes another backup. No server install success has yet been confirmed.
+
 ## 1. Read-only preflight on erptest-lightnode
 
 SSH into the target server as the Bench owner, **not root**, then run:

@@ -108,6 +108,71 @@
     node --check "$APP/erpdevelopers/public/js/login_chrome.js"
   fi
 
+  echo "=== Register recovered app with the Bench (without touching other sites) ==="
+  # A previous bench get-app failure occurred before patches.txt existed.
+  # The checkout is now valid, but the failed install may have omitted it from
+  # sites/apps.txt. Frappe install-app requires that Bench registration.
+  bench_cli="$(command -v bench)"
+  bench_python="$(sed -n '1s/^#!//p' "$bench_cli")"
+  case "$bench_python" in
+    /*) test -x "$bench_python" || {
+          echo "STOP: Bench Python executable missing"; exit 3;
+        } ;;
+    *) echo "STOP: Bench launcher has an unsupported interpreter; inspect manually."; exit 3 ;;
+  esac
+
+  "$bench_python" - "$BENCH" "$SITE" <<'PY'
+from pathlib import Path
+import datetime
+import shutil
+import sys
+from bench.bench import Bench
+
+root, site_name = Path(sys.argv[1]).resolve(), sys.argv[2]
+app_name = "erpdevelopers"
+apps_txt = root / "sites" / "apps.txt"
+apps_json = root / "sites" / "apps.json"
+backup_dir = root / "sites" / site_name / "private" / "backups"
+app_path = root / "apps" / app_name / app_name
+
+if site_name != "erp-developers.com":
+    raise SystemExit("STOP: registration site mismatch")
+if not apps_txt.is_file():
+    raise SystemExit("STOP: Bench apps.txt missing")
+if not all((app_path / x).is_file() for x in ("hooks.py", "modules.txt", "patches.txt")):
+    raise SystemExit("STOP: Frappe app discovery markers missing")
+
+old = [x.strip() for x in apps_txt.read_text(encoding="utf-8").splitlines() if x.strip()]
+if not old or "frappe" not in old or len(old) != len(set(old)):
+    raise SystemExit("STOP: Bench apps.txt appears invalid; no changes made")
+bench = Bench(str(root))
+candidate = list(bench.apps)
+expected = set(old) | {app_name}
+if set(candidate) != expected or len(candidate) != len(expected):
+    raise SystemExit(
+        "STOP: Bench discovery differs from existing apps.txt beyond erpdevelopers. "
+        "Review apps.txt and app discovery before editing."
+    )
+if app_name in old:
+    print("App already registered in apps.txt; no Bench-wide sync required")
+else:
+    if not backup_dir.is_dir():
+        raise SystemExit("STOP: backup directory missing")
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    for source in (apps_txt, apps_json):
+        if source.is_file():
+            destination = backup_dir / (source.name + ".before-erpdevelopers-" + stamp + ".bak")
+            shutil.copy2(source, destination)
+            print("Preserved Bench registry:", destination)
+    # Standard Bench API, not a manual global configuration rewrite.
+    bench.apps.sync(app_name=app_name, app_dir=app_name, branch="version-16")
+
+after = [x.strip() for x in apps_txt.read_text(encoding="utf-8").splitlines() if x.strip()]
+if set(after) != expected or len(after) != len(expected):
+    raise SystemExit("STOP: Unexpected apps.txt change; inspect saved registry backups")
+print("Bench app registration OK:", app_name)
+PY
+
   echo "=== Install ERP Developers on existing site ==="
   bench --site "$SITE" install-app erpdevelopers
   bench --site "$SITE" migrate

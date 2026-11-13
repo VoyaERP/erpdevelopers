@@ -73,6 +73,17 @@ class TestNativeLogin(unittest.TestCase):
         self.assertLess(script.index("backup --with-files"), script.index("bench get-app"))
         self.assertLess(script.index("backup --with-files"), script.index("install-app erpdevelopers"))
 
+    def test_bench_registration_uses_supported_api_and_preserves_apps(self):
+        script = (ROOT / "scripts/install_existing_site_erptest_lightnode.sh").read_text(encoding="utf-8")
+        self.assertIn("Bench(str(root))", script)
+        self.assertIn("bench.apps.sync(app_name=app_name, app_dir=app_name, branch=\"version-16\")", script)
+        self.assertIn('expected = set(old) | {app_name}', script)
+        self.assertIn("shutil.copy2(source, destination)", script)
+        self.assertLess(script.index("backup --with-files"), script.index("bench.apps.sync"))
+        self.assertLess(script.index("bench.apps.sync"), script.index("install-app erpdevelopers"))
+        self.assertNotIn("drop-site", script)
+        self.assertNotIn("bench restart", script)
+
     def test_install_is_site_guarded(self):
         script = (ROOT / "scripts/install_erptest_lightnode.sh").read_text(encoding="utf-8")
         self.assertIn('test ! -e "$BENCH/sites/$SITE"', script)
