@@ -1,148 +1,135 @@
-# ERP Developers — erptest-lightnode deployment (Frappe v16)
+# ERP Developers — deployment on erptest-lightnode
 
-**Public site:** https://erp-developers.com  
-**Server:** erptest-lightnode  
-**App:** VoyaERP/erpdevelopers, branch version-16  
-**Site:** erp-developers.com  
-**Bench:** /data/frappe/frappe-bench (observed previously; verify on server before executing)  
-**Status:** Source prepared. No SSH server deployment, DNS, TLS or UAT has yet been performed.
+- **Public domain:** https://erp-developers.com
+- **Host:** erptest-lightnode
+- **Repository:** https://github.com/VoyaERP/erpdevelopers (public)
+- **Branch:** version-16
+- **App:** erpdevelopers
+- **Site:** erp-developers.com
+- **Expected Bench:** /data/frappe/frappe-bench — observed previously; verify on the server
+- **Status:** Code prepared in GitHub. The assistant has NOT connected to erptest-lightnode, installed the app, changed DNS/TLS or verified the live site.
 
-## Implementation principles
+## Login architecture (Green Box method)
 
-Green Box reference: VoyaERP/greenbox.com.eg, main branch. Its production login approach kept Frappe's original /login authentication and 2FA while layering brand-specific CSS, header and footer. The v16 login markup differs from Green Box v15, so ERP Developers implements **new v16-specific styling and a small, idempotent JS site-chrome module**, without copying authentication code or replacing the native login template. No form, password handler, session handler or social/OTP handler is duplicated.
+The previous Green Box implementation preserved the **native Frappe login form**, password reset, signup configuration, social login and 2FA. ERP Developers follows this same safe approach: page-scoped CSS and an idempotent website header/footer script. The intersecting background is a local original SVG, not a new login template or authentication form. All auth/session/OTP logic stays in Frappe 16. The original form is not reparented and credentials never pass through custom JavaScript.
 
-The login UI displays navigation and a responsive dark-blue/teal technology story next to the original form. The homepage is a dedicated route named erp-developers-home, avoiding collision with Frappe's /index, and native Frappe navbar/footer blocks are overridden there only to prevent duplicates. Site branding is applied through an **explicit CLI setup helper**, not a global after-install hook. SVG icon is a clean derivative of the approved growth/shield visual direction; replace it with final artwork only after visual sign-off.
+Arabic and English site chrome follow the server-rendered Frappe HTML language. The app does not overwrite the Frappe language or localize validation/status messages with brittle JavaScript replacements.
 
-## Private GitHub source: GitHub App (read-only)
+## 1. Read-only preflight on erptest-lightnode
 
-Before running this installer, create and install a GitHub App limited to VoyaERP/erpdevelopers and Contents: Read-only. The first HTTPS clone is described in [GITHUB_APP_DEPLOY.md](GITHUB_APP_DEPLOY.md). No SSH Deploy Key, PAT or token-in-URL is required. The App private key remains off Git and the server uses an on-demand installation token for Git operations.
-
-## Step 1 — Preflight on the intended server
-
-Log in from your Mac using the SSH alias or IP already configured for erptest-lightnode. Do not assume that hostname resolves from outside the server.
+SSH into the target server as the Bench owner, **not root**, then run:
 
 ~~~bash
 (
   set +e
   export PATH="$HOME/.local/bin:$PATH"
-  echo "Hostname: $(uname -n)"
-  echo "User: $(id -un)"
-  echo "Bench path: /data/frappe/frappe-bench"
-  cd /data/frappe/frappe-bench || exit 1
+  echo "=== Host / user ==="
+  uname -n
+  id -un
+  echo "=== Existing Bench ==="
+  BENCH="/data/frappe/frappe-bench"
+  test -d "$BENCH/apps/frappe" || {
+    echo "STOP: Check the real Bench path; do not guess"; exit 1;
+  }
+  cd "$BENCH" || exit 1
   bench version
   git -C apps/frappe branch --show-current
   df -h .
-  echo "Existing site folders (names only):"
+  echo "=== Existing site folder names only ==="
   find sites -mindepth 2 -maxdepth 2 -name site_config.json -type f -printf '%h\n'
-  echo "Target folder present?"
-  test -e sites/erp-developers.com && echo "YES - STOP fresh install" || echo "No"
-  echo "Nginx available?"; command -v nginx || true
-  echo "GitHub App helper configured?"
-  test -r "$HOME/.config/erpdevelopers/github_app_credential.py"
-  # Private repo HTTPS access is verified in docs/GITHUB_APP_DEPLOY.md
-  echo "Preflight complete"
+  test ! -e "sites/erp-developers.com" && echo "Target site absent: new install possible" || echo "Target exists: use update flow"
+  echo "=== Proxy tooling ==="
+  command -v nginx || true
+  command -v certbot || true
+  echo "=== Public GitHub source ==="
+  git ls-remote https://github.com/VoyaERP/erpdevelopers.git refs/heads/version-16
 )
 ~~~
 
-Frappe 16 / ERPNext 16 on this server were reported in prior terminal output, but **must be verified again**. Do not read or print site_config.json secrets.
+Do not print passwords, site_config.json, DB backups or live application data. The installer refuses a wrong hostname, root user, non-Frappe-16 Bench, missing Bench, existing target site, dirty app checkout or less than **3 GiB available disk**. A successful preflight does not prove all Frappe 16 dependencies are compatible.
 
-## Step 2 — Install only new app/site
+## 2. Fresh installation from the public repository
 
-Follow [GITHUB_APP_DEPLOY.md](GITHUB_APP_DEPLOY.md) for the one-time organization GitHub App registration, PEM transfer to the server, helper configuration and first **tokenless HTTPS** clone.
-
-Once `$HOME/erpdevelopers-deploy-source` has been cloned to branch version-16 using that scoped GitHub App helper, execute this as the Bench owner on erptest-lightnode:
+Only run when the previous checks match the intended environment and the target site **does not exist**:
 
 ~~~bash
-export BENCH="/data/frappe/frappe-bench"
-bash "$HOME/erpdevelopers-deploy-source/scripts/install_erptest_lightnode.sh"
+(
+  set -Eeuo pipefail
+  export PATH="$HOME/.local/bin:$PATH"
+  SRC="$HOME/erpdevelopers-deploy-source"
+  test ! -e "$SRC" || {
+    echo "STOP: deployment source exists. Inspect it; do not overwrite."; exit 2;
+  }
+  git clone --branch version-16 --single-branch \
+    https://github.com/VoyaERP/erpdevelopers.git "$SRC"
+
+  BENCH="/data/frappe/frappe-bench" bash "$SRC/scripts/install_erptest_lightnode.sh"
+)
 ~~~
 
-The installer independently reloads the scoped GitHub App credential helper. It refuses wrong host, root execution, non-Frappe-v16 Bench, an existing target site, dirty/conflicting app checkout and low disk space. It does not modify DNS/SSL/Nginx or restart shared services. Creating the separate site prompts interactively for database and Administrator credentials.
+The installer uses anonymous read-only HTTPS, checks the public branch and Bench, installs the app on a **new Frappe 16 site** only, configures that site's home page and logo, builds the app assets, runs source-only unit tests and clears the site's caches. It prompts interactively for MariaDB administrative and site Administrator passwords. No values are embedded in the code.
 
-If a step fails after site creation, it may leave a partial site/database; inspect the exact failure, and do not delete/recreate automatically.
+It does **not** run bench update, change the shared Bench default site, rewrite Nginx, provision TLS, restart services, or touch other sites. If it fails after creating a site/database, inspect the partial state before retrying.
 
-## Step 3 — DNS and reverse proxy (manual approval)
+## 3. DNS, reverse proxy, SSL (operator-reviewed)
 
-Create an A record for erp-developers.com to the server's verified public IPv4; optional AAAA only if configured. No server public IP is assumed. If using Cloudflare, use **Full (strict)** with valid origin TLS, not Flexible. Decide whether www should redirect to the apex host.
-
-Check the current ingress (Nginx, Cloudflare, existing vhosts) and whether it is Bench-managed before any config generation. If this Bench already manages Nginx and you have backed up/reviewed its current configuration, typical steps are:
-
-~~~bash
-cd /data/frappe/frappe-bench
-bench setup nginx
-sudo nginx -t
-sudo systemctl reload nginx
-~~~
-
-This can affect all existing sites; **do not run it as part of the install helper**. If nginx is custom-managed, adjust the existing vhost/site routing instead. If an alias domain is needed, review bench setup add-domain. An exact-match Frappe site named erp-developers.com does not need a second alias for the same hostname.
-
-After DNS is correct and port 80/443 are reachable, provision HTTPS through your existing certificate strategy (Certbot/ACME or managed origin certificate). Only after inspecting current Nginx setup could a Certbot invocation be appropriate:
-
-~~~bash
-sudo certbot --nginx -d erp-developers.com
-sudo nginx -t
-sudo systemctl reload nginx
-~~~
-
-Never guess certificates, Cloudflare status, firewall rules or paths.
-
-After HTTPS is live, if needed set site-specific absolute URLs:
+1. Verify the server's public IP and external ingress, then point the apex DNS A record for erp-developers.com to that verified address. Add AAAA only when IPv6 is actually configured.
+2. Inspect how this server manages Nginx/Frappe domains and **back up the existing proxy configuration**. Adding a vhost or running bench setup nginx may affect all other sites. Do not execute an unreviewed automatic rewrite.
+3. Provision a trusted TLS certificate through the server's existing process. For Cloudflare-proxied traffic use **Full (strict)** and bypass caching for /login, /app, /api and /socket.io. Never use Flexible for a login site.
+4. Once HTTPS is verified, set the site-specific absolute URL:
 
 ~~~bash
 cd /data/frappe/frappe-bench
 bench --site erp-developers.com set-config host_name https://erp-developers.com
 ~~~
 
-## Step 4 — Verify before announcing deployment
+A shared Bench process restart might be required for the new hooks to load. Schedule and verify that separately rather than blindly restarting multi-site services.
+
+## 4. Verification after installation, routing and TLS
 
 ~~~bash
-cd "$HOME/frappe-bench"
+cd /data/frappe/frappe-bench
+
 bench --site erp-developers.com list-apps
-bench --site erp-developers.com execute frappe.db.get_single_value \
-  --args '["Website Settings","home_page"]'
-curl -I -H 'Host: erp-developers.com' http://127.0.0.1/
-curl -I -H 'Host: erp-developers.com' http://127.0.0.1/login
-curl -I -H 'Host: erp-developers.com' http://127.0.0.1/assets/erpdevelopers/css/login.css
-~~~
 
-The curl loopback checks assume local Nginx port 80; inspect actual listening ports and route if different. A /login 200 does not prove that password login/2FA works; browser UAT is mandatory.
+bench --site erp-developers.com execute \
+  frappe.db.get_single_value --args '["Website Settings","home_page"]'
 
-Public HTTPS checks after DNS:
+test -r sites/assets/erpdevelopers/css/login.css
+test -r sites/assets/erpdevelopers/images/login-network.svg
 
-~~~bash
 curl -I https://erp-developers.com/
 curl -I https://erp-developers.com/login
 curl -I https://erp-developers.com/assets/erpdevelopers/css/login.css
 curl -I https://erp-developers.com/assets/erpdevelopers/js/login_chrome.js
+curl -I https://erp-developers.com/assets/erpdevelopers/images/login-network.svg
 ~~~
 
-### UAT acceptance
+The public curl checks only pass once DNS and HTTPS are live. Browser UAT must check desktop/tablet/mobile breakpoints, Arabic/English Frappe locales, one header/footer, intact Frappe login fields, forgot-password, wrong password, 2FA, optional social login and no Console errors. Check existing sites still respond. **HTTP 200 is not a valid substitute for real authentication UAT**.
 
-- [ ] Homepage is ERP Developers on root, not Frappe/ERPNext default.
-- [ ] One site header, one site footer, one Frappe login form, one brand symbol; no duplicate Home/logo.
-- [ ] Login, wrong-password messaging, forgot password, signup (if enabled), OTP/2FA and social sign-in (if enabled) remain native.
-- [ ] Responsive layout desktop / tablet / mobile; Arabic and English website locale; no forced translation hacks or RTL errors.
-- [ ] No auth request interception, no guest privileged endpoints, no Desk CSS pollution.
-- [ ] No missing fonts/assets, no HTTP mixed content, no console errors.
-- [ ] Existing Bench sites work before and after any shared process restart.
-- [ ] Issue evidence includes tested commit SHA, screenshots, date, operator and rollback checkpoint.
+## 5. Update an already installed target site
 
-## Update flow
-
-The target-only update helper sources the GitHub App credential helper itself, but the initial source checkout fast-forward requires the temporary Git credentials from section C of [GITHUB_APP_DEPLOY.md](GITHUB_APP_DEPLOY.md).
-
-After the HTTPS source clone is updated to version-16:
+Only use this path when the site and app are already installed on erptest-lightnode:
 
 ~~~bash
-bash "$HOME/erpdevelopers-deploy-source/scripts/update_erptest_lightnode.sh"
+(
+  set -Eeuo pipefail
+  export PATH="$HOME/.local/bin:$PATH"
+  SRC="$HOME/erpdevelopers-deploy-source"
+  test -d "$SRC/.git" || { echo "STOP: source checkout is missing"; exit 2; }
+  test -z "$(git -C "$SRC" status --porcelain)" || { echo "STOP: source checkout is dirty"; exit 2; }
+  test "$(git -C "$SRC" branch --show-current)" = "version-16" || {
+    echo "STOP: unexpected branch"; exit 2;
+  }
+  git -C "$SRC" pull --ff-only origin version-16
+  BENCH="/data/frappe/frappe-bench" bash "$SRC/scripts/update_erptest_lightnode.sh"
+)
 ~~~
 
-This backup-first update script affects the target site/app only (shared Bench assets are rebuilt). It does not execute bench update, bench restart, uninstall-app, drop-site or database changes on other sites.
+The updater validates the target and clean checkout, backs up **erp-developers.com** with files, fast-forwards only the ERP Developers app, migrates the target site, builds assets and clears caches. Review impact on other sites using the same app; manual shared-service restart remains a separate gate.
 
-## Important boundaries
+## Security and rollback
 
-- **No production deployment is claimed** until server execution and HTTPS/UAT results are returned.
-- Root domain route uses the explicit Frappe Website Settings home page erp-developers-home.
-- The current vector icon follows the selected brand direction but is not an exact vector conversion of the reference PNG.
-- All private credentials, backups and session details remain off GitHub.
-- Changes to main documentation STATUS.md and Issue #2 should be made after UAT, not marked Done just because code was pushed.
+Record deployed commit SHA, site backup path and proxy configuration checkpoint before upgrades. Never put tokens, PEM private keys, database passwords, cookies, site_config.json or backup archives in Git. The old GitHub App private-repository deployment helper was retired because the source is now public.
+
+**Deployment is not complete until server commands and live browser acceptance have been confirmed.**
