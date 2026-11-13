@@ -62,7 +62,7 @@
     test "$(git -C "$APP" branch --show-current)" = "$REF" || {
       echo "STOP: existing app checkout is not on version-16"; exit 2;
     }
-    # bench get-app uses 'upstream'; manual clones usually use 'origin'.
+    # Bench default clone uses 'upstream'; manual clones usually use 'origin'.
     # Verify either without rewriting remote settings.
     source_remote=""
     for name in upstream origin; do
