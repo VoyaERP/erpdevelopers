@@ -4,6 +4,13 @@
 
 > حالة التنفيذ مبنية على أدلة من GitHub ومن مخرجات المستخدم فقط. لا يتم اعتبار الكود مختبرًا لمجرد رفعه.
 
+## 2026-11-14 — Third installation attempt: missing declared Python module
+
+- Operator fast-forwarded both clean Git checkouts to `bfe30a7`, ran the existing-site installer, backed up the target site with files, passed **13/13 source-only tests**, successfully registered ERP Developers in Bench `sites/apps.txt`, and preserved `apps.txt`/`apps.json` snapshots. The installer then reached Frappe's `sync_for` and stopped with `ModuleNotFoundError: No module named 'erpdevelopers.erp_developers'`.
+- Root cause confirmed from `erpdevelopers/modules.txt` (`ERP Developers`) and [Frappe v16.56.0 model/sync.py:133](https://github.com/frappe/frappe/blob/v16.56.0/frappe/model/sync.py#L133-L135): the framework imports `erpdevelopers.erp_developers`. Python package directory/`__init__.py` was absent. No source or DB entries were deleted.
+- Fixed on `version-16` at **39659d46422f7c45d9bc8ec75aafb91c1c1574e3**: added module `erpdevelopers/erp_developers/__init__.py`, a source contract test that imports every module declared in `modules.txt`, and a runtime import check in the guarded existing-site installer before trying `install-app`. [GitHub Actions CI PASS](https://github.com/VoyaERP/erpdevelopers/actions/runs/43527703007), source validation only.
+- **Not yet installed / not UAT-tested**. Next operator action: fast-forward both clean Git checkouts from `bfe30a7` to `39659d4` with expected-SHA checks, run a read-only check for any leftover `Module Def` entry, rerun the guarded existing-site installer (backup first), then check homepage, static assets, HTTPS and native login. Avoid `bench new-site`, `--force`, `bench update`, dropping the DB or restarting shared services blindly.
+
 ## 2026-11-14 — Second installation attempt: missing apps.txt registration
 
 - User fast-forwarded both source checkouts to `560b23f...`, verified the Frappe asset discovery path and passed **12/12 source tests**; new with-files backup succeeded (database, config, public and private archives).
@@ -49,7 +56,7 @@
 | --- | --- | --- |
 | [ED-00 #1](https://github.com/VoyaERP/erpdevelopers/issues/1) Environment | **Blocked: disk capacity + compatibility review** | Current-host guarded installer available, 3.6GB fails >=8GiB preflight; MariaDB v12.3 compatibility, Mac smoke |
 | [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Green Box-style native login, homepage and static CI ready; UAT pending** | Final approved logo asset, EN/AR content, SEO, device/auth UAT |
-| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Second install blocked at Bench apps.txt; guarded registration fix CI passed; server app absent** | Fast-forward both checkouts, rerun existing-site installer, verify apps/assets/HTTPS/auth |
+| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Bench registration succeeded; Frappe module import missing; source fix CI passed; app install pending** | Update both checkouts to 39659d4, check module row, rerun install, verify HTTPS and auth |
 | [ED-02 #3](https://github.com/VoyaERP/erpdevelopers/issues/3) IAM/privacy | **Planned** | Role matrix + threat model |
 | [ED-03 #4](https://github.com/VoyaERP/erpdevelopers/issues/4) Community | **Planned** | ED-02 approval |
 | [ED-04 #5](https://github.com/VoyaERP/erpdevelopers/issues/5) Developer Hub | **Planned** | ED-02 approval |
