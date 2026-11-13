@@ -107,6 +107,42 @@ Only **after** (1) an off-VM backup/snapshot; (2) identifying the Mac virtualiza
 
 ---
 
+## Fifth audit — QEMU confirmed; no resize performed (2026-11-13)
+
+**Observed:** `systemd-detect-virt` => `qemu`; `/dev/vda` **30G**, `vda1` **200M VFAT**, `vda2` **29.8G ext4** mounted as root and `/boot/dtbs`; `findmnt /` confirms ext4. `resize2fs` located at `/usr/bin/resize2fs`. **`growpart` is absent**. These commands are read-only; **no capacity change has taken place**.
+
+**QEMU is not evidence that the macOS management application is UTM.** Identify the real VM and host-backed image first; never run `qemu-img resize` against a live disk image. QEMU explicitly warns against modifying active images; UTM's Resize UI similarly requires careful backup and a separate guest partition/filesystem extension. Sources:
+- https://www.qemu.org/docs/master/tools/qemu-img.html
+- https://docs.getutm.app/settings-qemu/drive/resize-and-compress/
+- https://www.gnu.org/software/parted/manual/html_node/resizepart.html
+
+### Read-only Mac host discovery
+
+Run on **Mac terminal**, not MacVMs SSH:
+
+~~~bash
+(
+  echo "=== Mac free space ==="
+  df -h "$HOME"
+  echo "=== VM manager applications ==="
+  ls -ld /Applications/UTM.app "$HOME/Applications/UTM.app" /Applications/Parallels\ Desktop.app /Applications/VMware\ Fusion.app 2>/dev/null || true
+  echo "=== QEMU or UTM processes ==="
+  ps -axo pid,comm | grep -Ei '([U]TM|[q]emu-system|[P]arallels|[V]Mware)' || true
+  echo "=== End ==="
+)
+~~~
+
+This identifies likely UI/application ownership but does not resolve the backing disk image path. If UTM is confirmed, use its documented **Drive → Resize** UI only **with VM shut down and backed up**. Do not resize snapshots/suspended states or assume the same workflow for a generic QEMU command-line VM.
+
+### After host image expansion (conditional, not approved yet)
+
+1. Reboot guest only after approved offline host-side expansion.
+2. Read `lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINTS` and `sudo parted /dev/vda unit s print free` (read-only inspection).
+3. Verify the virtual disk's new size, existing partition start sectors, GPT/MBR type, boot layout, end-of-disk free space and external backup. Obtain the **specific approved partition extension command** for the verified layout; `growpart` can be installed only through an OS-supported package after headroom is available, or use a reviewed Parted workflow.
+4. `resize2fs` expands ext4 **after partition 2 has grown**, then validate `df -h /`, `lsblk`, v15 apps/sites and any startup faults.
+5. Until all checks pass, **do not touch** `~/frappe-bench` or start v16 initialization.
+
+---
 ## Verified host snapshot — 2026-11-13 (from user terminal)
 
 | Property | Observed value | Consequence |

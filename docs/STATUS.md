@@ -49,6 +49,17 @@
 - **Pending choice:** provision separate supported Ubuntu/Debian ARM64 VM **or** resize this virtual disk from 30G to a proposed **80G** and preferably increase memory to **8GiB**, subject to actual Mac host capacity and verified backup. This is a *recommendation awaiting user/host approval*, not a completed action.
 - **No cleanup performed.** Do not remove `frappe-bench`, `sites`, `apps`, `bk`, `mobile`, `~/.vscode-server`, Node 20, logs or backups blindly. Read-only inspection first; cache cleanup would not replace storage expansion.
 
+## Fifth audit — QEMU guest + partition tooling (2026-11-13)
+
+- **Virtualization detected:** `systemd-detect-virt` returns **qemu**. This identifies the hypervisor, **not** which macOS manager (UTM / QEMU / other) owns the disk; host-side manager still unverified.
+- Guest block layout reconfirmed: `/dev/vda` **30G**; `/dev/vda1` **200M vfat** mounted at `/boot`; `/dev/vda2` **29.8G ext4** mounted at `/` and `/boot/dtbs`. No host image expansion done.
+- `resize2fs` is installed at `/usr/bin/resize2fs`; `growpart` absent; `paccache` was not run because not available.
+- Correct growth sequence: external backup/snapshot → identify Mac hypervisor and disk image → stop VM completely → grow backing virtual disk (proposed 80G, pending available host space and approval) → boot/review `lsblk` → extend `vda2` using a **verified host-specific partition procedure** → grow ext4 using `resize2fs` → verify `df`, site/backup health, v15 regression.
+- **Do not execute** `resize2fs /dev/vda2` or any partition writer until the VM actually exposes a larger `vda`, a valid off-VM backup exists, and partition layout/backup is verified. Partition resizing and filesystem resizing are separate tasks.
+- Official references: [QEMU disk resize](https://www.qemu.org/docs/master/tools/qemu-img.html), [GNU Parted resizepart](https://www.gnu.org/software/parted/manual/html_node/resizepart.html), [UTM Drive](https://docs.getutm.app/settings-apple/drive/) (only if host confirms UTM).
+
+**Next non-destructive evidence required:** On Mac host, `df -h "$HOME"`, the virtualization application/VM owner, and confirmation of off-VM backup. This is a **decision gate**, not permission to modify a running disk.
+
 ## Evidence ledger
 
 | Date | Scope | Evidence | Result |
@@ -58,6 +69,7 @@
 | 2026-11-13 | MacVMs second shell | safe audit: Arch Linux ARM, Python 3.14.7, Node 20.20.2, MariaDB client 12.3.2, occupied ports 8000/9000/11000/13000/3306 | **Host inventoried; v16 runtime still unverified** |
 | 2026-11-13 | MacVMs readiness | Frappe 15.118.0, ERPNext 15.121.0, `rasheed` 0.0.1; 30G root with 3.8G free; 3.8GiB RAM, 2.5GiB available; MariaDB 12.3.2 server, Valkey 9.1.1, Yarn 1.22.22; Node 24.22.3 installed via nvm | **R0 blocked on disk capacity and compatibility validation; v15 untouched** |
 | 2026-11-13 | Storage/site inventory | 30G root, **3.6G free (88%)**, inodes 32%; Bench 6.1G; VS Code remote 3.1G; four v15 sites; ext4 `/dev/vda2` | **Blocker confirmed; expansion/VM isolation decision pending** |
+| 2026-11-13 | QEMU guest tool audit | `systemd-detect-virt=qemu`, `resize2fs` present, `growpart` absent, `vda2` ext4 | **Virtualization engine verified; Mac VM manager/backups remain unknown** |
 | 2026-11-13 | Project governance | Master plan + epic issue board created | **Documented; execution gates pending** |
 
 ## How to update this file
