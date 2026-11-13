@@ -4,6 +4,13 @@
 
 > حالة التنفيذ مبنية على أدلة من GitHub ومن مخرجات المستخدم فقط. لا يتم اعتبار الكود مختبرًا لمجرد رفعه.
 
+## 2026-11-14 — First existing-site installation blocked at Frappe asset discovery
+
+- User executed the guarded existing-site installer on erptest-lightnode. With-files backup succeeded (DB ~1007 KiB, site config and two archives). App cloned into `apps/erpdevelopers` at `dfbbaaa4...` but `bench get-app` stopped during its **automatic esbuild**, before the target-site `install-app`. Verified with `bench --site erp-developers.com list-apps`: only Frappe 16.56.0 and ERPNext 16.55.0; ERP Developers is **not installed**.
+- Build error: `TypeError [ERR_INVALID_ARG_TYPE]: paths[0] ... undefined` in Frappe `esbuild/esbuild.js:258`. Frappe [v16.56.0 esbuild/utils.js](https://github.com/frappe/frappe/blob/v16.56.0/esbuild/utils.js#L60-L110) `get_cloned_apps` / `is_frappe_app` requires `hooks.py`, `modules.txt`, and `patches.txt`; ERP Developers lacked `patches.txt` and was omitted from esbuild public path map. Production esbuild self-terminates on errors (exit 143); root cause is missing app marker, **not** disk exhaustion. `/data` 182 GiB free (3% utilized).
+- Recovery patch on `version-16`: new `erpdevelopers/patches.txt`, regression test, existing-site installer recognizes `upstream` (Bench default Git remote) as well as `origin`. Source SHA **560b23f0d7588c78848a06e18afa69c1eb2857e3**, [static GitHub CI PASSED](https://github.com/VoyaERP/erpdevelopers/actions/runs/43526841363).
+- Operator next: fast-forward **both clean** copies (`~/erpdevelopers-deploy-source` and `apps/erpdevelopers`) from `dfbbaaa...` to that pinned SHA (unshallow Bench app if needed), confirm esbuild recognizes it, then rerun the same **existing-site installer**. Do NOT delete site/DB, re-run new-site installer, or re-run `bench get-app` on an existing checkout. No live UAT or success claimed yet.
+- Nginx config includes hostname and Cloudflare Origin certificate paths and passed `nginx -t`, but public HTTPS and routing remain unverified.
 ## 2026-11-14 — Existing erptest-lightnode site confirmed (operator output)
 
 - Operator used SSH to `erptest-lightnode` (Debian x86_64). Site folder `/data/frappe/frappe-bench/sites/erp-developers.com` **already exists**. The fresh-site installer correctly exited before creating or changing the site.
@@ -35,7 +42,7 @@
 | --- | --- | --- |
 | [ED-00 #1](https://github.com/VoyaERP/erpdevelopers/issues/1) Environment | **Blocked: disk capacity + compatibility review** | Current-host guarded installer available, 3.6GB fails >=8GiB preflight; MariaDB v12.3 compatibility, Mac smoke |
 | [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Green Box-style native login, homepage and static CI ready; UAT pending** | Final approved logo asset, EN/AR content, SEO, device/auth UAT |
-| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Existing Frappe 16/ERPNext 16 site confirmed; app absent; existing-site installer/CI ready** | Backup, install app on existing site, DNS/TLS, native auth UAT |
+| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Backup succeeded; first install stopped at esbuild; missing patch marker fixed in GitHub/CI, server app still absent** | Fast-forward both source checkouts, rerun existing-site install, verify public route/2FA |
 | [ED-02 #3](https://github.com/VoyaERP/erpdevelopers/issues/3) IAM/privacy | **Planned** | Role matrix + threat model |
 | [ED-03 #4](https://github.com/VoyaERP/erpdevelopers/issues/4) Community | **Planned** | ED-02 approval |
 | [ED-04 #5](https://github.com/VoyaERP/erpdevelopers/issues/5) Developer Hub | **Planned** | ED-02 approval |
