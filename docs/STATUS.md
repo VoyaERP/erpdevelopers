@@ -4,6 +4,14 @@
 
 > حالة التنفيذ مبنية على أدلة من GitHub ومن مخرجات المستخدم فقط. لا يتم اعتبار الكود مختبرًا لمجرد رفعه.
 
+## 2026-11-14 — App installed; public HTTP 500 remains open
+
+- **Deployment completed on target site**, according to operator logs: `bench --site erp-developers.com list-apps` now reports Frappe **16.56.0**, ERPNext **16.55.0**, **erpdevelopers 0.1.0**, all `version-16`. ERP Developers SHA **39659d46422f7c45d9bc8ec75aafb91c1c1574e3**; application install, migration, site-specific Website Settings, assets build and translations succeeded.
+- Website Settings changed for this site: `home_page=erp-developers-home`, app name/logo/favicon/title and language picker. Build succeeded (`DONE Total Build Time: 198.438ms`); warning regarding Node deprecated `url.parse()` not shown to be a fatal error.
+- **Public web serving NOT OK**: `curl -I https://erp-developers.com/` and `curl -I https://erp-developers.com/login` returned **HTTP/2 500** with Cloudflare headers. This does not determine whether the exception is Frappe web rendering, stale workers, Nginx routing or another origin layer. No server traceback, direct-origin HTTP comparison or authenticated browser UAT evidence yet.
+- Nginx configuration syntax previously passed and contained the apex domain and Cloudflare Origin cert file paths. The specific request handling is **not yet verified**; no restart or DNS/TLS change has been made by this assistant.
+- **Next**: read-only direct-origin vs Cloudflare checks (using correct Host/SNI), log traceback and process health, classify before any targeted reload or source modification. Keep [Issue #13](https://github.com/VoyaERP/erpdevelopers/issues/13) OPEN.
+
 ## 2026-11-14 — Third installation attempt: missing declared Python module
 
 - Operator fast-forwarded both clean Git checkouts to `bfe30a7`, ran the existing-site installer, backed up the target site with files, passed **13/13 source-only tests**, successfully registered ERP Developers in Bench `sites/apps.txt`, and preserved `apps.txt`/`apps.json` snapshots. The installer then reached Frappe's `sync_for` and stopped with `ModuleNotFoundError: No module named 'erpdevelopers.erp_developers'`.
@@ -56,7 +64,7 @@
 | --- | --- | --- |
 | [ED-00 #1](https://github.com/VoyaERP/erpdevelopers/issues/1) Environment | **Blocked: disk capacity + compatibility review** | Current-host guarded installer available, 3.6GB fails >=8GiB preflight; MariaDB v12.3 compatibility, Mac smoke |
 | [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Green Box-style native login, homepage and static CI ready; UAT pending** | Final approved logo asset, EN/AR content, SEO, device/auth UAT |
-| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Bench registration succeeded; Frappe module import missing; source fix CI passed; app install pending** | Update both checkouts to 39659d4, check module row, rerun install, verify HTTPS and auth |
+| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Installed v0.1.0, build passed; public / and /login HTTP 500** | Direct-origin check, Frappe traceback and service health; then HTTPS and auth UAT |
 | [ED-02 #3](https://github.com/VoyaERP/erpdevelopers/issues/3) IAM/privacy | **Planned** | Role matrix + threat model |
 | [ED-03 #4](https://github.com/VoyaERP/erpdevelopers/issues/4) Community | **Planned** | ED-02 approval |
 | [ED-04 #5](https://github.com/VoyaERP/erpdevelopers/issues/5) Developer Hub | **Planned** | ED-02 approval |
