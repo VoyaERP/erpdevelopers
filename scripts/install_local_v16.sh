@@ -52,6 +52,12 @@
   test "$(node -p 'process.versions.node.split(".")[0]')" = "24"
   python3.14 --version
   node --version
+  # nvm global packages are isolated per Node major version.
+  # Yarn was observed under Node 20; verify/reinstall only for Node 24 as needed.
+  if ! command -v yarn >/dev/null 2>&1; then
+    echo "Installing Yarn 1.22.22 into Node 24's own nvm prefix"
+    npm install -g yarn@1.22.22
+  fi
   yarn --version
 
   echo "=== Test GitHub access before large downloads ==="
