@@ -186,6 +186,10 @@ Use proposed quality targets when applicable, not fabricated current results: WC
 7. **AI:** provider, storage/retention, model policy, cost and opt-in are decisions, not implicit requirements.
 8. **Scale/timeline:** estimate after R0 and MVP requirements are validated. No invented deadlines or progress percentages.
 
+## Source authentication decision — GitHub App (2026-11-14)
+
+For `erp-developers.com` deployment on `erptest-lightnode`, the accepted user preference is a **dedicated GitHub App**, installed only on the private repository `VoyaERP/erpdevelopers` with **Contents: Read-only**, over HTTPS. It replaces the proposed server GitHub SSH-key approach, not the administrator's Mac-to-server SSH login. Code merged in PR [#15](https://github.com/VoyaERP/erpdevelopers/pull/15) at **a668ba53146d193de32940083f2c94c9a31fe1e4**. GitHub App registration, downloaded PEM handling, repository installation and server UAT require explicit operator action; do not mark the deployment complete. Canonical setup: [docs/GITHUB_APP_DEPLOY.md](https://github.com/VoyaERP/erpdevelopers/blob/version-16/docs/GITHUB_APP_DEPLOY.md).
+
 ## Public website hosting track — erptest-lightnode (2026-11-14)
 
 The ERP Developers public site is planned at **erp-developers.com** on the existing Frappe **v16** erptest-lightnode Bench, separate from MacVMs' **v15** environment. **Source** (native Frappe login styling and new homepage) has been merged at commit ae1a44a, but **deployment and release criteria are still open**. The operator-owned installation guide is [version-16/docs/ERPTEST_LIGHTNODE.md](https://github.com/VoyaERP/erpdevelopers/blob/version-16/docs/ERPTEST_LIGHTNODE.md), tracked by [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13).

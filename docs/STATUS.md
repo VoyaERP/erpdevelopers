@@ -7,7 +7,7 @@
 ## Observed baseline
 
 - **main:** repository entry/documentation branch; not a deployed release.
-- **version-16:** code includes branded native login, unique homepage, explicit site setup, and erptest-lightnode install/update scripts. Latest verified GitHub merge **ae1a44a777e89f7a55ee212a90a5c378321572df** (PR #12, merged). No erptest server deployment or UAT confirmed.
+- **version-16:** branded native login, dedicated homepage, site setup and erptest-lightnode installers. Latest verified GitHub development commit **a668ba53146d193de32940083f2c94c9a31fe1e4** (PR #15, merged), adding GitHub App authentication. No erptest server deployment or UAT confirmed.
 - **version-15:** no such branch in this repository as of the snapshot; possible existing v15 elsewhere is **unverified**.
 - **MacVMs / existing Rasheed app:** actual host **MacVMs**, Arch Linux ARM aarch64. The existing `/home/manakhly/frappe-bench` runs **Frappe 15.118.0**, **ERPNext 15.121.0**, **rasheed app 0.0.1** and many other v15 apps; existing Frappe Git branch is `version-15`. This is a verified **v15 bench**, not a separate v16 host. User previously referred to “Rasheed local”; confirmed `rasheed` is an app present in this bench. Keep legacy workloads untouched. Python **3.14.7**, Node **20.20.2 by default**, **Node 24.22.3 installed successfully via user-level nvm** and verified **inside a subshell** (does not update default Node), Bench CLI **5.31.0**, Yarn **1.22.22**, Git **2.55.0**, Valkey **9.1.1**, MariaDB **12.3.2 server and client**. Ports `8000`, `9000`, `11000`, `13000`, `3306` are occupied; candidate alternative ports showed no listeners at the check instant.
 - **Deployment:** Frappe v16 installation and Mac UAT **not started/verified**. **Latest critical storage blocker:** VM root `/dev/vda2` is **30 GB**, **25 GB used**, **3.6 GB available (88% used)** as confirmed by the 2026-11-13 follow-up; inode use is only **32%**, so the limiting resource is free storage. RAM **3.8 GiB total, ~2.5 GiB available**, swap **4 GiB**. Risk of out-of-space/build OOM while v15 workloads are running: **do not run `bench init` yet**. Recommended planning target for parallel test bench: at least **15–20 GB free disk** and **8 GiB RAM total or larger**, subject to measured workload; these are capacity recommendations, not claimed official Frappe minima. MariaDB **12.3.2 server** is different from documented v16 **11.8** baseline: compatibility is **unverified**, avoid changing shared DB. Valkey **9.1.1** exceeds documented 6+ baseline but integration still untested. **Arch Linux ARM not officially supported** for Frappe hosting; consider a separate supported Debian/Ubuntu ARM64 test VM if resources cannot be expanded. Docker and Podman commands absent. New Bench still requires distinct ports, isolated site/database and explicit per-shell `nvm use 24`.
@@ -70,6 +70,15 @@
 - Frappe v16's published MariaDB **11.8** target differs from MacVMs MariaDB **12.3.2**: test compatibility only on a new database, never change the shared DB service for an unverified install.
 - This is for local development and Mac SSH-tunnel UAT only, **not production readiness**.
 
+## GitHub App deployment decision (2026-11-14)
+
+- The user selected a dedicated **GitHub App** for private repository authentication on **erptest-lightnode**, replacing the previous SSH Deploy Key / account SSH key guidance for this target.
+- Implemented and merged in **version-16**, [PR #15](https://github.com/VoyaERP/erpdevelopers/pull/15), commit **a668ba53146d193de32940083f2c94c9a31fe1e4**.
+- New source-of-truth guide: [docs/GITHUB_APP_DEPLOY.md](https://github.com/VoyaERP/erpdevelopers/blob/version-16/docs/GITHUB_APP_DEPLOY.md). The installer and updater now access the private GitHub repository using tokenless HTTPS plus a Git credential helper that issues a short-lived **Contents:read** GitHub App installation token scoped to **VoyaERP/erpdevelopers**.
+- Credentials remain **off GitHub**: downloaded App PEM/config stored securely under `~/.config/erpdevelopers` on the server (0600 files). Neither token nor PEM is saved in the repository or in Git remote URLs.
+- **Pending:** user/organization owner must register and install the App (only selected repository), download and transfer its PEM, configure numeric App ID, verify HTTPS Git, then execute new-site installer on erptest-lightnode. **No App creation, server installation, DNS/TLS, CI pass or UAT is claimed.** Existing failing CI gate remains open.
+- Target Bench: `/data/frappe/frappe-bench`. The **MacVMs/Frappe15 environment is a separate workstream**, unaffected by this GitHub App change.
+
 ## Private-repository SSH deployment refinement (2026-11-14)
 
 - GitHub repository `VoyaERP/erpdevelopers` is **private**. Git operations performed by erptest-lightnode must authenticate using an **existing SSH key authorized for this repository**; ChatGPT's GitHub connector does not confer server SSH access.
@@ -99,6 +108,7 @@
 | 2026-11-13 | Storage/site inventory | 30G root, **3.6G free (88%)**, inodes 32%; Bench 6.1G; VS Code remote 3.1G; four v15 sites; ext4 `/dev/vda2` | **Blocker confirmed; expansion/VM isolation decision pending** |
 | 2026-11-13 | QEMU guest tool audit | `systemd-detect-virt=qemu`, `resize2fs` present, `growpart` absent, `vda2` ext4 | **Virtualization engine verified; Mac VM manager/backups remain unknown** |
 | 2026-11-13 | In-place v16 installation decision | User requests current MacVMs; guarded install script committed on `version-16` (Node24 scoped, free-space/port/v15 safety gates) | **Script ready, not run; disk preflight blocked at 3.6GiB free** |
+| 2026-11-14 | Private GitHub App source authentication | PR #15 merged to version-16 (a668ba5); GitHub App helper, tokenless HTTPS installer and setup guide | **Code ready; App installation/server Git auth pending; CI unresolved** |
 | 2026-11-14 | erptest-lightnode website/Login | PR #12 merged on version-16 commit ae1a44a; deployment guide + guarded script + v16-native /login CSS/JS | **Source merged; CI failure unresolved; no server/UAT proof** |
 | 2026-11-13 | Project governance | Master plan + epic issue board created | **Documented; execution gates pending** |
 
