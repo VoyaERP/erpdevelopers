@@ -173,6 +173,24 @@ if set(after) != expected or len(after) != len(expected):
 print("Bench app registration OK:", app_name)
 PY
 
+  echo "=== Verify that every declared Frappe module imports ==="
+  "$BENCH/env/bin/python" - <<'PY'
+from importlib import import_module
+from pathlib import Path
+from frappe import scrub
+
+declared = Path("apps/erpdevelopers/erpdevelopers/modules.txt")
+for line in declared.read_text(encoding="utf-8").splitlines():
+    title = line.strip()
+    if not title or title.startswith("#"):
+        continue
+    dotted = "erpdevelopers." + scrub(title)
+    loaded = import_module(dotted)
+    if not getattr(loaded, "__file__", None):
+        raise SystemExit(f"STOP: module {dotted} is not a Python package")
+    print("Frappe module OK:", dotted)
+PY
+
   echo "=== Install ERP Developers on existing site ==="
   bench --site "$SITE" install-app erpdevelopers
   bench --site "$SITE" migrate

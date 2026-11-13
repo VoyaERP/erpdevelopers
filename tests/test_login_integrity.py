@@ -25,6 +25,25 @@ class TestNativeLogin(unittest.TestCase):
                           "document.documentElement.lang =", "wrapper.insertBefore("):
             self.assertNotIn(forbidden, js)
 
+    def test_declared_frappe_modules_are_python_packages(self):
+        # Frappe v16 install sync_for imports app_name + "." + scrub(module).
+        # A missing package caused ModuleNotFoundError during site installation.
+        from importlib import import_module
+
+        declared = [
+            value.strip()
+            for value in (APP / "modules.txt").read_text(encoding="utf-8").splitlines()
+            if value.strip() and not value.lstrip().startswith("#")
+        ]
+        self.assertTrue(declared, "modules.txt must declare a Frappe module")
+        for module_name in declared:
+            slug = module_name.replace(" ", "_").replace("-", "_").lower()
+            module_path = APP / slug / "__init__.py"
+            with self.subTest(module=module_name):
+                self.assertTrue(module_path.is_file(), f"Missing module: {module_path}")
+                imported = import_module(f"erpdevelopers.{slug}")
+                self.assertIsNotNone(imported.__file__)
+
     def test_v16_asset_discovery_markers_exist(self):
         # frappe v16 esbuild/utils.js is_frappe_app() checks all three files.
         for filename in ("hooks.py", "modules.txt", "patches.txt"):

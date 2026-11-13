@@ -53,6 +53,18 @@ The previous Green Box implementation preserved the **native Frappe login form**
 
 Arabic and English site chrome follow the server-rendered Frappe HTML language. The site-scoped setup enables Frappe's own language picker; the native picker is moved into the branded header, without replacing its event handlers. The app does not overwrite the Frappe language or localize validation/status messages with brittle JavaScript replacements.
 
+## Recovery from missing Python module (2026-11-14)
+
+Third installation attempt got past Bench registry sync, passed **13/13 source-only tests** and the with-files backup. Site installation then failed in Frappe's DocType sync:
+
+```
+ModuleNotFoundError: No module named 'erpdevelopers.erp_developers'
+```
+
+The app's `erpdevelopers/modules.txt` declares `ERP Developers`. Frappe v16 uses `scrub()` to resolve that declaration as the Python module `erpdevelopers.erp_developers` while running [`sync_for`](https://github.com/frappe/frappe/blob/v16.56.0/frappe/model/sync.py#L133-L135). The package folder and `__init__.py` were missing. The corrected branch now includes `erpdevelopers/erp_developers/__init__.py`, a source regression test that imports every declared module, and a runtime import preflight before `install-app`.
+
+A previous failed installation may have attempted to create a Module Def row before the import failure. Do not use `--force` as a workaround or delete rows without inspecting them. Fast-forward the deployment-source and Bench app checkouts to the tested commit, then rerun the guarded existing-site installer. It creates another targeted site backup and retains the Bench registry backup already present. No site reinstall, global Bench update, or Frappe core change is needed.
+
 ## Recovery from missing Bench apps.txt entry (2026-11-14)
 
 Second operator attempt confirmed source recovery to `560b23f0d7588c78848a06e18afa69c1eb2857e3`, valid `get_public_path`, backup with DB and file archives, and **12/12 source contract tests passed**. The next error was:
