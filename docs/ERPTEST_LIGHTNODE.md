@@ -4,7 +4,7 @@
 **Server:** erptest-lightnode  
 **App:** VoyaERP/erpdevelopers, branch version-16  
 **Site:** erp-developers.com  
-**Bench:** /home/manakhly/frappe-bench (confirm first)  
+**Bench:** /data/frappe/frappe-bench (observed previously; verify on server before executing)  
 **Status:** Source prepared. No SSH server deployment, DNS, TLS or UAT has yet been performed.
 
 ## Implementation principles
@@ -12,6 +12,58 @@
 Green Box reference: VoyaERP/greenbox.com.eg, main branch. Its production login approach kept Frappe's original /login authentication and 2FA while layering brand-specific CSS, header and footer. The v16 login markup differs from Green Box v15, so ERP Developers implements **new v16-specific styling and a small, idempotent JS site-chrome module**, without copying authentication code or replacing the native login template. No form, password handler, session handler or social/OTP handler is duplicated.
 
 The login UI displays navigation and a responsive dark-blue/teal technology story next to the original form. The homepage is a dedicated route named erp-developers-home, avoiding collision with Frappe's /index, and native Frappe navbar/footer blocks are overridden there only to prevent duplicates. Site branding is applied through an **explicit CLI setup helper**, not a global after-install hook. SVG icon is a clean derivative of the approved growth/shield visual direction; replace it with final artwork only after visual sign-off.
+
+## Private GitHub repository — reuse existing SSH key (no duplicate key)
+
+The repository **VoyaERP/erpdevelopers** is private. The GitHub connector authorized in ChatGPT does **not** authenticate Git operations from erptest-lightnode; the server's existing SSH identity must itself have read access to this repository.
+
+- Use the existing private key on the server, under the **Bench owner account**, with a configured GitHub account that has VoyaERP/erpdevelopers repository read permission.
+- Do **not** copy a private key into GitHub, chat, a shell command, repository, site config or CI variables. Only public key material belongs in GitHub's SSH key settings.
+- A GitHub **account SSH key** can access multiple repositories based on the account's permissions. A **repository deploy key** is scoped to one repository and normally cannot be reused for a different repository; if the current key is a deploy key for another repo, use an account key with access or a new repository-specific deploy key after approval.
+- If the key is protected by a passphrase, load it into **ssh-agent** in your current login session; the install helper uses \`BatchMode=yes\` for its preflight so it will stop instead of hanging on a passphrase prompt.
+- **Do not change any existing Frappe/ERPNext remote URLs**. Only this app checkout uses the repository's SSH URL \`git@github.com:VoyaERP/erpdevelopers.git\`.
+
+### Read-only SSH preflight, as \`manakhly\` on erptest-lightnode
+
+~~~bash
+(
+  set +e
+  echo "=== Who owns the Bench ==="
+  stat -c '%U %n' /data/frappe/frappe-bench
+  echo "=== Existing local public-key filenames (safe metadata only) ==="
+  find "$HOME/.ssh" -maxdepth 1 -type f -name '*.pub' -printf '%f\n'
+  echo "=== SSH agent identities ==="
+  ssh-add -l || true
+  echo "=== SSH GitHub account identity ==="
+  ssh -T git@github.com || true
+  echo "=== Actual private repository access ==="
+  git ls-remote --exit-code \
+    git@github.com:VoyaERP/erpdevelopers.git refs/heads/version-16
+)
+~~~
+
+**Success criterion:** \`git ls-remote\` prints one commit SHA for \`refs/heads/version-16\`, not \`Permission denied (publickey)\` or \`Repository not found\`. \`ssh -T git@github.com\` normally returns exit status **1** despite a successful greeting; do not treat that alone as failure.
+
+### If the server already has a passphrase-protected key but no loaded agent
+
+From the **interactive erptest-lightnode shell**, not in a one-off subshell:
+
+~~~bash
+# Only if no useful SSH agent is available:
+eval "$(ssh-agent -s)"
+
+# Check which private-key path actually exists before choosing.
+ls -l "$HOME/.ssh/"*.pub 2>/dev/null || true
+
+# Example ONLY if this is the existing registered key:
+ssh-add "$HOME/.ssh/id_ed25519"
+
+# Verify repository authorization, not merely GitHub SSH identity.
+git ls-remote --exit-code \
+  git@github.com:VoyaERP/erpdevelopers.git refs/heads/version-16
+~~~
+
+If the existing key has a different filename, pass that actual **private** key path to \`ssh-add\`; never paste the key's contents. If the greeting identifies a GitHub account that cannot read \`VoyaERP/erpdevelopers\`, grant that account repository access or configure a permitted repository-specific key. There is no reason to create a duplicate key while the existing account key can be authorized.
 
 ## Step 1 — Preflight on the intended server
 
@@ -23,8 +75,8 @@ Log in from your Mac using the SSH alias or IP already configured for erptest-li
   export PATH="$HOME/.local/bin:$PATH"
   echo "Hostname: $(uname -n)"
   echo "User: $(id -un)"
-  echo "Bench path: $HOME/frappe-bench"
-  cd "$HOME/frappe-bench" || exit 1
+  echo "Bench path: /data/frappe/frappe-bench"
+  cd /data/frappe/frappe-bench || exit 1
   bench version
   git -C apps/frappe branch --show-current
   df -h .
@@ -77,7 +129,7 @@ Create an A record for erp-developers.com to the server's verified public IPv4; 
 Check the current ingress (Nginx, Cloudflare, existing vhosts) and whether it is Bench-managed before any config generation. If this Bench already manages Nginx and you have backed up/reviewed its current configuration, typical steps are:
 
 ~~~bash
-cd "$HOME/frappe-bench"
+cd /data/frappe/frappe-bench
 bench setup nginx
 sudo nginx -t
 sudo systemctl reload nginx
@@ -98,7 +150,7 @@ Never guess certificates, Cloudflare status, firewall rules or paths.
 After HTTPS is live, if needed set site-specific absolute URLs:
 
 ~~~bash
-cd "$HOME/frappe-bench"
+cd /data/frappe/frappe-bench
 bench --site erp-developers.com set-config host_name https://erp-developers.com
 ~~~
 

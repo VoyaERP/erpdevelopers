@@ -6,7 +6,7 @@
 
   export PATH="$HOME/.local/bin:$PATH"
   SITE="erp-developers.com"
-  BENCH="$HOME/frappe-bench"
+  BENCH="${BENCH:-/data/frappe/frappe-bench}"
   APP="$BENCH/apps/erpdevelopers"
   REPO="git@github.com:VoyaERP/erpdevelopers.git"
 
@@ -33,8 +33,12 @@
   test -n "$free_kib" && test "$free_kib" -ge $((3 * 1024 * 1024)) || {
     echo "STOP: less than 3GiB free disk"; exit 2;
   }
-  git ls-remote --exit-code "$REPO" refs/heads/version-16 >/dev/null || {
-    echo "STOP: private GitHub repository access not configured"; exit 3;
+  GIT_SSH_COMMAND="ssh -o BatchMode=yes" \
+    git ls-remote --exit-code "$REPO" refs/heads/version-16 >/dev/null || {
+    echo "STOP: SSH key cannot read VoyaERP/erpdevelopers." 
+    echo "Load the EXISTING authorized key with ssh-add (do not create/commit a new key)."
+    echo "Test: git ls-remote --exit-code git@github.com:VoyaERP/erpdevelopers.git refs/heads/version-16"
+    exit 3;
   }
 
   if [ -e "$APP" ]; then

@@ -5,7 +5,7 @@
   trap 'echo "UPDATE STOPPED at line $LINENO. Review partial state." >&2' ERR
   export PATH="$HOME/.local/bin:$PATH"
   SITE="erp-developers.com"
-  BENCH="$HOME/frappe-bench"
+  BENCH="${BENCH:-/data/frappe/frappe-bench}"
   APP="$BENCH/apps/erpdevelopers"
 
   case "$(uname -n)" in erptest-lightnode|erptest-lightnode.*) ;; *) echo "Wrong host"; exit 2;; esac
@@ -29,6 +29,12 @@
     fi
   done
   test -n "$REMOTE" || { echo "Unexpected Git remote"; exit 2; }
+  echo "=== Verify access to private repository using current SSH identity ==="
+  GIT_SSH_COMMAND="ssh -o BatchMode=yes" \
+    git ls-remote --exit-code git@github.com:VoyaERP/erpdevelopers.git refs/heads/version-16 >/dev/null || {
+    echo "STOP: GitHub private repo access is not available; load the existing SSH key with ssh-add."
+    exit 3
+  }
   bench --site "$SITE" backup --with-files
   git -C "$APP" fetch "$REMOTE" version-16
   git -C "$APP" merge --ff-only "$REMOTE/version-16"
