@@ -29,10 +29,14 @@
     fi
   done
   test -n "$REMOTE" || { echo "Unexpected Git remote"; exit 2; }
-  echo "=== Verify access to private repository using current SSH identity ==="
-  GIT_SSH_COMMAND="ssh -o BatchMode=yes" \
-    git ls-remote --exit-code git@github.com:VoyaERP/erpdevelopers.git refs/heads/version-16 >/dev/null || {
-    echo "STOP: GitHub private repo access is not available; load the existing SSH key with ssh-add."
+  test "$(git -C "$APP" remote get-url "$REMOTE")" = "https://github.com/VoyaERP/erpdevelopers.git" || {
+    echo "STOP: HTTPS app remote required for GitHub App authentication" >&2; exit 2;
+  }
+  echo "=== Verify the GitHub App's repository-scoped HTTPS access ==="
+  source "$(dirname "${BASH_SOURCE[0]}")/github_app_auth.sh"
+  erpdev_enable_github_app_git
+  git ls-remote --exit-code https://github.com/VoyaERP/erpdevelopers.git refs/heads/version-16 >/dev/null || {
+    echo "STOP: GitHub App authentication failed" >&2
     exit 3
   }
   bench --site "$SITE" backup --with-files

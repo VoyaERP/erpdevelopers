@@ -86,3 +86,7 @@ The current homepage route is **erp-developers-home** and the native Frappe 16 *
 **Server installation and update:** See [erptest-lightnode deployment guide](docs/ERPTEST_LIGHTNODE.md). Scripts: [new-site installer](scripts/install_erptest_lightnode.sh) and [target-site updater](scripts/update_erptest_lightnode.sh). No shared Bench restart/Nginx rewrites are automated.
 
 The reference logo approved in conversation is not yet an exact source-vector asset. The app includes a small branded SVG mark approximating its selected growth/shield direction, with a pending visual approval step.
+
+### Private GitHub App access for erptest-lightnode
+
+The supported deployment credential is now a **read-only GitHub App installation token**, retrieved on demand over HTTPS (no permanent token in Git and no server SSH Deploy Key). Set up the App under the VoyaERP organization, select only the erpdevelopers repository, and follow [docs/GITHUB_APP_DEPLOY.md](docs/GITHUB_APP_DEPLOY.md) to bootstrap the first clone securely. GitHub App creation and server deployment require operator action and are not yet verified.
