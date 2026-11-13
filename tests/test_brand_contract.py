@@ -29,7 +29,7 @@ class TestBrandContract(unittest.TestCase):
             viewport, 'width="268" height="268" viewBox="64 37 268 268"'
         )
         import re
-        icon = re.sub(r'\\n<g font-family="Inter,Arial,sans-serif">[\\s\\S]*?</g>', "", icon)
+        icon = re.sub(r'\n<g font-family="Inter,Arial,sans-serif">[\s\S]*?</g>', "", icon)
         self.assertEqual((images / "erp-mark.svg").read_text(encoding="utf-8"), icon)
 
     def test_logo_appears_on_home_and_login_and_site_branding(self):
