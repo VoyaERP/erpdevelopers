@@ -27,7 +27,7 @@ Run the isolated development bench with `bench start` and visit the site. Set th
 
 ## Branding
 
-The selected logo is a blue/teal ascending-growth mark. This scaffold provides a CSS-only temporary brand mark to avoid pretending an exact vector of the supplied reference was produced. Place the approved original PNG or an approved vector inside `erpdevelopers/public/images/` in a separate branding commit after verifying the asset visually.
+The approved brand is concept **01 — Neural Intelligence**. Its exact original `erp_developers_01_neural_intelligence.svg` was recovered without redrawing and committed as `erpdevelopers/public/images/erp-developers-neural-intelligence.svg` (SHA-256 `9ff7a4b8409a3bbf1f5cf438e5d73fc3d3fd28f564576c720c572d55f6d93293`). The site uses a viewport-trimmed copy of the **same original SVG artwork** at `erp-developers-logo.svg` (header/login/footer and Website Settings app logo); the favicon uses the exact mark artwork extracted from that SVG at `erp-mark.svg`. No brand shapes, wording or colors were redesigned.
 
 ## Security and scope
 
@@ -81,11 +81,11 @@ The canonical roadmap and environment state stay on `main` in `docs/MASTER_PLAN.
 
 The current homepage route is **erp-developers-home** and the native Frappe 16 **/login** receives only a website header/footer, intersecting image-backed technology background, and scoped CSS; there is **no replacement authentication handler or form**. The styling follows Green Box's verified native-login approach while using the ERP Developers navy/blue/teal brand.
 
-**Production target:** erp-developers.com (DNS, TLS and server deployment not yet executed).
+**Deployed test target:** erp-developers.com on erptest-lightnode; Frappe v16 app 0.1.0 installation and HTTP 200 confirmed on 2026-11-14. Full browser UAT and production acceptance are still outstanding.
 
 **Server installation and update:** See [erptest-lightnode deployment guide](docs/ERPTEST_LIGHTNODE.md). Scripts: [new-site installer](scripts/install_erptest_lightnode.sh) and [target-site updater](scripts/update_erptest_lightnode.sh). No shared Bench restart/Nginx rewrites are automated.
 
-The reference logo approved in conversation is not yet an exact source-vector asset. The app includes a small branded SVG mark approximating its selected growth/shield direction, with a pending visual approval step.
+The previously approved Neural Intelligence logo is included in its original vector form and is used throughout homepage, login, and site branding. Layout spacing has been tightened, including a compact hero, balanced modules and shorter login panel. Core Frappe authentication remains untouched.
 
 ### Public HTTPS deployment for erptest-lightnode
 

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="310" viewBox="42 20 780 310" role="img" aria-label="ERP Developers — Engage. Reason. Progress.">
+<defs>
+<linearGradient id="aqua" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0478ED"/><stop offset="1" stop-color="#18DDDB"/></linearGradient>
+<linearGradient id="violet" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#096AE8"/><stop offset="1" stop-color="#7D60F7"/></linearGradient>
+<linearGradient id="green" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1BA6DB"/><stop offset="1" stop-color="#00B89C"/></linearGradient>
+</defs>
+
+<rect x="64" y="37" width="268" height="268" rx="63" fill="#092443"/>
+<path d="M111 113 H274 M111 171 H254 M111 231 H274" fill="none" stroke="#3FC6FA" stroke-width="11" stroke-linecap="round"/>
+<path d="M111 113 L172 171 L111 231 M172 171 L254 171 M172 171 L274 113 M172 171 L274 231" fill="none" stroke="#2178CF" stroke-width="4.4" stroke-linecap="round"/>
+<circle cx="111" cy="113" r="13.5" fill="#78E1FF"/>
+<circle cx="111" cy="171" r="13.5" fill="#78E1FF"/>
+<circle cx="111" cy="231" r="13.5" fill="#78E1FF"/>
+<circle cx="172" cy="171" r="16" fill="#F7FBFF" stroke="#18CBE2" stroke-width="6"/>
+<circle cx="274" cy="113" r="13.5" fill="#16D4D2"/>
+<circle cx="254" cy="171" r="13.5" fill="#16D4D2"/>
+<circle cx="274" cy="231" r="13.5" fill="#16D4D2"/>
+
+<g font-family="Inter,Arial,sans-serif">
+  <text x="377" y="164" fill="#0B2345" font-size="131" font-weight="800" letter-spacing="-7">ERP</text>
+  <text x="384" y="234" fill="#182E4C" font-size="50" font-weight="500" letter-spacing="0.7">Developers</text>
+  <text x="384" y="287" fill="#567089" font-size="26.5" font-weight="400" letter-spacing="1.4">Engage. Reason. Progress.</text>
+</g>
+</svg>

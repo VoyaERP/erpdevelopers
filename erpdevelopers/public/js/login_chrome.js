@@ -5,7 +5,7 @@
 (() => {
   "use strict";
 
-  const ICON = "/assets/erpdevelopers/images/erp-mark.svg";
+  const ICON = "/assets/erpdevelopers/images/erp-developers-logo.svg";
   const copy = {
     en: {
       home: "Home", vision: "Vision", ecosystem: "Ecosystem",
@@ -36,12 +36,6 @@
     return node;
   }
 
-  function wordmark() {
-    const name = create("span", "ed-login-brand-name");
-    name.append(create("strong", "", "ERP"), create("span", "", "Developers"));
-    return name;
-  }
-
   function header(t) {
     const outer = create("header", "ed-login-header");
     const inner = create("div", "ed-login-header-inner");
@@ -49,11 +43,11 @@
     brand.setAttribute("aria-label", "ERP Developers");
     const img = create("img", "ed-login-brand-image");
     img.src = ICON;
-    img.width = 44;
-    img.height = 44;
+    img.width = 200;
+    img.height = 80;
     img.alt = "";
     img.setAttribute("aria-hidden", "true");
-    brand.append(img, wordmark());
+    brand.append(img);
 
     const nav = create("nav", "ed-login-nav");
     nav.setAttribute("aria-label", t.navigation);
@@ -75,7 +69,12 @@
     const outer = create("footer", "ed-login-footer");
     const inner = create("div", "ed-login-footer-inner");
     const brand = create("div", "ed-login-footer-brand");
-    brand.append(wordmark(), create("small", "", "Engage. Reason. Progress."));
+    const img = create("img", "ed-login-footer-logo");
+    img.src = ICON;
+    img.width = 155;
+    img.height = 62;
+    img.alt = "ERP Developers — Engage. Reason. Progress.";
+    brand.append(img);
     const summary = create("p", "ed-login-footer-summary", t.footer);
     const rights = create(
       "p", "ed-login-footer-rights",

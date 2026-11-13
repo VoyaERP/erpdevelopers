@@ -9,6 +9,7 @@ import frappe
 EXPECTED_SITE = "erp-developers.com"
 HOME_ROUTE = "erp-developers-home"
 ICON = "/assets/erpdevelopers/images/erp-mark.svg"
+BRAND_LOGO = "/assets/erpdevelopers/images/erp-developers-logo.svg"
 
 
 def configure_website():
@@ -20,7 +21,7 @@ def configure_website():
     desired = {
         "home_page": HOME_ROUTE,
         "app_name": "ERP Developers",
-        "app_logo": ICON,
+        "app_logo": BRAND_LOGO,
         "favicon": ICON,
         "title_prefix": "ERP Developers",
         "show_language_picker": 1,

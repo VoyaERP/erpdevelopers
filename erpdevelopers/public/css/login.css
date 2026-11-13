@@ -1,168 +1,123 @@
-/* ERP Developers login. Green Box v0.1.25 method: native Frappe form + image backdrop,
- * not a second login component or a grid requiring reparented auth markup. */
+/* ERP Developers login: original Frappe 16 authentication form, improved website chrome only. */
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website{
-  --ed-login-navy:#081f41;
-  --ed-login-blue:#145cc1;
-  --ed-login-teal:#05b9ac;
-  --ed-login-ink:#22344d;
-  --ed-login-edge:#dce6f3;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  color:var(--ed-login-ink);
-  background:#f4f7fb;
+  --ed-login-navy:#0b2445;--ed-login-blue:#0e66d7;--ed-login-teal:#04b8ad;
+  --ed-login-ink:#223b57;--ed-login-edge:#dfeaf5;
+  min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;
+  color:var(--ed-login-ink);background:linear-gradient(130deg,#f2f8fe,#f9fbff 66%,#edf9fc);
 }
 .ed-login-website *{box-sizing:border-box}
-.ed-login-skip{position:fixed;top:-120px;inset-inline-start:16px;background:#fff;color:#081f41;padding:10px 14px;border:2px solid #145cc1;border-radius:8px;z-index:20000}
+.ed-login-website a:focus-visible,.ed-login-website button:focus-visible,.ed-login-website select:focus-visible{outline:3px solid #13c2e8;outline-offset:3px}
+.ed-login-skip{position:fixed;top:-120px;inset-inline-start:16px;z-index:20000;background:#fff;color:#0b2445;padding:10px 14px;border:2px solid #0e66d7;border-radius:8px}
 .ed-login-skip:focus{top:12px}
-.ed-login-header{background:#fff;border-bottom:1px solid #e7edf5;position:relative;z-index:5;flex-shrink:0}
-.ed-login-header-inner{width:min(1240px,100%);margin:auto;min-height:76px;padding:13px 26px;display:flex;align-items:center;justify-content:space-between;gap:22px}
-.ed-login-brand{display:flex;align-items:center;gap:11px;text-decoration:none!important;white-space:nowrap;color:var(--ed-login-navy)!important}
-.ed-login-brand-image{width:44px;height:44px;object-fit:contain}
-.ed-login-brand-name{display:inline-flex;align-items:baseline;gap:6px;font-size:19px;font-weight:600;letter-spacing:-.7px}
-.ed-login-brand-name strong{font-size:25px;font-weight:850;letter-spacing:-1.1px}
-.ed-login-nav{display:flex;align-items:center;gap:clamp(10px,2vw,27px);flex-wrap:wrap}
-.ed-login-nav a{font-size:13px;font-weight:650;text-decoration:none!important;color:#36516e!important}
-.ed-login-nav a:hover{color:var(--ed-login-blue)!important}
-.ed-login-current{border:1px solid #bfe6e5;background:#ecfaf8;border-radius:10px;color:#00645d;padding:10px 15px;font-size:13px;font-weight:750;white-space:nowrap}
+.ed-login-header{background:rgba(255,255,255,.97);border-bottom:1px solid #e7eef5;flex-shrink:0;z-index:5}
+.ed-login-header-inner{width:min(1160px,100%);min-height:79px;padding:3px 25px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.ed-login-brand{display:flex;align-items:center;text-decoration:none!important;flex:0 0 auto}
+.ed-login-brand-image{display:block;width:200px;height:auto;max-height:79px;object-fit:contain}
+.ed-login-nav{display:flex;align-items:center;justify-content:center;gap:clamp(12px,2vw,27px);flex-wrap:wrap}
+.ed-login-nav a{font-size:13px;font-weight:700;text-decoration:none!important;white-space:nowrap;color:#405b79!important}
+.ed-login-nav a:hover{color:#0e66d7!important}
+.ed-login-current{border:1px solid #d4eaf2;background:#edf9fb;border-radius:10px;color:#0b6470;padding:9px 13px;font-size:12px;font-weight:750;white-space:nowrap}
 .ed-login-language{margin:0;flex:0 0 auto}
-.ed-login-language .form-control{font-size:13px;min-width:82px;max-width:140px;min-height:38px;padding:6px 9px;border:1px solid #c9dbe8;border-radius:9px;background:#fff;color:var(--ed-login-navy)}
+.ed-login-language .form-control{min-width:83px;max-width:145px;min-height:36px;padding:5px 8px;border:1px solid #d4e1ed;border-radius:9px;background:#fff;color:#0b2445;font-size:12px}
 .ed-login-language.hide{display:none!important}
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website .web-header,
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website header.navbar,
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website .web-footer{display:none!important}
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login{width:100%;min-width:0;flex:1 0 auto}
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper{
-  position:relative;
-  isolation:isolate;
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  width:min(1130px,calc(100% - 42px));
-  max-width:none;
-  min-height:515px;
-  margin:clamp(24px,4vw,52px) auto;
-  padding:36px clamp(22px,4vw,64px);
-  border-radius:24px;
-  overflow:hidden;
-  background:linear-gradient(100deg,#e8f4fa 0%,#f7fbff 54%,#fff 78%);
-  box-shadow:0 20px 56px rgba(20,49,95,.09);
-  border:1px solid var(--ed-login-edge);
+  position:relative;isolation:isolate;display:flex;align-items:center;justify-content:flex-end;
+  width:min(1030px,calc(100% - 38px));max-width:none;min-height:426px;
+  margin:17px auto 21px;padding:24px 30px;border:1px solid var(--ed-login-edge);
+  border-radius:22px;overflow:hidden;background:#f7fbff;box-shadow:0 18px 40px #184b8213;
 }
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper::before{
-  content:"";
-  position:absolute;
-  z-index:0;
-  inset:16px auto 16px 16px;
-  width:53%;
-  pointer-events:none;
-  border-radius:19px;
-  background:
-    linear-gradient(112deg,rgba(4,18,46,.33),rgba(7,47,100,.08)),
-    url("/assets/erpdevelopers/images/login-network.svg") center/cover no-repeat,
-    linear-gradient(130deg,#071c3c,#0d5594);
+  content:"";position:absolute;z-index:0;inset-block:13px;inset-inline-start:13px;
+  width:51%;pointer-events:none;border-radius:15px;
+  background:linear-gradient(112deg,#061b3866,#082b580f),
+  url("/assets/erpdevelopers/images/login-network.svg") center/cover no-repeat,
+  linear-gradient(130deg,#071c3c,#115a93);
 }
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper::after{
-  content:"";
-  position:absolute;
-  z-index:0;
-  inset:16px auto 16px 16px;
-  width:53%;
-  pointer-events:none;
-  border-radius:19px;
-  background:
-    linear-gradient(139deg,transparent 0 27%,rgba(255,255,255,.12) 27% 32%,transparent 32%),
-    linear-gradient(39deg,transparent 0 62%,rgba(42,225,227,.12) 62% 70%,transparent 70%);
+  content:"";position:absolute;z-index:0;inset-block:13px;inset-inline-start:13px;
+  width:51%;pointer-events:none;border-radius:15px;
+  background:linear-gradient(140deg,transparent 0 30%,#ffffff0c 30% 35%,transparent 35%),
+  linear-gradient(36deg,transparent 0 68%,#42e1e119 68% 72%,transparent 72%);
 }
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper>main{
-  position:relative;
-  z-index:1;
-  display:block;
-  width:min(100%,466px);
-  max-width:46%;
-  min-width:0;
-  margin:0;
-  padding:0;
+  position:relative;z-index:1;display:block;width:min(100%,455px);
+  max-width:47%;min-width:0;margin:0;padding:0;
 }
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper :is(.page-header-wrapper,.page-breadcrumbs,.page-footer){display:none}
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page_content,
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page_content>div{width:100%;max-width:none;margin:0;padding:0}
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .login-content.page-card{
-  width:100%;
-  max-width:100%;
-  border:1px solid #e3eaf2;
-  border-radius:18px;
-  padding:clamp(22px,3.3vw,37px);
-  margin:0;
-  background:#fff;
-  box-shadow:0 16px 40px rgba(6,32,71,.08);
+  width:100%;max-width:100%;margin:0;padding:clamp(19px,2.5vw,30px);
+  border:1px solid #e1eaf4;border-radius:17px;background:#fff;box-shadow:0 12px 30px #092a5d12;
 }
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head{margin:0 0 24px;align-items:flex-start}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head .app-logo{max-width:48px;max-height:48px;object-fit:contain}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head h4{color:var(--ed-login-navy);font-size:clamp(22px,2.7vw,30px);font-weight:800}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-subtitle{color:#60728b;line-height:1.6}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-label{color:#294360;font-size:13px;font-weight:700}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head{margin:0 0 17px;align-items:center}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head .app-logo{
+  width:auto;max-width:170px;max-height:66px;object-fit:contain;
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head h4{color:var(--ed-login-navy);font-size:clamp(22px,2.5vw,28px);font-weight:800}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-subtitle{color:#647b91;line-height:1.5}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-label{color:#254565;font-size:13px;font-weight:700}
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-group{max-width:100%}
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-control{
-  width:100%;min-height:49px;border:1px solid #d7e2ee;border-radius:10px;
-  color:var(--ed-login-navy);background:#fff;direction:ltr;text-align:start;
-  padding:11px 13px;font-size:15px;
+  width:100%;min-height:46px;border:1px solid #d4e1ed;border-radius:10px;
+  color:var(--ed-login-navy);background:#fff;direction:ltr;text-align:left;
+  padding:10px 12px;font-size:14px;
 }
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-control:focus-visible{
-  outline:2px solid var(--ed-login-blue);outline-offset:1px;box-shadow:none
+  outline:2px solid var(--ed-login-blue);outline-offset:1px;box-shadow:none;
 }
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .btn-login:not(.btn-ldap-login),
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .btn-forgot{
-  background:var(--ed-login-blue)!important;
-  color:#fff!important;
-  border:1px solid var(--ed-login-blue)!important;
-  min-height:49px;border-radius:10px;font-weight:750;
+  min-height:46px;border-radius:10px;font-weight:750;background:var(--ed-login-blue)!important;
+  color:#fff!important;border:1px solid var(--ed-login-blue)!important;
 }
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .btn-login:not(.btn-ldap-login):hover,
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .btn-forgot:hover{
-  background:#0d469a!important
-}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .btn-forgot:hover{background:#0b4da8!important}
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .btn:disabled{opacity:.55;cursor:not-allowed}
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login a{color:var(--ed-login-blue)}
-.ed-login-website a:focus-visible,.ed-login-website button:focus-visible{outline:2px solid var(--ed-login-teal);outline-offset:3px}
-.ed-login-footer{background:#081b38;color:#c2d4e8;flex-shrink:0}
-.ed-login-footer-inner{max-width:1240px;padding:22px 26px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.ed-login-footer{background:#fff;border-top:1px solid #e4edf5;flex-shrink:0}
+.ed-login-footer-inner{max-width:1160px;min-height:75px;padding:4px 25px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:17px}
 .ed-login-footer p{margin:0}
-.ed-login-footer-brand{display:flex;align-items:baseline;gap:14px;color:#fff;white-space:nowrap}
-.ed-login-footer-brand .ed-login-brand-name{font-size:14px;letter-spacing:0}
-.ed-login-footer-brand .ed-login-brand-name strong{font-size:20px}
-.ed-login-footer-brand small{font-size:12px;color:#7fddd6}
-.ed-login-footer-summary,.ed-login-footer-rights{font-size:12px;color:#bad0e6}
+.ed-login-footer-brand{display:flex;align-items:center;flex:0 0 auto}
+.ed-login-footer-logo{display:block;width:155px;height:auto;max-height:65px}
+.ed-login-footer-summary,.ed-login-footer-rights{font-size:12px;color:#678098}
 :root[lang^="ar"] .ed-login-website{font-family:"Tajawal","Noto Sans Arabic",Tahoma,Arial,sans-serif}
 :root[lang^="ar"] .ed-login-website #page-login .login-content{direction:rtl;text-align:right}
 :root[lang^="ar"] .ed-login-website #page-login .form-control{direction:ltr;text-align:left}
-@media(max-width:960px){
+@media(max-width:1000px){
+  .ed-login-header-inner{gap:12px}
   .ed-login-nav{gap:12px}
-  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper{padding:23px;min-height:480px}
-  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper::before,
-  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper::after{inset:12px auto 12px 12px;width:50%}
-  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper>main{max-width:49%}
+  .ed-login-brand-image{width:174px}
+  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper{padding:20px;min-height:405px}
+  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper>main{max-width:48%}
 }
-@media(max-width:720px){
-  .ed-login-header-inner{padding:13px 18px;flex-wrap:wrap;gap:10px}
-  .ed-login-nav{order:3;width:100%;gap:12px}
+@media(max-width:760px){
+  .ed-login-header-inner{padding:5px 17px 10px;flex-wrap:wrap;gap:9px}
+  .ed-login-brand-image{width:165px}
+  .ed-login-nav{order:3;width:100%;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;gap:14px}
+  .ed-login-nav a{font-size:12px}
   .ed-login-current{margin-inline-start:auto}
   :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper{
-    display:block;width:min(550px,calc(100% - 24px));min-height:0;
-    margin:22px auto 28px;padding:175px 12px 13px;border-radius:20px;
+    display:block;width:min(530px,calc(100% - 22px));min-height:0;
+    margin:13px auto 17px;padding:143px 12px 12px;border-radius:18px;
   }
   :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper::before,
   :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper::after{
-    inset:12px 12px auto 12px;width:auto;height:150px;border-radius:13px;
+    inset:11px 11px auto 11px;width:auto;height:122px;border-radius:12px;
   }
   :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper>main{width:100%;max-width:none}
   :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .login-content.page-card{box-shadow:none}
-  .ed-login-footer-inner{padding:19px 18px;flex-wrap:wrap}
+  .ed-login-footer-inner{padding:10px 17px;flex-wrap:wrap;min-height:0;gap:7px}
+  .ed-login-footer-brand{width:100%}
 }
-@media(max-width:420px){
-  .ed-login-nav a{font-size:12px}
-  .ed-login-brand-name strong{font-size:22px}
-  .ed-login-brand-name{font-size:16px}
-  .ed-login-footer-brand{flex-wrap:wrap;gap:5px 12px}
+@media(max-width:425px){
+  .ed-login-brand-image{width:148px}
+  .ed-login-current{font-size:11px;padding:7px 9px}
+  .ed-login-footer-logo{width:132px}
+  .ed-login-footer-summary,.ed-login-footer-rights{font-size:11px}
 }
 @media(prefers-reduced-motion:reduce){.ed-login-website *{scroll-behavior:auto;transition:none!important}}

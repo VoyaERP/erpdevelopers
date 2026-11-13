@@ -3,41 +3,131 @@
 {% block footer %}{% endblock %}
 {% block page_container %}
 <main class="ed-site" id="top">
-  <header class="ed-nav" aria-label="Main navigation">
-    <a href="#top" class="ed-brand" aria-label="ERP Developers home">
-      <img class="ed-brand-icon" src="/assets/erpdevelopers/images/erp-mark.svg" width="43" height="43" alt="" aria-hidden="true">
-      <span class="ed-brand-text"><strong>ERP</strong><small>Developers</small></span>
-    </a>
-    <nav aria-label="Site sections">
-      <a href="#vision">Vision</a><a href="#ecosystem">Ecosystem</a><a href="#ai">AI & Innovation</a><a href="#roadmap">Roadmap</a>
-    </nav>
-    <a class="ed-nav-cta" href="/login">Member sign in</a>
-  </header>
-  <section class="ed-hero" aria-labelledby="ed-heading">
-    <div class="ed-eyebrow"><span class="ed-pulse"></span> Human collaboration. Intelligent technology.</div>
-    <h1 id="ed-heading">Technology grows stronger <em>together.</em></h1>
-    <p>ERP Developers brings people, expertise and intelligent systems into one connected technology ecosystem — not limited to a single ERP, vendor or platform.</p>
-    <div class="ed-actions"><a class="ed-btn ed-btn-primary" href="#ecosystem">Explore our ecosystem <span aria-hidden="true">↗</span></a><a class="ed-btn ed-btn-quiet" href="#vision">Our philosophy</a></div>
-    <div class="ed-principles" aria-label="Brand values"><span><b>E</b>ngage.</span><span><b>R</b>eason.</span><span><b>P</b>rogress.</span></div>
-    <div class="ed-art" aria-hidden="true"><div class="ed-art-grid"></div><div class="ed-orbit ed-orbit-one"></div><div class="ed-orbit ed-orbit-two"></div><div class="ed-orb ed-orb-one"></div><div class="ed-orb ed-orb-two"></div><div class="ed-art-core">ERP<span>AI</span></div><div class="ed-art-caption">Connect knowledge <span>→</span> Create progress</div></div>
-  </section>
-  <section id="vision" class="ed-section ed-vision">
-    <p class="ed-kicker">OUR MISSION</p><h2>More than software.<br><span>An ecosystem for progress.</span></h2>
-    <p>We connect developers, architects, organizations and learners around useful technology, responsible AI and measurable business outcomes.</p>
-  </section>
-  <section id="ecosystem" class="ed-section">
-    <div class="ed-section-head"><div><p class="ed-kicker">THE ECOSYSTEM</p><h2>One platform. Many possibilities.</h2></div><p>Designed as modular destinations that can grow independently, with shared identity and security foundations.</p></div>
-    <div class="ed-grid">
-      <article class="ed-tile"><div class="ed-tile-icon">01</div><h3>Developer Hub</h3><p>Technical knowledge, reusable resources and collaboration across languages and platforms.</p><span>Planned module</span></article>
-      <article class="ed-tile"><div class="ed-tile-icon">02</div><h3>Community</h3><p>Practical discussions, expert networks and peer learning across business and technology.</p><span>Planned module</span></article>
-      <article class="ed-tile"><div class="ed-tile-icon">03</div><h3>Learning Academy</h3><p>Structured learning paths, assessments and career-ready technical skills.</p><span>Planned module</span></article>
-      <article class="ed-tile"><div class="ed-tile-icon">04</div><h3>Career Connections</h3><p>Verified opportunities and employer connections. External job integrations require approval.</p><span>Planned module</span></article>
-      <article class="ed-tile"><div class="ed-tile-icon">05</div><h3>Solutions Marketplace</h3><p>Discover services, business applications and expertise without vendor lock-in.</p><span>Planned module</span></article>
-      <article class="ed-tile"><div class="ed-tile-icon">06</div><h3>Intelligent Advisory</h3><p>Architecture guidance, AI-assisted discovery and evidence-based decision support.</p><span>Planned module</span></article>
+  <a class="ed-skip" href="#content">Skip to content</a>
+  <header class="ed-nav">
+    <div class="ed-shell ed-nav-inner">
+      <a href="/" class="ed-brand" aria-label="ERP Developers home">
+        <img src="/assets/erpdevelopers/images/erp-developers-logo.svg" width="210" height="84" alt="ERP Developers — Engage. Reason. Progress.">
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="#vision">Our vision</a>
+        <a href="#ecosystem">Ecosystem</a>
+        <a href="#ai">AI &amp; Innovation</a>
+        <a href="#roadmap">Roadmap</a>
+      </nav>
+      <a class="ed-nav-cta" href="/login">Member sign in <span aria-hidden="true">↗</span></a>
     </div>
-  </section>
-  <section id="ai" class="ed-ai ed-section"><div><p class="ed-kicker">INTELLIGENCE WITH PURPOSE</p><h2>AI should improve decisions, not replace judgment.</h2><p>We envision secure, human-reviewed assistants that accelerate discovery, knowledge sharing and solution delivery. AI capabilities are on the roadmap and are not active on this preview site.</p></div><div class="ed-ai-diagram" aria-hidden="true"><span>Knowledge</span><span>Reasoning</span><span>Human review</span><span>Progress</span></div></section>
-  <section id="roadmap" class="ed-section ed-roadmap"><p class="ed-kicker">WHAT COMES NEXT</p><h2>Build trust first. Expand with intent.</h2><p>Phase 1: brand website and bilingual foundation. Phase 2: secure identities and community. Phase 3: learning, developer resources and verified jobs. Phase 4: opt-in intelligent services and integrations.</p></section>
-  <footer class="ed-footer"><div><strong>ERP</strong> <span>Developers</span><small>Engage. Reason. Progress.</small></div><p>Building a smarter, more connected technology community.</p><a href="/login">Sign in</a><a href="#top">Back to top ↑</a></footer>
+  </header>
+
+  <div id="content">
+    <section class="ed-hero" aria-labelledby="ed-heading">
+      <div class="ed-shell ed-hero-inner">
+        <div class="ed-hero-copy">
+          <p class="ed-eyebrow"><span class="ed-status-dot" aria-hidden="true"></span> PEOPLE · KNOWLEDGE · INTELLIGENCE</p>
+          <h1 id="ed-heading">Technology moves forward <span>together.</span></h1>
+          <p class="ed-hero-lead">A connected space for developers, solution architects, organizations and curious minds — exploring practical innovation beyond any single ERP or technology.</p>
+          <div class="ed-actions">
+            <a class="ed-btn ed-btn-primary" href="#ecosystem">Explore the ecosystem <span aria-hidden="true">↗</span></a>
+            <a class="ed-btn ed-btn-secondary" href="#vision">Discover our vision</a>
+          </div>
+          <div class="ed-principles" aria-label="Our values">
+            <span><b>E</b>ngage.</span>
+            <span><b>R</b>eason.</span>
+            <span><b>P</b>rogress.</span>
+          </div>
+        </div>
+        <div class="ed-visual" aria-hidden="true">
+          <div class="ed-visual-grid"></div>
+          <div class="ed-visual-heading"><span class="ed-visual-indicator"></span> A CONNECTED ECOSYSTEM</div>
+          <div class="ed-visual-ring ed-ring-a"></div>
+          <div class="ed-visual-ring ed-ring-b"></div>
+          <div class="ed-visual-core">
+            <img src="/assets/erpdevelopers/images/erp-mark.svg" width="80" height="80" alt="">
+            <strong>Ideas meet expertise.</strong>
+            <small>Progress becomes possible.</small>
+          </div>
+          <span class="ed-visual-chip ed-chip-a">Developers</span>
+          <span class="ed-visual-chip ed-chip-b">Architecture</span>
+          <span class="ed-visual-chip ed-chip-c">Learning</span>
+          <span class="ed-visual-chip ed-chip-d">Responsible AI</span>
+          <div class="ed-visual-bottom">ENGAGE <span>→</span> REASON <span>→</span> PROGRESS</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="ed-audience">
+      <div class="ed-shell ed-audience-inner">
+        <strong>Built for people who build the future</strong>
+        <div aria-label="Who the ecosystem is for">
+          <span>Developers</span><span>Architects</span><span>Learners</span><span>Business leaders</span>
+        </div>
+      </div>
+    </div>
+
+    <section id="vision" class="ed-section ed-vision" aria-labelledby="ed-vision-heading">
+      <div class="ed-shell ed-intro">
+        <div><p class="ed-kicker">OUR VISION</p><h2 id="ed-vision-heading">Beyond platforms.<br><span>Connected by purpose.</span></h2></div>
+        <p>Technology is most valuable when knowledge is shared and decisions are better informed. We want to connect technical talent, business expertise and responsible innovation in one open-minded community.</p>
+      </div>
+    </section>
+
+    <section id="ecosystem" class="ed-section ed-ecosystem" aria-labelledby="ed-ecosystem-heading">
+      <div class="ed-shell">
+        <div class="ed-section-head">
+          <div><p class="ed-kicker">EXPLORE THE ECOSYSTEM</p><h2 id="ed-ecosystem-heading">One vision. Many possibilities.</h2></div>
+          <p>Six focused destinations, designed to grow on shared identity, usability and strong security foundations.</p>
+        </div>
+        <div class="ed-grid">
+          <article class="ed-tile"><span class="ed-tile-index">01 <i aria-hidden="true"></i></span><h3>Developer Hub</h3><p>Engineering knowledge, reusable patterns and collaboration across technology stacks.</p><span class="ed-tile-status">Planned module</span></article>
+          <article class="ed-tile"><span class="ed-tile-index">02 <i aria-hidden="true"></i></span><h3>Community</h3><p>Focused conversations, expert connections and valuable peer-to-peer learning.</p><span class="ed-tile-status">Planned module</span></article>
+          <article class="ed-tile"><span class="ed-tile-index">03 <i aria-hidden="true"></i></span><h3>Learning Academy</h3><p>Structured paths, assessments and practical skills for career growth.</p><span class="ed-tile-status">Planned module</span></article>
+          <article class="ed-tile"><span class="ed-tile-index">04 <i aria-hidden="true"></i></span><h3>Career Connections</h3><p>Opportunities and employer networks, with approved integrations when available.</p><span class="ed-tile-status">Planned module</span></article>
+          <article class="ed-tile"><span class="ed-tile-index">05 <i aria-hidden="true"></i></span><h3>Solutions Marketplace</h3><p>Discover products, business solutions and independent expertise.</p><span class="ed-tile-status">Planned module</span></article>
+          <article class="ed-tile"><span class="ed-tile-index">06 <i aria-hidden="true"></i></span><h3>Intelligent Advisory</h3><p>Human-reviewed architecture insight and evidence-led technology decisions.</p><span class="ed-tile-status">Planned module</span></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="ai" class="ed-section ed-ai" aria-labelledby="ed-ai-heading">
+      <div class="ed-shell">
+        <div class="ed-ai-panel">
+          <div class="ed-ai-copy">
+            <p class="ed-kicker">INTELLIGENCE WITH PURPOSE</p>
+            <h2 id="ed-ai-heading">Smarter technology.<br>Better human decisions.</h2>
+            <p>Our vision for AI combines useful automation with trusted data, clear oversight and accountable outcomes. AI services are planned and are not active on this preview site.</p>
+            <a href="#roadmap" class="ed-ai-link">See the roadmap <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="ed-ai-flow" aria-hidden="true">
+            <div><span>01</span><strong>Knowledge</strong><small>Discover context</small></div>
+            <div><span>02</span><strong>Reasoning</strong><small>Evaluate options</small></div>
+            <div><span>03</span><strong>Human review</strong><small>Validate decisions</small></div>
+            <div><span>04</span><strong>Progress</strong><small>Improve outcomes</small></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="roadmap" class="ed-section ed-roadmap" aria-labelledby="ed-roadmap-heading">
+      <div class="ed-shell">
+        <div class="ed-roadmap-title"><div><p class="ed-kicker">THE ROAD AHEAD</p><h2 id="ed-roadmap-heading">Built deliberately. Ready to grow.</h2></div><p>Our foundation starts with a secure public experience; new capabilities will follow through independent delivery and testing.</p></div>
+        <div class="ed-steps">
+          <div><span>01</span><strong>Foundation</strong><small>Brand and secure website</small></div>
+          <div><span>02</span><strong>Connection</strong><small>Identity and community</small></div>
+          <div><span>03</span><strong>Opportunity</strong><small>Learning, developers and careers</small></div>
+          <div><span>04</span><strong>Intelligence</strong><small>Opt-in AI and integrations</small></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="ed-footer">
+    <div class="ed-shell ed-footer-inner">
+      <a href="/" class="ed-footer-brand" aria-label="ERP Developers home">
+        <img src="/assets/erpdevelopers/images/erp-developers-logo.svg" width="183" height="73" alt="ERP Developers — Engage. Reason. Progress.">
+      </a>
+      <p>Connecting people, knowledge and possibility.</p>
+      <div class="ed-footer-links"><a href="/login">Member sign in</a><a href="#top">Back to top ↑</a></div>
+    </div>
+  </footer>
 </main>
 {% endblock %}
