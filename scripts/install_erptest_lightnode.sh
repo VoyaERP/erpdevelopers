@@ -33,15 +33,11 @@
   test -n "$free_kib" && test "$free_kib" -ge $((3 * 1024 * 1024)) || {
     echo "STOP: less than 3GiB free disk"; exit 2;
   }
-  # No SSH deploy keys or stored HTTPS tokens. The app issues a short-lived
-  # installation token for this one repository only.
-  source "$(dirname "${BASH_SOURCE[0]}")/github_app_auth.sh"
-  erpdev_enable_github_app_git
-  git ls-remote --exit-code "$REPO" refs/heads/version-16 >/dev/null || {
-    echo "STOP: GitHub App cannot read VoyaERP/erpdevelopers." >&2
-    echo "Verify app installation, Contents:read, app ID and PEM ownership." >&2
-    exit 3
-  }
+  # Public repository: no GitHub App, PAT, deploy key or login required.
+  echo "=== Verify anonymous HTTPS branch access ==="
+  export GIT_TERMINAL_PROMPT=0
+  REMOTE_SHA="$(git ls-remote --exit-code "$REPO" refs/heads/version-16 | awk 'NR==1 {print $1}')"
+  test -n "$REMOTE_SHA" || { echo "STOP: Cannot read public version-16 branch"; exit 3; }
 
   if [ -e "$APP" ]; then
     test -d "$APP/.git" || { echo "STOP: app path is not a checkout"; exit 2; }
@@ -49,11 +45,15 @@
     test "$(git -C "$APP" branch --show-current)" = version-16 || {
       echo "STOP: unexpected app branch"; exit 2;
     }
-    # Existing SSH remotes are NOT rewritten automatically.
+    # Keep the shared checkout untouched; fail if the operator needs an update.
     if ! git -C "$APP" remote -v | grep -Fq "$REPO"; then
-      echo "STOP: existing app must use its HTTPS GitHub remote (no SSH URL)." >&2
+      echo "STOP: unexpected app origin; inspect before changing." >&2
       exit 2
     fi
+    test "$(git -C "$APP" rev-parse HEAD)" = "$REMOTE_SHA" || {
+      echo "STOP: installed app checkout is not at public version-16 HEAD." >&2
+      exit 2
+    }
   else
     bench get-app --branch version-16 "$REPO"
   fi

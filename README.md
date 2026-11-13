@@ -71,7 +71,7 @@ Only mark release work complete after real v16 test-site evidence, security chec
 Use [scripts/install_local_v16.sh](scripts/install_local_v16.sh) **only on MacVMs** after increasing disk free space to **at least 8 GiB** and verifying an off-VM backup. It refuses to write if the existing v15 Frappe branch is unexpected, target Bench/site already exists, or disk/memory requirements are not met. It uses Node 24 in its own subshell, allocates a distinct Bench, checks port conflicts, then creates only a **new v16 site**. On the documented 2026-11-13 machine state (**3.6 GiB free**) the script intentionally **stops before initialization**. The shared MariaDB server is 12.3.2 whereas Frappe's published v16 baseline is 11.8; a successful dev experiment is not production validation. Do not run this script as root, bypass guards or execute it on the v15 Bench.
 
     # Clone the small repo once, then run the reviewed script:
-    git clone --branch version-16 --single-branch git@github.com:VoyaERP/erpdevelopers.git ~/erpdevelopers-source
+    git clone --branch version-16 --single-branch https://github.com/VoyaERP/erpdevelopers.git ~/erpdevelopers-source
     cd ~/erpdevelopers-source
     bash scripts/install_local_v16.sh
 
@@ -79,7 +79,7 @@ The canonical roadmap and environment state stay on `main` in `docs/MASTER_PLAN.
 
 ## ERP Developers public website on erptest-lightnode (Frappe 16)
 
-The current homepage route is **erp-developers-home** and the native Frappe 16 **/login** receives only a website header/footer, AI-themed decorative panel, and scoped CSS; there is **no replacement authentication handler or form**. The styling follows Green Box's verified native-login approach while using the ERP Developers navy/blue/teal brand.
+The current homepage route is **erp-developers-home** and the native Frappe 16 **/login** receives only a website header/footer, intersecting image-backed technology background, and scoped CSS; there is **no replacement authentication handler or form**. The styling follows Green Box's verified native-login approach while using the ERP Developers navy/blue/teal brand.
 
 **Production target:** erp-developers.com (DNS, TLS and server deployment not yet executed).
 
@@ -87,6 +87,14 @@ The current homepage route is **erp-developers-home** and the native Frappe 16 *
 
 The reference logo approved in conversation is not yet an exact source-vector asset. The app includes a small branded SVG mark approximating its selected growth/shield direction, with a pending visual approval step.
 
-### Private GitHub App access for erptest-lightnode
+### Public HTTPS deployment for erptest-lightnode
 
-The supported deployment credential is now a **read-only GitHub App installation token**, retrieved on demand over HTTPS (no permanent token in Git and no server SSH Deploy Key). Set up the App under the VoyaERP organization, select only the erpdevelopers repository, and follow [docs/GITHUB_APP_DEPLOY.md](docs/GITHUB_APP_DEPLOY.md) to bootstrap the first clone securely. GitHub App creation and server deployment require operator action and are not yet verified.
+The repository is now **public**. Clone branch version-16 over anonymous HTTPS: no GitHub App, SSH key, deploy key or PAT is required for source downloads. The guarded installer creates only the new ERP Developers Frappe 16 site on the validated Bench. See [deployment steps](docs/ERPTEST_LIGHTNODE.md).
+
+~~~bash
+git clone --branch version-16 --single-branch https://github.com/VoyaERP/erpdevelopers.git "$HOME/erpdevelopers-deploy-source"
+BENCH=/data/frappe/frappe-bench bash "$HOME/erpdevelopers-deploy-source/scripts/install_erptest_lightnode.sh"
+~~~
+
+**Important:** verify hostname, Bench version/path, disk, site-name availability and backup strategy first. DNS, HTTPS, proxy changes and restarting shared Bench services are separate operator-controlled steps.
+

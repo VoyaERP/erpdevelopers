@@ -29,14 +29,15 @@
     fi
   done
   test -n "$REMOTE" || { echo "Unexpected Git remote"; exit 2; }
-  test "$(git -C "$APP" remote get-url "$REMOTE")" = "https://github.com/VoyaERP/erpdevelopers.git" || {
-    echo "STOP: HTTPS app remote required for GitHub App authentication" >&2; exit 2;
+  REPO="https://github.com/VoyaERP/erpdevelopers.git"
+  test "$(git -C "$APP" remote get-url "$REMOTE")" = "$REPO" || {
+    echo "STOP: HTTPS public origin required. Inspect origin rather than rewriting it automatically." >&2
+    exit 2
   }
-  echo "=== Verify the GitHub App's repository-scoped HTTPS access ==="
-  source "$(dirname "${BASH_SOURCE[0]}")/github_app_auth.sh"
-  erpdev_enable_github_app_git
-  git ls-remote --exit-code https://github.com/VoyaERP/erpdevelopers.git refs/heads/version-16 >/dev/null || {
-    echo "STOP: GitHub App authentication failed" >&2
+  echo "=== Verify anonymous public GitHub branch ==="
+  export GIT_TERMINAL_PROMPT=0
+  git ls-remote --exit-code "$REPO" refs/heads/version-16 >/dev/null || {
+    echo "STOP: Cannot read public version-16 branch" >&2
     exit 3
   }
   bench --site "$SITE" backup --with-files

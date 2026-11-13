@@ -61,8 +61,8 @@
   yarn --version
 
   echo "=== Test GitHub access before large downloads ==="
-  git ls-remote --exit-code git@github.com:VoyaERP/erpdevelopers.git refs/heads/version-16 >/dev/null || {
-    echo "Cannot reach the private repository; verify SSH key and permissions."; exit 4;
+  git ls-remote --exit-code https://github.com/VoyaERP/erpdevelopers.git refs/heads/version-16 >/dev/null || {
+    echo "Cannot read the public repository via HTTPS."; exit 4;
   }
 
   echo "=== Initialize a *separate* Frappe 16 Bench ==="
@@ -113,8 +113,8 @@ PY
   fi
 
   cd "$TARGET"
-  echo "=== Clone ERP Developers v16 (private repository) ==="
-  bench get-app --branch version-16 git@github.com:VoyaERP/erpdevelopers.git
+  echo "=== Clone ERP Developers v16 (public repository) ==="
+  bench get-app --branch version-16 https://github.com/VoyaERP/erpdevelopers.git
 
   available_kib="$(df -Pk "$HOME" | awk 'NR==2 {print $4}')"
   if [ "$available_kib" -lt "$MIN_STAGE_FREE_KIB" ]; then
