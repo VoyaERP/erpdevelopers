@@ -13,6 +13,92 @@ Connection to 192.168.64.15 closed.
 
 The script began with **set -euo pipefail**, apparently in the interactive session. A failing command under set -e can exit the shell, which closes the SSH connection. A missing hostname binary may mean a restricted PATH or minimal OS package, **not** a Frappe failure. Confirm whether **MacVMs** and **Rasheed** refer to the same target.
 
+## Verified host snapshot — 2026-11-13 (from user terminal)
+
+| Property | Observed value | Consequence |
+| --- | --- | --- |
+| Hostname | `MacVMs` from `uname -n` | Resolve whether this is also the intended `Rasheed` target |
+| OS | `Arch Linux ARM` / `archarm`, rolling | **Not among officially supported Frappe host distros**; app may work but environment needs extra validation |
+| Python | `python3.14 3.14.7` | v16 Python prerequisite present |
+| Node.js | `v20.20.2` from user-level `nvm` | **Blocker:** v16 requires Node 24; do not alter Node 20 default on existing Bench |
+| Bench CLI | `5.31.0` | Installed; test v16 compatibility during isolated setup |
+| Git | `2.55.0` | Available |
+| MariaDB client | `12.3.2` | **Server version not known**; v16 documents 11.8; cannot infer compatibility from client |
+| Existing Bench | `/home/manakhly/frappe-bench` | Do not mutate or restart until inspected |
+| Listening ports | `8000, 9000, 11000, 13000, 3306` | Reserve nonconflicting ports for new Bench |
+| Missing command | `hostname` | Not required to fix to proceed; `uname -n` is a working alternative |
+
+Current official installation guide: https://docs.frappe.io/framework/user/en/installation . Its official support list is **macOS or Debian/Ubuntu** (not Arch). This is a **development compatibility experiment**, not an officially supported production deployment.
+
+### Next safe inventory command (read-only)
+
+Paste this as a single subshell **on MacVMs via SSH**. It does not modify databases, existing sites, npm defaults or Bench configs.
+
+~~~bash
+(
+  set +e
+  echo "== Identity / architecture =="; uname -n; uname -m
+  echo "== Resources =="; command -v free >/dev/null && free -h; df -h "$HOME"
+  echo "== MariaDB server (read-only) =="
+  if command -v mariadb >/dev/null 2>&1; then
+    mariadb -N -B -e 'SELECT VERSION();' 2>&1 || echo "Local DB login unavailable; server version still unknown"
+  fi
+  command -v mariadbd >/dev/null 2>&1 && mariadbd --version || true
+  echo "== Redis or Valkey =="
+  command -v redis-server >/dev/null 2>&1 && redis-server --version || true
+  command -v valkey-server >/dev/null 2>&1 && valkey-server --version || true
+  echo "== nvm versions and Yarn =="
+  if [ -s "$HOME/.nvm/nvm.sh" ]; then
+    . "$HOME/.nvm/nvm.sh"
+    nvm ls
+  fi
+  yarn --version 2>&1 || true
+  echo "== Existing Bench, read-only =="
+  if [ -d "$HOME/frappe-bench/apps/frappe" ]; then
+    (cd "$HOME/frappe-bench" &&
+      printf 'Frappe branch: ' && git -C apps/frappe branch --show-current &&
+      bench version &&
+      bench list-sites)
+  fi
+  echo "== Free port candidates =="
+  ss -ltn | grep -E ':(8001|8002|9001|9002|11001|13001|18080) ' || echo "No candidate collisions shown"
+  echo "== Docker / Podman availability =="
+  command -v docker || true
+  command -v podman || true
+  echo "== END =="
+)
+~~~
+
+### Optional: install Node 24 ONLY into existing user-level nvm
+
+Do this in a **dedicated v16 shell** once resources are checked. `nvm install 24` does not uninstall Node 20; **do not run `nvm alias default 24`**, upgrade system Node, or restart existing Bench services.
+
+~~~bash
+(
+  set -e
+  export NVM_DIR="$HOME/.nvm"
+  test -s "$NVM_DIR/nvm.sh"
+  . "$NVM_DIR/nvm.sh"
+  nvm install 24
+  nvm use 24
+  node --version
+  npm --version
+  yarn --version
+)
+~~~
+
+Because this example runs in a subshell, it verifies Node 24 without changing the interactive parent environment. **When initializing the new Bench**, source `"$HOME/.nvm/nvm.sh"` and `nvm use 24` in the *actual* separate install shell first; verify `node --version` before `bench init`. No need to change the existing Node 20 default.
+
+### MariaDB v16 decision gate
+
+Do **not** downgrade/upgrade the shared MariaDB instance merely because the client reports 12.3.2. Inspect server `SELECT VERSION()`; check if it meets **the specific v16 11.8 tested/documented target**, then decide whether an isolated compatible database service is needed (for example a vetted ARM64 MariaDB 11.8 container if available). The separate v16 site must never reuse or overwrite an existing site DB.
+
+### Port decision gate
+
+Bench [multi-bench behavior](https://github.com/frappe/bench/wiki/Multi-Bench-Setup) can allocate separate ports when it detects sibling Benches, but **do not assume allocation**. After `bench init`, inspect the new Bench's `sites/common_site_config.json` **without disclosing secrets**, and confirm actual Procfile/Redis/socket.io ports are unused, before `bench start`. On this host 8000/9000/11000/13000 are already occupied.
+
+---
+
 ## 2. Safe, read-only audit — paste inside the new remote SSH session
 
 **Important:** the surrounding parentheses contain any shell-option changes inside a subprocess. We deliberately do NOT enable set -e on the interactive parent shell. This script only reads host information.
