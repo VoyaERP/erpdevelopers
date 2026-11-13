@@ -4,7 +4,6 @@ app_name = "erpdevelopers"
 app_title = "ERP Developers"
 app_publisher = "ERP Developers"
 app_description = "Technology, collaboration, knowledge and intelligent transformation"
-app_email = "hello@erpdevelopers.com"
 app_license = "MIT"
 app_version = app_version
 
