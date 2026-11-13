@@ -4,6 +4,13 @@
 
 > حالة التنفيذ مبنية على أدلة من GitHub ومن مخرجات المستخدم فقط. لا يتم اعتبار الكود مختبرًا لمجرد رفعه.
 
+## 2026-11-14 — Root cause isolated to Gunicorn web runtime
+
+- Operator diagnostics: Cloudflare **and direct-local-Nginx** GET requests to `/`, `/login` and `/api/method/ping` all returned HTTP 500. Nginx listening 80/443; Gunicorn listening 127.0.0.1:8000 with 5 workers under `--preload`. This rules out a Cloudflare-only problem and shows the failure occurs before ordinary route handling.
+- `logs/web.error.log` reports **`ModuleNotFoundError: No module named 'erpdevelopers'`** in Frappe `init_request → setup_module_map → get_module_list`; subsequent **`AttributeError: is_ajax`** is an exception-handler symptom. The Bench CLI can list and run the installed app, which suggests the web process may be retaining pre-install import state, but **stale Gunicorn not yet confirmed by comparing live PID start time with installation**.
+- Source of Gunicorn service naming: [Bench v5.31 Supervisor template](https://github.com/frappe/bench/blob/v5.31.0/bench/config/templates/supervisor.conf#L5-L16), optionally [systemd template](https://github.com/frappe/bench/blob/v5.31.0/bench/config/templates/systemd/frappe-bench-frappe-web.service). Operator next: verify target Bench env Python import, confirm precise process manager and Gunicorn service ownership, perform **only targeted web process restart** if confirmed (short impact to shared-Bench sites), then repeat direct-origin `/api/method/ping`, `/login`, `/` GET and inspect fresh log only if still failing.
+- No application source changes, Nginx changes or service restarts performed by assistant. Site UI/login UAT remains blocked and issue #13 OPEN.
+
 ## 2026-11-14 — App installed; public HTTP 500 remains open
 
 - **Deployment completed on target site**, according to operator logs: `bench --site erp-developers.com list-apps` now reports Frappe **16.56.0**, ERPNext **16.55.0**, **erpdevelopers 0.1.0**, all `version-16`. ERP Developers SHA **39659d46422f7c45d9bc8ec75aafb91c1c1574e3**; application install, migration, site-specific Website Settings, assets build and translations succeeded.
