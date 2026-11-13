@@ -89,6 +89,10 @@ The reference logo approved in conversation is not yet an exact source-vector as
 
 ### Public HTTPS deployment for erptest-lightnode
 
+**Existing-site update (2026-11-14):** The server already has a site named `erp-developers.com` with Frappe 16.56.0 and ERPNext 16.55.0, but `erpdevelopers` is not installed. The new-site installer intentionally stops here. **For this actual environment, use** [scripts/install_existing_site_erptest_lightnode.sh](scripts/install_existing_site_erptest_lightnode.sh) **after cloning the public repo**; see the existing-site path in [docs/ERPTEST_LIGHTNODE.md](docs/ERPTEST_LIGHTNODE.md). That script backs up the existing site and installs ERP Developers on it; it does not run `bench new-site` or erase ERPNext.
+
+
+
 The repository is now **public**. Clone branch version-16 over anonymous HTTPS: no GitHub App, SSH key, deploy key or PAT is required for source downloads. The guarded installer creates only the new ERP Developers Frappe 16 site on the validated Bench. See [deployment steps](docs/ERPTEST_LIGHTNODE.md).
 
 ~~~bash

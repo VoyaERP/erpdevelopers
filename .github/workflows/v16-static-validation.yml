@@ -26,6 +26,7 @@ jobs:
       - name: Bash syntax
         run: |
           bash -n scripts/install_erptest_lightnode.sh
+          bash -n scripts/install_existing_site_erptest_lightnode.sh
           bash -n scripts/update_erptest_lightnode.sh
           bash -n scripts/install_local_v16.sh
       - name: Contract tests

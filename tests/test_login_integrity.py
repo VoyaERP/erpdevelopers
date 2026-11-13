@@ -49,6 +49,19 @@ class TestNativeLogin(unittest.TestCase):
         self.assertIn('href="/login"', home)
         self.assertFalse((APP / "www/index.html").exists())
 
+    def test_existing_site_installer_never_recreates_site(self):
+        script = (ROOT / "scripts/install_existing_site_erptest_lightnode.sh").read_text(encoding="utf-8")
+        self.assertIn('test -f "$BENCH/sites/$SITE/site_config.json"', script)
+        self.assertIn('backup --with-files', script)
+        self.assertIn('install-app erpdevelopers', script)
+        self.assertIn('site_setup.configure_website', script)
+        self.assertNotIn("bench new-site", script)
+        self.assertNotIn("bench update", script)
+        self.assertNotIn("drop-site", script)
+        self.assertNotIn("bench restart", script)
+        self.assertLess(script.index("backup --with-files"), script.index("bench get-app"))
+        self.assertLess(script.index("backup --with-files"), script.index("install-app erpdevelopers"))
+
     def test_install_is_site_guarded(self):
         script = (ROOT / "scripts/install_erptest_lightnode.sh").read_text(encoding="utf-8")
         self.assertIn('test ! -e "$BENCH/sites/$SITE"', script)

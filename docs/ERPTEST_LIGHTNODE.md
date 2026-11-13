@@ -7,7 +7,45 @@
 - **App:** erpdevelopers
 - **Site:** erp-developers.com
 - **Expected Bench:** /data/frappe/frappe-bench — observed previously; verify on the server
-- **Status:** Code prepared in GitHub. The assistant has NOT connected to erptest-lightnode, installed the app, changed DNS/TLS or verified the live site.
+- **Status:** Existing erp-developers.com Frappe 16 + ERPNext 16 site observed by operator; app absent. Existing-site installer added. No install, DNS/TLS change or live browser UAT confirmed.
+
+## Observed site state — existing Frappe 16 site (2026-11-14)
+
+The operator connected via SSH and confirmed:
+
+- Existing `sites/erp-developers.com` directory: **yes** (new-site installer correctly refused to run)
+- `bench --site erp-developers.com list-apps`: Frappe **16.56.0**, ERPNext **16.55.0**, **no erpdevelopers app installed**
+- `apps/erpdevelopers`: absent
+- `sudo nginx -t`: syntax OK. **No evidence yet** of domain-specific vhost/DNS/TLS or actual HTTP routing.
+
+**Use the EXISTING-site installer below. Do not run** `bench new-site`, do not delete the site, and do not use the existing-app *update* helper until ERP Developers is installed.
+
+### Existing site, app NOT installed — correct initial deployment
+
+Run these commands on erptest-lightnode as the Bench owner. They first clone the public source, then the guarded script backs up the existing site with files, downloads the app if necessary, tests it, installs it into the existing site and configures ERP Developers branding. It never recreates the site or alters Nginx.
+
+~~~bash
+(
+  set -Eeuo pipefail
+  export PATH="$HOME/.local/bin:$PATH"
+  REPO="https://github.com/VoyaERP/erpdevelopers.git"
+  SRC="$HOME/erpdevelopers-deploy-source"
+  if [ ! -e "$SRC" ]; then
+    git clone --branch version-16 --single-branch "$REPO" "$SRC"
+  else
+    test -d "$SRC/.git"
+    test -z "$(git -C "$SRC" status --porcelain)"
+    test "$(git -C "$SRC" branch --show-current)" = "version-16"
+    test "$(git -C "$SRC" remote get-url origin)" = "$REPO"
+    git -C "$SRC" pull --ff-only origin version-16
+  fi
+  bash "$SRC/scripts/install_existing_site_erptest_lightnode.sh"
+)
+~~~
+
+**Important:** The existing-site script applies changes to the target site's **Website Settings** (home page, logo, favicon and language picker) after a successful backup. If that existing site carries another organization's live public website, do not run it until the intended ownership of the public pages has been reviewed. Existing ERPNext transactions remain untouched; page settings do change as requested. A backup is not a substitute for a confirmed restore plan.
+
+Once installed, use the *update existing ERP Developers app* procedure later in this document. If the script stops partway through, inspect the partial app/site state; do not rerun fresh-site installer or recreate the DB.
 
 ## Login architecture (Green Box method)
 
@@ -37,7 +75,7 @@ SSH into the target server as the Bench owner, **not root**, then run:
   df -h .
   echo "=== Existing site folder names only ==="
   find sites -mindepth 2 -maxdepth 2 -name site_config.json -type f -printf '%h\n'
-  test ! -e "sites/erp-developers.com" && echo "Target site absent: new install possible" || echo "Target exists: use update flow"
+  test ! -e "sites/erp-developers.com" && echo "Target absent: fresh-site flow" || echo "Target exists: distinguish app-not-installed from app-installed"
   echo "=== Proxy tooling ==="
   command -v nginx || true
   command -v certbot || true
