@@ -1,0 +1,41 @@
+{% extends "templates/web.html" %}
+{% block page_content %}
+<main class="ed-site" id="top">
+  <header class="ed-nav" aria-label="Main navigation">
+    <a href="#top" class="ed-brand" aria-label="ERP Developers home">
+      <span class="ed-brand-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span class="ed-brand-text"><strong>ERP</strong><small>Developers</small></span>
+    </a>
+    <nav aria-label="Site sections">
+      <a href="#vision">Vision</a><a href="#ecosystem">Ecosystem</a><a href="#ai">AI & Innovation</a><a href="#roadmap">Roadmap</a>
+    </nav>
+    <a class="ed-nav-cta" href="#ecosystem">Explore platform</a>
+  </header>
+  <section class="ed-hero" aria-labelledby="ed-heading">
+    <div class="ed-eyebrow"><span class="ed-pulse"></span> Human collaboration. Intelligent technology.</div>
+    <h1 id="ed-heading">Technology grows stronger <em>together.</em></h1>
+    <p>ERP Developers brings people, expertise and intelligent systems into one connected technology ecosystem — not limited to a single ERP, vendor or platform.</p>
+    <div class="ed-actions"><a class="ed-btn ed-btn-primary" href="#ecosystem">Explore our ecosystem <span aria-hidden="true">↗</span></a><a class="ed-btn ed-btn-quiet" href="#vision">Our philosophy</a></div>
+    <div class="ed-principles" aria-label="Brand values"><span><b>E</b>ngage.</span><span><b>R</b>eason.</span><span><b>P</b>rogress.</span></div>
+    <div class="ed-art" aria-hidden="true"><div class="ed-art-grid"></div><div class="ed-orbit ed-orbit-one"></div><div class="ed-orbit ed-orbit-two"></div><div class="ed-orb ed-orb-one"></div><div class="ed-orb ed-orb-two"></div><div class="ed-art-core">ERP<span>AI</span></div><div class="ed-art-caption">Connect knowledge <span>→</span> Create progress</div></div>
+  </section>
+  <section id="vision" class="ed-section ed-vision">
+    <p class="ed-kicker">OUR MISSION</p><h2>More than software.<br><span>An ecosystem for progress.</span></h2>
+    <p>We connect developers, architects, organizations and learners around useful technology, responsible AI and measurable business outcomes.</p>
+  </section>
+  <section id="ecosystem" class="ed-section">
+    <div class="ed-section-head"><div><p class="ed-kicker">THE ECOSYSTEM</p><h2>One platform. Many possibilities.</h2></div><p>Designed as modular destinations that can grow independently, with shared identity and security foundations.</p></div>
+    <div class="ed-grid">
+      <article class="ed-tile"><div class="ed-tile-icon">01</div><h3>Developer Hub</h3><p>Technical knowledge, reusable resources and collaboration across languages and platforms.</p><span>Planned module</span></article>
+      <article class="ed-tile"><div class="ed-tile-icon">02</div><h3>Community</h3><p>Practical discussions, expert networks and peer learning across business and technology.</p><span>Planned module</span></article>
+      <article class="ed-tile"><div class="ed-tile-icon">03</div><h3>Learning Academy</h3><p>Structured learning paths, assessments and career-ready technical skills.</p><span>Planned module</span></article>
+      <article class="ed-tile"><div class="ed-tile-icon">04</div><h3>Career Connections</h3><p>Verified opportunities and employer connections. External job integrations require approval.</p><span>Planned module</span></article>
+      <article class="ed-tile"><div class="ed-tile-icon">05</div><h3>Solutions Marketplace</h3><p>Discover services, business applications and expertise without vendor lock-in.</p><span>Planned module</span></article>
+      <article class="ed-tile"><div class="ed-tile-icon">06</div><h3>Intelligent Advisory</h3><p>Architecture guidance, AI-assisted discovery and evidence-based decision support.</p><span>Planned module</span></article>
+    </div>
+  </section>
+  <section id="ai" class="ed-ai ed-section"><div><p class="ed-kicker">INTELLIGENCE WITH PURPOSE</p><h2>AI should improve decisions, not replace judgment.</h2><p>We envision secure, human-reviewed assistants that accelerate discovery, knowledge sharing and solution delivery. AI capabilities are on the roadmap and are not active on this preview site.</p></div><div class="ed-ai-diagram" aria-hidden="true"><span>Knowledge</span><span>Reasoning</span><span>Human review</span><span>Progress</span></div></section>
+  <section id="roadmap" class="ed-section ed-roadmap"><p class="ed-kicker">WHAT COMES NEXT</p><h2>Build trust first. Expand with intent.</h2><p>Phase 1: brand website and bilingual foundation. Phase 2: secure identities and community. Phase 3: learning, developer resources and verified jobs. Phase 4: opt-in intelligent services and integrations.</p></section>
+  <footer class="ed-footer"><div><strong>ERP</strong> <span>Developers</span><small>Engage. Reason. Progress.</small></div><p>Building a smarter, more connected technology community.</p><a href="#top">Back to top ↑</a></footer>
+</main>
+{% endblock %}

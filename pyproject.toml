@@ -1,0 +1,15 @@
+[build-system]
+requires = ["flit_core>=3.9,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "erpdevelopers"
+version = "0.1.0"
+description = "ERP Developers technology community and website"
+readme = "README.md"
+requires-python = ">=3.14"
+authors = [{name = "ERP Developers"}]
+dependencies = []
+
+[tool.bench.frappe-dependencies]
+frappe = ">=16.0.0,<17.0.0"
