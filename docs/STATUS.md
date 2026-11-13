@@ -4,6 +4,14 @@
 
 > حالة التنفيذ مبنية على أدلة من GitHub ومن مخرجات المستخدم فقط. لا يتم اعتبار الكود مختبرًا لمجرد رفعه.
 
+## 2026-11-14 — Existing erptest-lightnode site confirmed (operator output)
+
+- Operator used SSH to `erptest-lightnode` (Debian x86_64). Site folder `/data/frappe/frappe-bench/sites/erp-developers.com` **already exists**. The fresh-site installer correctly exited before creating or changing the site.
+- `bench --site erp-developers.com list-apps` shows **frappe 16.56.0**, **erpnext 16.55.0**, with **no erpdevelopers installed**. `apps/erpdevelopers` is absent (Git reported cannot change directory).
+- Operator `sudo nginx -t` reports syntax OK. This **does not** prove routing, DNS, TLS or an actual served home page.
+- Canonical install path changed to **install app into existing site**, never run `bench new-site` and never drop the DB. New [backup-first existing-site installer](https://github.com/VoyaERP/erpdevelopers/blob/version-16/scripts/install_existing_site_erptest_lightnode.sh), updated guide and static contracts live on **version-16** at `dfbbaaa4d551b1f360ce696632b22ca119005a9f`; [GitHub Actions PASS](https://github.com/VoyaERP/erpdevelopers/actions/runs/43526306183).
+- Existing-site installer intentionally updates the exact site's Website Settings for ERP Developers home page/logo after successful backup and app installation; **existing ERPNext data is preserved**, though public site branding changes. No SSH installation or login/UAT has been completed by assistant.
+
 ## 2026-11-14 — Green Box-style login + public HTTPS deployment source
 
 - **Ready in GitHub:** source branch `version-16` at `de86960ffa73c24fadba44723eb4bb5864aa6b87`; native Frappe 16 login preserved with local intersecting technology SVG, EN/AR chrome + native language selector; public anonymous HTTPS install/update helpers for erptest-lightnode; legacy GitHub App credential helper files removed from this branch.
@@ -13,7 +21,7 @@
 ## Observed baseline
 
 - **main:** repository entry/documentation branch; not a deployed release.
-- **version-16:** Green Box-style preserved native Frappe login, intersecting local SVG backdrop, Frappe locale picker, dedicated homepage and site-scoped settings, erptest-lightnode installers using **public anonymous HTTPS** (private GitHub App helpers retired). Latest source SHA **de86960ffa73c24fadba44723eb4bb5864aa6b87**. [GitHub static CI PASS](https://github.com/VoyaERP/erpdevelopers/actions/runs/43525672861). **Not yet installed or UAT-tested on erptest-lightnode.**
+- **version-16:** native Frappe login styling, SVG backdrop, Frappe locale picker and homepage; public HTTPS installation scripts. Latest source SHA **dfbbaaa4d551b1f360ce696632b22ca119005a9f** adds backup-first installation into existing Frappe site. [Static CI PASS](https://github.com/VoyaERP/erpdevelopers/actions/runs/43526306183). **Not yet installed/UAT-tested on erptest-lightnode.**
 - **version-15:** no such branch in this repository as of the snapshot; possible existing v15 elsewhere is **unverified**.
 - **MacVMs / existing Rasheed app:** actual host **MacVMs**, Arch Linux ARM aarch64. The existing `/home/manakhly/frappe-bench` runs **Frappe 15.118.0**, **ERPNext 15.121.0**, **rasheed app 0.0.1** and many other v15 apps; existing Frappe Git branch is `version-15`. This is a verified **v15 bench**, not a separate v16 host. User previously referred to “Rasheed local”; confirmed `rasheed` is an app present in this bench. Keep legacy workloads untouched. Python **3.14.7**, Node **20.20.2 by default**, **Node 24.22.3 installed successfully via user-level nvm** and verified **inside a subshell** (does not update default Node), Bench CLI **5.31.0**, Yarn **1.22.22**, Git **2.55.0**, Valkey **9.1.1**, MariaDB **12.3.2 server and client**. Ports `8000`, `9000`, `11000`, `13000`, `3306` are occupied; candidate alternative ports showed no listeners at the check instant.
 - **Deployment:** Frappe v16 installation and Mac UAT **not started/verified**. **Latest critical storage blocker:** VM root `/dev/vda2` is **30 GB**, **25 GB used**, **3.6 GB available (88% used)** as confirmed by the 2026-11-13 follow-up; inode use is only **32%**, so the limiting resource is free storage. RAM **3.8 GiB total, ~2.5 GiB available**, swap **4 GiB**. Risk of out-of-space/build OOM while v15 workloads are running: **do not run `bench init` yet**. Recommended planning target for parallel test bench: at least **15–20 GB free disk** and **8 GiB RAM total or larger**, subject to measured workload; these are capacity recommendations, not claimed official Frappe minima. MariaDB **12.3.2 server** is different from documented v16 **11.8** baseline: compatibility is **unverified**, avoid changing shared DB. Valkey **9.1.1** exceeds documented 6+ baseline but integration still untested. **Arch Linux ARM not officially supported** for Frappe hosting; consider a separate supported Debian/Ubuntu ARM64 test VM if resources cannot be expanded. Docker and Podman commands absent. New Bench still requires distinct ports, isolated site/database and explicit per-shell `nvm use 24`.
@@ -27,7 +35,7 @@
 | --- | --- | --- |
 | [ED-00 #1](https://github.com/VoyaERP/erpdevelopers/issues/1) Environment | **Blocked: disk capacity + compatibility review** | Current-host guarded installer available, 3.6GB fails >=8GiB preflight; MariaDB v12.3 compatibility, Mac smoke |
 | [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Green Box-style native login, homepage and static CI ready; UAT pending** | Final approved logo asset, EN/AR content, SEO, device/auth UAT |
-| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Public HTTPS installer ready; not installed** | Confirm Bench/site/host, deploy, DNS/TLS, native auth UAT |
+| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Existing Frappe 16/ERPNext 16 site confirmed; app absent; existing-site installer/CI ready** | Backup, install app on existing site, DNS/TLS, native auth UAT |
 | [ED-02 #3](https://github.com/VoyaERP/erpdevelopers/issues/3) IAM/privacy | **Planned** | Role matrix + threat model |
 | [ED-03 #4](https://github.com/VoyaERP/erpdevelopers/issues/4) Community | **Planned** | ED-02 approval |
 | [ED-04 #5](https://github.com/VoyaERP/erpdevelopers/issues/5) Developer Hub | **Planned** | ED-02 approval |
