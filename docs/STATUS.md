@@ -4,15 +4,21 @@
 
 > حالة التنفيذ مبنية على أدلة من GitHub ومن مخرجات المستخدم فقط. لا يتم اعتبار الكود مختبرًا لمجرد رفعه.
 
+## 2026-11-14 — Green Box-style login + public HTTPS deployment source
+
+- **Ready in GitHub:** source branch `version-16` at `de86960ffa73c24fadba44723eb4bb5864aa6b87`; native Frappe 16 login preserved with local intersecting technology SVG, EN/AR chrome + native language selector; public anonymous HTTPS install/update helpers for erptest-lightnode; legacy GitHub App credential helper files removed from this branch.
+- **Evidence:** [CI run 43525672861 — PASS](https://github.com/VoyaERP/erpdevelopers/actions/runs/43525672861), source-only checks. This does not constitute authenticated login/UAT or server install evidence.
+- **Block:** server connection not available to assistant, site/DNS/TLS/ingress not verified; issue #13 remains OPEN.
+
 ## Observed baseline
 
 - **main:** repository entry/documentation branch; not a deployed release.
-- **version-16:** branded native login, dedicated homepage, site setup and erptest-lightnode installers. Latest verified GitHub development commit **a668ba53146d193de32940083f2c94c9a31fe1e4** (PR #15, merged), adding GitHub App authentication. No erptest server deployment or UAT confirmed.
+- **version-16:** Green Box-style preserved native Frappe login, intersecting local SVG backdrop, Frappe locale picker, dedicated homepage and site-scoped settings, erptest-lightnode installers using **public anonymous HTTPS** (private GitHub App helpers retired). Latest source SHA **de86960ffa73c24fadba44723eb4bb5864aa6b87**. [GitHub static CI PASS](https://github.com/VoyaERP/erpdevelopers/actions/runs/43525672861). **Not yet installed or UAT-tested on erptest-lightnode.**
 - **version-15:** no such branch in this repository as of the snapshot; possible existing v15 elsewhere is **unverified**.
 - **MacVMs / existing Rasheed app:** actual host **MacVMs**, Arch Linux ARM aarch64. The existing `/home/manakhly/frappe-bench` runs **Frappe 15.118.0**, **ERPNext 15.121.0**, **rasheed app 0.0.1** and many other v15 apps; existing Frappe Git branch is `version-15`. This is a verified **v15 bench**, not a separate v16 host. User previously referred to “Rasheed local”; confirmed `rasheed` is an app present in this bench. Keep legacy workloads untouched. Python **3.14.7**, Node **20.20.2 by default**, **Node 24.22.3 installed successfully via user-level nvm** and verified **inside a subshell** (does not update default Node), Bench CLI **5.31.0**, Yarn **1.22.22**, Git **2.55.0**, Valkey **9.1.1**, MariaDB **12.3.2 server and client**. Ports `8000`, `9000`, `11000`, `13000`, `3306` are occupied; candidate alternative ports showed no listeners at the check instant.
 - **Deployment:** Frappe v16 installation and Mac UAT **not started/verified**. **Latest critical storage blocker:** VM root `/dev/vda2` is **30 GB**, **25 GB used**, **3.6 GB available (88% used)** as confirmed by the 2026-11-13 follow-up; inode use is only **32%**, so the limiting resource is free storage. RAM **3.8 GiB total, ~2.5 GiB available**, swap **4 GiB**. Risk of out-of-space/build OOM while v15 workloads are running: **do not run `bench init` yet**. Recommended planning target for parallel test bench: at least **15–20 GB free disk** and **8 GiB RAM total or larger**, subject to measured workload; these are capacity recommendations, not claimed official Frappe minima. MariaDB **12.3.2 server** is different from documented v16 **11.8** baseline: compatibility is **unverified**, avoid changing shared DB. Valkey **9.1.1** exceeds documented 6+ baseline but integration still untested. **Arch Linux ARM not officially supported** for Frappe hosting; consider a separate supported Debian/Ubuntu ARM64 test VM if resources cannot be expanded. Docker and Podman commands absent. New Bench still requires distinct ports, isolated site/database and explicit per-shell `nvm use 24`.
 - **Brand:** approved reference image exists in project conversation but production-ready approved files are **not committed to the repository**. Landing code currently uses a CSS temporary mark.
-- **Testing:** no successful Rasheed/Mac browser UAT evidence or verified CI workflow in this repository.
+- **Testing:** latest version-16 GitHub static CI passed (Python compile, Node JS parse, Bash syntax and source contract unit tests; run 43525672861). No successful live erptest-lightnode or Rasheed/Mac browser UAT; no authenticated workflow or production verification.
 - **Marketing/community/LMS/jobs/AI:** public landing scaffold mentions modules as planned. Do not represent them as implemented.
 
 ## Workstream dashboard
@@ -20,8 +26,8 @@
 | Epic | Observed status | Next evidence required |
 | --- | --- | --- |
 | [ED-00 #1](https://github.com/VoyaERP/erpdevelopers/issues/1) Environment | **Blocked: disk capacity + compatibility review** | Current-host guarded installer available, 3.6GB fails >=8GiB preflight; MariaDB v12.3 compatibility, Mac smoke |
-| [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Branded login/home source merged; deployment/UAT pending** | Final approved logo asset, EN/AR full content, SEO, visual/auth UAT |
-| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Source ready; not installed** | Server preflight, new site, DNS/TLS, native login UAT |
+| [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Green Box-style native login, homepage and static CI ready; UAT pending** | Final approved logo asset, EN/AR content, SEO, device/auth UAT |
+| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Public HTTPS installer ready; not installed** | Confirm Bench/site/host, deploy, DNS/TLS, native auth UAT |
 | [ED-02 #3](https://github.com/VoyaERP/erpdevelopers/issues/3) IAM/privacy | **Planned** | Role matrix + threat model |
 | [ED-03 #4](https://github.com/VoyaERP/erpdevelopers/issues/4) Community | **Planned** | ED-02 approval |
 | [ED-04 #5](https://github.com/VoyaERP/erpdevelopers/issues/5) Developer Hub | **Planned** | ED-02 approval |
