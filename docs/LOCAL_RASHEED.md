@@ -13,6 +13,55 @@ Connection to 192.168.64.15 closed.
 
 The script began with **set -euo pipefail**, apparently in the interactive session. A failing command under set -e can exit the shell, which closes the SSH connection. A missing hostname binary may mean a restricted PATH or minimal OS package, **not** a Frappe failure. Confirm whether **MacVMs** and **Rasheed** refer to the same target.
 
+## Third audit — confirmed capacity and stack (2026-11-13)
+
+User-provided terminal evidence from `[manakhly@MacVMs ~]`:
+
+| Resource | Actual observation | Decision |
+| --- | --- | --- |
+| Architecture | `aarch64` / Arch Linux ARM | Outside officially supported Frappe distro list |
+| Root filesystem | `/dev/vda2`: **30G total, 25G used, 3.8G free, 87% used** | **HARD STOP** for another Bench; capacity first |
+| RAM | **3.8 GiB total**, about **2.5 GiB available**; 4GiB swap | Concurrent v15+v16 builds may suffer memory pressure |
+| MariaDB | `SELECT VERSION()` and `mariadbd --version`: **12.3.2** | Server confirmed; not documented v16 11.8 target; compatibility requires test |
+| Redis/Valkey | Valkey **9.1.1** is present through both `redis-server` and `valkey-server` | v16 6+ prerequisite met by version, integration not tested |
+| Yarn | **1.22.22** | Meets official 1.22+ |
+| Frappe existing | **15.118.0**, ERPNext **15.121.0**, app `rasheed 0.0.1`, branch **version-15** | Preserve existing bench/services/apps |
+| Installed Node 24 | `nvm install 24` completed; **v24.22.3**, npm **11.19.1** | Installed; default shell still Node 20.20.2 unless `nvm use 24` invoked |
+| Candidate ports | No listeners reported for `8001`, `8002`, `9001`, `11001`, `13001`, `18080` at scan moment | Must revalidate before `bench start`; don't assume auto-allocation |
+| Containers | `docker` and `podman` not found | Do not prescribe immediate container commands without installation plan |
+
+**R0 conclusion:** **Do NOT run `bench init`, `bench new-site`, `bench update`, `bench restart`, database version changes, or cache cleanup on the existing v15 bench yet.** Source code work can continue independently in GitHub. Storage expansion or separate supported development VM is the safest path. Suggested *capacity planning target* (not an official framework minimum): **15–20 GB free disk** and **>=8 GiB total RAM** when planning to operate v15 and v16 side by side. Prefer a **separate Debian 13 / Ubuntu 24.04+ ARM64 VM** with sufficient resources, to avoid unsupported Arch-specific packaging and shared database risks.
+
+### Read-only storage and existing-sites inspection
+
+Run inside a subshell on MacVMs; does not delete or modify anything:
+
+~~~bash
+(
+  set +e
+  echo "=== Root disk/inodes ==="; df -h /; df -i /
+  echo "=== Home directory sizes ==="
+  du -x -h -d 1 "$HOME" 2>/dev/null | sort -h | tail -n 20
+  echo "=== Existing Bench major sizes ==="
+  du -x -h -d 1 "$HOME/frappe-bench" 2>/dev/null | sort -h | tail -n 20
+  echo "=== Other possible disk caches (read-only) ==="
+  du -sh "$HOME/.cache" "$HOME/.local" "$HOME/.nvm" /var/cache/pacman/pkg 2>/dev/null || true
+  echo "=== Disk partitions ==="
+  command -v lsblk >/dev/null 2>&1 && lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINTS || true
+  echo "=== Current Frappe v15 site names (no secrets) ==="
+  find "$HOME/frappe-bench/sites" -mindepth 2 -maxdepth 2 -type f -name site_config.json -printf '%h\n' 2>/dev/null
+  echo "=== Current Frappe branch ==="
+  git -C "$HOME/frappe-bench/apps/frappe" branch --show-current
+  echo "=== END ==="
+)
+~~~
+
+**Note:** `bench list-sites` is not a valid command in this installation (observed `No such command 'list-sites'`). Use the read-only `find` above or `bench --site all list-apps` when actually needed, according to Frappe docs. Never display `site_config.json`: it includes secrets.
+
+**Safe options after inspection:** (1) expand the VM's existing 30GB virtual disk and filesystem with a verified backup and host-specific runbook, or (2) create an **isolated supported Debian/Ubuntu ARM64 VM** with its own compatible MariaDB 11.8, Node 24 and Frappe 16. Do not delete unknown backups, logs, package caches or existing Frappe assets without reviewing retention and recovery needs. Do not upgrade/downgrade shared MariaDB 12.3.2.
+
+---
+
 ## Verified host snapshot — 2026-11-13 (from user terminal)
 
 | Property | Observed value | Consequence |
