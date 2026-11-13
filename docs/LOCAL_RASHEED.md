@@ -107,6 +107,30 @@ Only **after** (1) an off-VM backup/snapshot; (2) identifying the Mac virtualiza
 
 ---
 
+## Current-host v16 installation — user preference accepted (2026-11-13)
+
+The user prefers to test on the **same MacVMs** (Arch Linux ARM) rather than provisioning a new VM. This does **not** waive the preservation, disk, or database compatibility gates. The reviewed install helper now lives at:
+
+- [version-16/scripts/install_local_v16.sh](https://github.com/VoyaERP/erpdevelopers/blob/version-16/scripts/install_local_v16.sh)
+
+Run in a normal MacVMs SSH session **as `manakhly`, not root**; after verifying the off-VM backup and raising free disk to >=8GiB:
+
+~~~bash
+test ! -e "$HOME/erpdevelopers-source" && \
+  git clone --branch version-16 --single-branch \
+    git@github.com:VoyaERP/erpdevelopers.git \
+    "$HOME/erpdevelopers-source"
+
+cd "$HOME/erpdevelopers-source"
+bash scripts/install_local_v16.sh
+~~~
+
+This command **does not override the storage guard**. On the known 3.6 GiB free disk it exits before initiating a second Bench. The install helper uses per-shell `nvm use 24`, independent Bench path `~/frappe-bench-erpdev-v16`, checks generated port conflicts and prompts for separate site credentials rather than putting them in terminal history. Failed/partial runs are intentionally **not automatically deleted**; inspect state before retrying. Branch/head and local site evidence must be recorded after an actual run.
+
+**Note:** this user preference supersedes the initial *preference* for a separate supported VM, but not the fallback if native Arch ARM dependencies or MariaDB 12.3 cause incompatibility.
+
+---
+
 ## Fifth audit — QEMU confirmed; no resize performed (2026-11-13)
 
 **Observed:** `systemd-detect-virt` => `qemu`; `/dev/vda` **30G**, `vda1` **200M VFAT**, `vda2` **29.8G ext4** mounted as root and `/boot/dtbs`; `findmnt /` confirms ext4. `resize2fs` located at `/usr/bin/resize2fs`. **`growpart` is absent**. These commands are read-only; **no capacity change has taken place**.

@@ -19,7 +19,7 @@
 
 | Epic | Observed status | Next evidence required |
 | --- | --- | --- |
-| [ED-00 #1](https://github.com/VoyaERP/erpdevelopers/issues/1) Environment | **Blocked: disk capacity + compatibility review** | Free disk/RAM capacity, MariaDB v12.3 vs v16 baseline, separate ports/site, Mac smoke |
+| [ED-00 #1](https://github.com/VoyaERP/erpdevelopers/issues/1) Environment | **Blocked: disk capacity + compatibility review** | Current-host guarded installer available, 3.6GB fails >=8GiB preflight; MariaDB v12.3 compatibility, Mac smoke |
 | [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Scaffold committed, UAT pending** | Approved asset + CMS/i18n/SEO + browser UAT |
 | [ED-02 #3](https://github.com/VoyaERP/erpdevelopers/issues/3) IAM/privacy | **Planned** | Role matrix + threat model |
 | [ED-03 #4](https://github.com/VoyaERP/erpdevelopers/issues/4) Community | **Planned** | ED-02 approval |
@@ -60,6 +60,15 @@
 
 **Next non-destructive evidence required:** On Mac host, `df -h "$HOME"`, the virtualization application/VM owner, and confirmation of off-VM backup. This is a **decision gate**, not permission to modify a running disk.
 
+## User direction: test on existing MacVMs (2026-11-13)
+
+- User instructed to proceed on the **current MacVMs host**, not create a new VM at this stage.
+- **Safe interpretation:** attempt a **separate v16 Bench** on this host, never upgrade the four existing v15 sites in place.
+- Added a [guarded v16 installer](https://github.com/VoyaERP/erpdevelopers/blob/version-16/scripts/install_local_v16.sh) to the `version-16` branch. It checks the preserved v15 branch/site, **at least 8 GiB free storage**, >=2GiB available RAM, Node24 within nvm, GitHub SSH, and distinct ports before it creates a new v16 site.
+- **Current 3.6 GB free fails the preflight**; *no install has been executed* on MacVMs and no safe capacity exception was granted. Required next step is to expand the disk or deliberately reclaim verified expendable storage until the guard passes. Preserve backup/restore options before modifying disk.
+- Frappe v16's published MariaDB **11.8** target differs from MacVMs MariaDB **12.3.2**: test compatibility only on a new database, never change the shared DB service for an unverified install.
+- This is for local development and Mac SSH-tunnel UAT only, **not production readiness**.
+
 ## Evidence ledger
 
 | Date | Scope | Evidence | Result |
@@ -70,6 +79,7 @@
 | 2026-11-13 | MacVMs readiness | Frappe 15.118.0, ERPNext 15.121.0, `rasheed` 0.0.1; 30G root with 3.8G free; 3.8GiB RAM, 2.5GiB available; MariaDB 12.3.2 server, Valkey 9.1.1, Yarn 1.22.22; Node 24.22.3 installed via nvm | **R0 blocked on disk capacity and compatibility validation; v15 untouched** |
 | 2026-11-13 | Storage/site inventory | 30G root, **3.6G free (88%)**, inodes 32%; Bench 6.1G; VS Code remote 3.1G; four v15 sites; ext4 `/dev/vda2` | **Blocker confirmed; expansion/VM isolation decision pending** |
 | 2026-11-13 | QEMU guest tool audit | `systemd-detect-virt=qemu`, `resize2fs` present, `growpart` absent, `vda2` ext4 | **Virtualization engine verified; Mac VM manager/backups remain unknown** |
+| 2026-11-13 | In-place v16 installation decision | User requests current MacVMs; guarded install script committed on `version-16` (Node24 scoped, free-space/port/v15 safety gates) | **Script ready, not run; disk preflight blocked at 3.6GiB free** |
 | 2026-11-13 | Project governance | Master plan + epic issue board created | **Documented; execution gates pending** |
 
 ## How to update this file
