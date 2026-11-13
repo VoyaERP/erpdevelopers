@@ -65,3 +65,14 @@ The full roadmap, security/architecture gates, issue board and live status are m
 - [GitHub delivery issues](https://github.com/VoyaERP/erpdevelopers/issues)
 
 Only mark release work complete after real v16 test-site evidence, security checks and UAT; an app commit by itself is not deployment proof.
+
+## MacVMs in-place install (guarded)
+
+Use [scripts/install_local_v16.sh](scripts/install_local_v16.sh) **only on MacVMs** after increasing disk free space to **at least 8 GiB** and verifying an off-VM backup. It refuses to write if the existing v15 Frappe branch is unexpected, target Bench/site already exists, or disk/memory requirements are not met. It uses Node 24 in its own subshell, allocates a distinct Bench, checks port conflicts, then creates only a **new v16 site**. On the documented 2026-11-13 machine state (**3.6 GiB free**) the script intentionally **stops before initialization**. The shared MariaDB server is 12.3.2 whereas Frappe's published v16 baseline is 11.8; a successful dev experiment is not production validation. Do not run this script as root, bypass guards or execute it on the v15 Bench.
+
+    # Clone the small repo once, then run the reviewed script:
+    git clone --branch version-16 --single-branch git@github.com:VoyaERP/erpdevelopers.git ~/erpdevelopers-source
+    cd ~/erpdevelopers-source
+    bash scripts/install_local_v16.sh
+
+The canonical roadmap and environment state stay on `main` in `docs/MASTER_PLAN.md`, `docs/STATUS.md`, and `docs/LOCAL_RASHEED.md`.
