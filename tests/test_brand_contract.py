@@ -11,7 +11,7 @@ class TestBrandContract(unittest.TestCase):
             self.assertIn(word, template)
 
     def test_no_active_integrations_claimed(self):
-        template = (ROOT / "erpdevelopers/www/index.html").read_text(encoding="utf-8")
+        template = (ROOT / "erpdevelopers/www/erp-developers-home.html").read_text(encoding="utf-8")
         self.assertIn("Planned module", template)
         self.assertIn("not active on this preview site", template)
 

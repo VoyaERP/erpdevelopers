@@ -1,55 +1,29 @@
-/* ERP Developers website presentation on Frappe v16's native /login.
-   No login form duplication, request interception, 2FA override or auth logic. */
+/* Native Frappe v16 /login enhancement.
+ * Same safe method as Green Box: decorative brand chrome around the ORIGINAL form.
+ * We never translate auth messages, reparent fields, replace forms or intercept requests.
+ */
 (() => {
   "use strict";
 
   const ICON = "/assets/erpdevelopers/images/erp-mark.svg";
   const copy = {
     en: {
-      home: "Home",
-      vision: "Vision",
-      ecosystem: "Ecosystem",
-      ai: "AI & Innovation",
-      signIn: "Sign in",
-      navigation: "Main navigation",
-      skip: "Skip to sign in",
-      asideLabel: "ERP Developers technology community",
-      eyebrow: "ENGAGE. REASON. PROGRESS.",
-      title: "A connected space for people and technology.",
-      description: "Discover knowledge, build expertise and grow through collaboration. One technology community, without vendor boundaries.",
-      engage: "Engage",
-      engageDesc: "Connect people",
-      reason: "Reason",
-      reasonDesc: "Think intelligently",
-      progress: "Progress",
-      progressDesc: "Create impact",
-      footer: "Technology grows stronger together.",
-      copyright: "All rights reserved"
+      home: "Home", vision: "Vision", ecosystem: "Ecosystem",
+      ai: "AI & Innovation", signIn: "Sign in",
+      navigation: "Main navigation", skip: "Skip to sign in",
+      footer: "A community for people, knowledge and technology.",
+      rights: "All rights reserved"
     },
     ar: {
-      home: "الرئيسية",
-      vision: "رؤيتنا",
-      ecosystem: "المنصة",
-      ai: "الذكاء والابتكار",
-      signIn: "تسجيل الدخول",
-      navigation: "القائمة الرئيسية",
-      skip: "انتقل إلى تسجيل الدخول",
-      asideLabel: "مجتمع ERP Developers التقني",
-      eyebrow: "ENGAGE. REASON. PROGRESS.",
-      title: "مساحة تجمع الخبرات والأفكار والتقنيات.",
-      description: "تواصل مع الخبراء، وطوّر مهاراتك، وشارك المعرفة في مجتمع تقني لا يرتبط بنظام أو شركة واحدة.",
-      engage: "Engage",
-      engageDesc: "تعاون وتواصل",
-      reason: "Reason",
-      reasonDesc: "تفكير ذكي",
-      progress: "Progress",
-      progressDesc: "تطور وتأثير",
-      footer: "التكنولوجيا أقوى بالتعاون.",
-      copyright: "جميع الحقوق محفوظة"
+      home: "الرئيسية", vision: "رؤيتنا", ecosystem: "المنصة",
+      ai: "الذكاء والابتكار", signIn: "تسجيل الدخول",
+      navigation: "القائمة الرئيسية", skip: "انتقل إلى تسجيل الدخول",
+      footer: "مجتمع يجمع الخبرات والمعرفة والتقنيات.",
+      rights: "جميع الحقوق محفوظة"
     }
   };
 
-  function element(tag, className, label) {
+  function create(tag, className, label) {
     const node = document.createElement(tag);
     if (className) node.className = className;
     if (typeof label === "string") node.textContent = label;
@@ -57,30 +31,31 @@
   }
 
   function link(href, label, className) {
-    const node = element("a", className, label);
+    const node = create("a", className, label);
     node.href = href;
     return node;
   }
 
-  function brand() {
-    const a = link("/", "", "ed-login-brand");
-    a.setAttribute("aria-label", "ERP Developers");
-    const img = element("img", "ed-login-brand-image");
-    img.src = ICON;
-    img.width = 43;
-    img.height = 43;
-    img.alt = "";
-    img.setAttribute("aria-hidden", "true");
-    const name = element("span", "ed-login-brand-name");
-    name.append(element("strong", "", "ERP"), element("span", "", "Developers"));
-    a.append(img, name);
-    return a;
+  function wordmark() {
+    const name = create("span", "ed-login-brand-name");
+    name.append(create("strong", "", "ERP"), create("span", "", "Developers"));
+    return name;
   }
 
   function header(t) {
-    const outer = element("header", "ed-login-header");
-    const inner = element("div", "ed-login-header-inner");
-    const nav = element("nav", "ed-login-nav");
+    const outer = create("header", "ed-login-header");
+    const inner = create("div", "ed-login-header-inner");
+    const brand = link("/", "", "ed-login-brand");
+    brand.setAttribute("aria-label", "ERP Developers");
+    const img = create("img", "ed-login-brand-image");
+    img.src = ICON;
+    img.width = 44;
+    img.height = 44;
+    img.alt = "";
+    img.setAttribute("aria-hidden", "true");
+    brand.append(img, wordmark());
+
+    const nav = create("nav", "ed-login-nav");
     nav.setAttribute("aria-label", t.navigation);
     [
       ["/", t.home],
@@ -88,77 +63,50 @@
       ["/#ecosystem", t.ecosystem],
       ["/#ai", t.ai]
     ].forEach(([href, label]) => nav.appendChild(link(href, label)));
-    const current = element("span", "ed-login-current", t.signIn);
+
+    const current = create("span", "ed-login-current", t.signIn);
     current.setAttribute("aria-current", "page");
-    inner.append(brand(), nav, current);
+    inner.append(brand, nav, current);
     outer.appendChild(inner);
     return outer;
   }
 
-  function story(t) {
-    const aside = element("aside", "ed-login-story");
-    aside.setAttribute("aria-label", t.asideLabel);
-    const content = element("div", "ed-login-story-content");
-    content.append(
-      element("p", "ed-login-story-eyebrow", t.eyebrow),
-      element("h2", "ed-login-story-title", t.title),
-      element("p", "ed-login-story-description", t.description)
-    );
-    const values = element("div", "ed-login-values");
-    [
-      [t.engage, t.engageDesc],
-      [t.reason, t.reasonDesc],
-      [t.progress, t.progressDesc]
-    ].forEach(([name, detail]) => {
-      const item = element("div", "ed-login-value");
-      item.append(element("strong", "", name), element("small", "", detail));
-      values.appendChild(item);
-    });
-    content.appendChild(values);
-    aside.appendChild(content);
-    return aside;
-  }
-
   function footer(t) {
-    const outer = element("footer", "ed-login-footer");
-    const inner = element("div", "ed-login-footer-inner");
-    const wordmark = element("p", "ed-login-footer-brand");
-    wordmark.append(element("strong", "", "ERP"), element("span", "", "Developers"));
-    const summary = element("p", "ed-login-footer-summary", t.footer);
-    const rights = element(
+    const outer = create("footer", "ed-login-footer");
+    const inner = create("div", "ed-login-footer-inner");
+    const brand = create("div", "ed-login-footer-brand");
+    brand.append(wordmark(), create("small", "", "Engage. Reason. Progress."));
+    const summary = create("p", "ed-login-footer-summary", t.footer);
+    const rights = create(
       "p", "ed-login-footer-rights",
-      t.copyright + " © " + String(new Date().getFullYear())
+      t.rights + " © " + String(new Date().getFullYear())
     );
-    inner.append(wordmark, summary, rights);
+    inner.append(brand, summary, rights);
     outer.appendChild(inner);
     return outer;
   }
 
   function render() {
-    if ((window.location.pathname.replace(/\/+$/, "") || "/") !== "/login") return;
+    const path = window.location.pathname.replace(/\/+$/, "") || "/";
+    if (path !== "/login") return;
     const page = document.getElementById("page-login");
-    if (!page || document.body.dataset.edLoginEnhanced === "1") return;
-    const wrapper = page.querySelector(".page-content-wrapper");
-    if (!wrapper) return; // Leave Frappe's native login untouched on markup changes.
+    if (!page || !page.querySelector(".page-content-wrapper")) return;
+    if (document.body.dataset.edLoginEnhanced === "1") return;
 
-    const lang = (document.documentElement.lang || "en").toLowerCase().split("-")[0];
-    const arabic = lang === "ar";
-    const t = arabic ? copy.ar : copy.en;
+    const language = (document.documentElement.lang || "en")
+      .toLowerCase().split("-")[0];
+    const t = language === "ar" ? copy.ar : copy.en;
+    const direction = language === "ar" ? "rtl" : "ltr";
+    const skip = link("#page-login", t.skip, "ed-login-skip");
+    const top = header(t);
+    const bottom = footer(t);
+    top.dir = direction;
+    bottom.dir = direction;
 
+    // Only add siblings to body. No changes inside native Frappe login DOM.
     document.body.classList.add("ed-login-website");
     document.body.dataset.edLoginEnhanced = "1";
-    const top = header(t);
-    top.dir = arabic ? "rtl" : "ltr";
-    document.body.insertBefore(top, page);
-
-    const skip = link("#page-login", t.skip, "ed-login-skip");
-    top.before(skip);
-    const aside = story(t);
-    aside.dir = arabic ? "rtl" : "ltr";
-    wrapper.insertBefore(aside, wrapper.firstChild);
-
-    const bottom = footer(t);
-    bottom.dir = arabic ? "rtl" : "ltr";
+    document.body.prepend(skip, top);
     document.body.appendChild(bottom);
   }
 

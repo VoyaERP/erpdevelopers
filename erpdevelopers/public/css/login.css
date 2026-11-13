@@ -1,179 +1,165 @@
-/* Native Frappe 16 /login only; it does not replace the login component or OTP.
-   All selectors are route + enhancement-class scoped, avoiding Desk/site regressions. */
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website {
-  --ed-login-navy:#081d3f;
-  --ed-login-deep:#0b2d60;
-  --ed-login-cyan:#178bdd;
-  --ed-login-teal:#0cb9aa;
-  --ed-login-muted:#5a6c83;
-  --ed-login-border:#dfe8f2;
-  color:var(--ed-login-navy);
-  background:linear-gradient(180deg,#f5faff 0%,#fff 95%);
+/* ERP Developers login. Green Box v0.1.25 method: native Frappe form + image backdrop,
+ * not a second login component or a grid requiring reparented auth markup. */
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website{
+  --ed-login-navy:#081f41;
+  --ed-login-blue:#145cc1;
+  --ed-login-teal:#05b9ac;
+  --ed-login-ink:#22344d;
+  --ed-login-edge:#dce6f3;
   min-height:100vh;
   display:flex;
   flex-direction:column;
+  color:var(--ed-login-ink);
+  background:#f4f7fb;
 }
 .ed-login-website *{box-sizing:border-box}
-.ed-login-skip{position:fixed;inset-inline-start:12px;top:-110px;background:#fff;color:#081d3f;z-index:10000;padding:11px 16px;border:2px solid #178bdd;border-radius:9px}
+.ed-login-skip{position:fixed;top:-120px;inset-inline-start:16px;background:#fff;color:#081f41;padding:10px 14px;border:2px solid #145cc1;border-radius:8px;z-index:20000}
 .ed-login-skip:focus{top:12px}
-.ed-login-header{width:100%;background:#fff;border-bottom:1px solid #e9eef6;flex-shrink:0}
-.ed-login-header-inner{max-width:1240px;min-height:79px;padding:14px 28px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:26px}
-.ed-login-brand{display:flex;align-items:center;gap:11px;white-space:nowrap;text-decoration:none!important;color:#081d3f!important}
-.ed-login-brand-image{width:43px;height:43px;display:block;object-fit:contain}
-.ed-login-brand-name{display:flex;align-items:baseline;gap:6px;font-size:21px;letter-spacing:-.8px;color:#081d3f}
-.ed-login-brand-name strong{font-size:26px;font-weight:800}
-.ed-login-brand-name span{font-weight:500}
-.ed-login-nav{display:flex;align-items:center;gap:26px;flex-wrap:wrap}
-.ed-login-nav a{font-size:13px;font-weight:650;color:#344e6b!important;text-decoration:none!important}
-.ed-login-nav a:hover{color:#087bb9!important}
-.ed-login-current{border:1px solid #cce4ef;border-radius:10px;padding:10px 17px;font-size:13px;font-weight:750;background:#f0fbfc;color:#116c82}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login{
-  width:100%;
-  min-width:0;
-  flex:1 0 auto;
-}
+.ed-login-header{background:#fff;border-bottom:1px solid #e7edf5;position:relative;z-index:5;flex-shrink:0}
+.ed-login-header-inner{width:min(1240px,100%);margin:auto;min-height:76px;padding:13px 26px;display:flex;align-items:center;justify-content:space-between;gap:22px}
+.ed-login-brand{display:flex;align-items:center;gap:11px;text-decoration:none!important;white-space:nowrap;color:var(--ed-login-navy)!important}
+.ed-login-brand-image{width:44px;height:44px;object-fit:contain}
+.ed-login-brand-name{display:inline-flex;align-items:baseline;gap:6px;font-size:19px;font-weight:600;letter-spacing:-.7px}
+.ed-login-brand-name strong{font-size:25px;font-weight:850;letter-spacing:-1.1px}
+.ed-login-nav{display:flex;align-items:center;gap:clamp(10px,2vw,27px);flex-wrap:wrap}
+.ed-login-nav a{font-size:13px;font-weight:650;text-decoration:none!important;color:#36516e!important}
+.ed-login-nav a:hover{color:var(--ed-login-blue)!important}
+.ed-login-current{border:1px solid #bfe6e5;background:#ecfaf8;border-radius:10px;color:#00645d;padding:10px 15px;font-size:13px;font-weight:750;white-space:nowrap}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website .web-header,
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website header.navbar,
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website .web-footer{display:none!important}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login{width:100%;min-width:0;flex:1 0 auto}
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper{
-  width:min(1100px,calc(100% - 42px));
-  max-width:none;
-  margin:clamp(36px,5vw,70px) auto;
-  padding:0;
-  display:grid;
-  grid-template-columns:minmax(0,1.06fr) minmax(345px,.94fr);
-  min-height:560px;
-  border:1px solid #e0eaf3;
-  border-radius:26px;
-  overflow:hidden;
-  background:#fff;
-  box-shadow:0 22px 65px rgba(15,57,112,.09);
-}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper > main{
-  grid-column:2;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  width:100%;
-  max-width:none;
-  min-width:0;
-  margin:0;
-  padding:40px clamp(22px,3.6vw,54px);
-}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-breadcrumbs,
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-header-wrapper,
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-footer{
-  display:none;
-}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page_content{
-  display:block;
-  width:100%;
-  max-width:440px;
-  min-width:0;
-  margin:0 auto;
-}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page_content > div{
-  width:100%;
-  max-width:100%;
-}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .login-content.page-card{
-  border:0;
-  box-shadow:none;
-  padding:0;
-  background:transparent;
-  width:100%;
-  max-width:100%;
-  margin:0 auto;
-}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head .app-logo{display:none!important}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head{
-  margin:0 0 20px;
-}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head h4{
-  font-size:clamp(26px,3vw,33px);font-weight:800;color:#081d3f;letter-spacing:-1px;
-}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head .page-card-subtitle{color:#61738a}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-group{width:100%}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-control{
-  width:100%;height:51px;min-height:51px;border:1px solid #d8e4ef;
-  border-radius:10px;padding:12px 14px;background:#fff;color:#081d3f;
-  font-size:15px;direction:ltr;text-align:start;
-}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-control:focus-visible{
-  outline:2px solid #167eca;outline-offset:1px;box-shadow:none
-}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .es-button[data-variant="solid"]{
-  background:#1269dc!important;color:#fff!important;border:1px solid #1269dc!important;
-  min-height:49px;border-radius:10px;font-weight:750
-}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .es-button[data-variant="solid"]:hover{background:#0c56b3!important}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .es-button[data-variant="solid"]:disabled{opacity:.55;cursor:not-allowed}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login a{color:#1269dc}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login a:focus-visible,
-.ed-login-header a:focus-visible,.ed-login-footer a:focus-visible{outline:2px solid #0cb9aa;outline-offset:3px}
-.ed-login-story{
-  grid-column:1;
-  grid-row:1;
-  background:
-    radial-gradient(circle at 88% 20%,rgba(26,185,196,.22),transparent 38%),
-    radial-gradient(circle at 30% 90%,rgba(13,131,214,.3),transparent 45%),
-    linear-gradient(140deg,#071c3c 0%,#0b356b 57%,#115aa1 100%);
-  min-width:0;
-  color:#fff;
-  padding:clamp(32px,4vw,66px);
-  display:flex;
-  align-items:center;
   position:relative;
   isolation:isolate;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  width:min(1130px,calc(100% - 42px));
+  max-width:none;
+  min-height:515px;
+  margin:clamp(24px,4vw,52px) auto;
+  padding:36px clamp(22px,4vw,64px);
+  border-radius:24px;
+  overflow:hidden;
+  background:linear-gradient(100deg,#e8f4fa 0%,#f7fbff 54%,#fff 78%);
+  box-shadow:0 20px 56px rgba(20,49,95,.09);
+  border:1px solid var(--ed-login-edge);
 }
-.ed-login-story::before{
-  content:"";position:absolute;inset:18px;opacity:.16;z-index:-1;pointer-events:none;
-  background-image:linear-gradient(90deg,transparent 96%,#d4faff 97%),linear-gradient(transparent 96%,#d4faff 97%);
-  background-size:32px 32px;mask-image:radial-gradient(circle at 65% 40%,#000,transparent 73%);
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper::before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  inset:16px auto 16px 16px;
+  width:53%;
+  pointer-events:none;
+  border-radius:19px;
+  background:
+    linear-gradient(112deg,rgba(4,18,46,.33),rgba(7,47,100,.08)),
+    url("/assets/erpdevelopers/images/login-network.svg") center/cover no-repeat,
+    linear-gradient(130deg,#071c3c,#0d5594);
 }
-.ed-login-story-content{position:relative;max-width:460px}
-.ed-login-story-eyebrow{font-size:12px;letter-spacing:1.6px;font-weight:850;color:#76eade;margin-bottom:27px!important}
-.ed-login-story-title{font-size:clamp(30px,3.5vw,44px);line-height:1.2;letter-spacing:-1.2px;color:#fff;font-weight:800;margin:0 0 21px}
-.ed-login-story-description{color:#d6e7f6;font-size:16px;line-height:1.85;margin:0 0 40px}
-.ed-login-values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.ed-login-value{border:1px solid #ffffff33;border-radius:12px;padding:12px 10px;background:#ffffff0d}
-.ed-login-value strong{display:block;font-size:14px;color:#fff}
-.ed-login-value small{display:block;color:#c8e4f0;font-size:11px;margin-top:5px}
-.ed-login-footer{flex-shrink:0;background:#071c3c;color:#bed1e4}
-.ed-login-footer-inner{max-width:1240px;margin:0 auto;padding:23px 28px;display:flex;gap:18px;align-items:center;justify-content:space-between}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper::after{
+  content:"";
+  position:absolute;
+  z-index:0;
+  inset:16px auto 16px 16px;
+  width:53%;
+  pointer-events:none;
+  border-radius:19px;
+  background:
+    linear-gradient(139deg,transparent 0 27%,rgba(255,255,255,.12) 27% 32%,transparent 32%),
+    linear-gradient(39deg,transparent 0 62%,rgba(42,225,227,.12) 62% 70%,transparent 70%);
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper>main{
+  position:relative;
+  z-index:1;
+  display:block;
+  width:min(100%,466px);
+  max-width:46%;
+  min-width:0;
+  margin:0;
+  padding:0;
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper :is(.page-header-wrapper,.page-breadcrumbs,.page-footer){display:none}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page_content,
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page_content>div{width:100%;max-width:none;margin:0;padding:0}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .login-content.page-card{
+  width:100%;
+  max-width:100%;
+  border:1px solid #e3eaf2;
+  border-radius:18px;
+  padding:clamp(22px,3.3vw,37px);
+  margin:0;
+  background:#fff;
+  box-shadow:0 16px 40px rgba(6,32,71,.08);
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head{margin:0 0 24px;align-items:flex-start}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head .app-logo{max-width:48px;max-height:48px;object-fit:contain}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head h4{color:var(--ed-login-navy);font-size:clamp(22px,2.7vw,30px);font-weight:800}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-subtitle{color:#60728b;line-height:1.6}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-label{color:#294360;font-size:13px;font-weight:700}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-group{max-width:100%}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-control{
+  width:100%;min-height:49px;border:1px solid #d7e2ee;border-radius:10px;
+  color:var(--ed-login-navy);background:#fff;direction:ltr;text-align:start;
+  padding:11px 13px;font-size:15px;
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-control:focus-visible{
+  outline:2px solid var(--ed-login-blue);outline-offset:1px;box-shadow:none
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .btn-login:not(.btn-ldap-login),
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .btn-forgot{
+  background:var(--ed-login-blue)!important;
+  color:#fff!important;
+  border:1px solid var(--ed-login-blue)!important;
+  min-height:49px;border-radius:10px;font-weight:750;
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .btn-login:not(.btn-ldap-login):hover,
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .btn-forgot:hover{
+  background:#0d469a!important
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .btn:disabled{opacity:.55;cursor:not-allowed}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login a{color:var(--ed-login-blue)}
+.ed-login-website a:focus-visible,.ed-login-website button:focus-visible{outline:2px solid var(--ed-login-teal);outline-offset:3px}
+.ed-login-footer{background:#081b38;color:#c2d4e8;flex-shrink:0}
+.ed-login-footer-inner{max-width:1240px;padding:22px 26px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .ed-login-footer p{margin:0}
-.ed-login-footer-brand{white-space:nowrap;display:flex;align-items:baseline;gap:5px;color:#fff}
-.ed-login-footer-brand strong{font-size:18px;font-weight:850}
-.ed-login-footer-brand span{font-size:15px;color:#d5e3f1}
-.ed-login-footer-summary,.ed-login-footer-rights{font-size:12px;color:#bed1e4}
-@media(max-width:940px){
-  .ed-login-header-inner{padding:14px 19px}
-  .ed-login-nav{gap:14px}
-  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper{
-    grid-template-columns:minmax(0,1fr) minmax(330px,1fr);
-  }
-  .ed-login-story{padding:34px}
-  .ed-login-footer-inner{padding:21px 19px}
+.ed-login-footer-brand{display:flex;align-items:baseline;gap:14px;color:#fff;white-space:nowrap}
+.ed-login-footer-brand .ed-login-brand-name{font-size:14px;letter-spacing:0}
+.ed-login-footer-brand .ed-login-brand-name strong{font-size:20px}
+.ed-login-footer-brand small{font-size:12px;color:#7fddd6}
+.ed-login-footer-summary,.ed-login-footer-rights{font-size:12px;color:#bad0e6}
+:root[lang^="ar"] .ed-login-website{font-family:"Tajawal","Noto Sans Arabic",Tahoma,Arial,sans-serif}
+:root[lang^="ar"] .ed-login-website #page-login .login-content{direction:rtl;text-align:right}
+:root[lang^="ar"] .ed-login-website #page-login .form-control{direction:ltr;text-align:left}
+@media(max-width:960px){
+  .ed-login-nav{gap:12px}
+  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper{padding:23px;min-height:480px}
+  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper::before,
+  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper::after{inset:12px auto 12px 12px;width:50%}
+  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper>main{max-width:49%}
 }
 @media(max-width:720px){
-  .ed-login-header-inner{flex-wrap:wrap;gap:11px}
-  .ed-login-nav{order:3;width:100%;gap:18px}
+  .ed-login-header-inner{padding:13px 18px;flex-wrap:wrap;gap:10px}
+  .ed-login-nav{order:3;width:100%;gap:12px}
   .ed-login-current{margin-inline-start:auto}
   :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper{
-    grid-template-columns:minmax(0,1fr);width:min(540px,calc(100% - 28px));margin:22px auto 35px;min-height:0;border-radius:20px;
+    display:block;width:min(550px,calc(100% - 24px));min-height:0;
+    margin:22px auto 28px;padding:175px 12px 13px;border-radius:20px;
   }
-  .ed-login-story{grid-column:1;grid-row:1;padding:27px;min-height:220px}
-  .ed-login-story-title{font-size:28px;margin-bottom:12px}
-  .ed-login-story-description{font-size:14px;margin-bottom:17px}
-  .ed-login-values{display:none}
-  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper > main{
-    grid-column:1;grid-row:2;padding:29px 24px 38px;
+  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper::before,
+  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper::after{
+    inset:12px 12px auto 12px;width:auto;height:150px;border-radius:13px;
   }
-  .ed-login-footer-inner{flex-wrap:wrap}
+  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper>main{width:100%;max-width:none}
+  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .login-content.page-card{box-shadow:none}
+  .ed-login-footer-inner{padding:19px 18px;flex-wrap:wrap}
 }
 @media(max-width:420px){
-  .ed-login-nav{gap:10px}.ed-login-nav a{font-size:12px}
-  .ed-login-brand-name{font-size:18px}.ed-login-brand-name strong{font-size:22px}
-  .ed-login-story-title{font-size:24px}
-  .ed-login-story{padding:23px}
+  .ed-login-nav a{font-size:12px}
+  .ed-login-brand-name strong{font-size:22px}
+  .ed-login-brand-name{font-size:16px}
+  .ed-login-footer-brand{flex-wrap:wrap;gap:5px 12px}
 }
-@media(prefers-reduced-motion:reduce){
-  .ed-login-website *{scroll-behavior:auto;transition:none!important}
-}
+@media(prefers-reduced-motion:reduce){.ed-login-website *{scroll-behavior:auto;transition:none!important}}

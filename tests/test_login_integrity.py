@@ -13,18 +13,26 @@ class TestNativeLogin(unittest.TestCase):
         self.assertIn("login.css", hooks)
         self.assertNotIn("override_whitelisted_methods", hooks)
 
-    def test_login_script_never_creates_form_or_intercepts_login(self):
+    def test_no_custom_form_or_auth_interception(self):
         js = (APP / "public/js/login_chrome.js").read_text(encoding="utf-8")
         self.assertIn('document.getElementById("page-login")', js)
         self.assertIn('!== "/login"', js)
-        for forbidden in ('innerHTML', 'createElement("form")', 'frappe.call(', 'fetch(',
-                          'document.documentElement.lang ='):
+        self.assertIn("document.body.dataset.edLoginEnhanced", js)
+        self.assertIn("document.body.prepend(skip, top)", js)
+        for forbidden in ('innerHTML', 'create("form")', 'createElement("form")',
+                          "frappe.call(", "fetch(", "XMLHttpRequest",
+                          "document.documentElement.lang =", "wrapper.insertBefore("):
             self.assertNotIn(forbidden, js)
 
-    def test_css_is_route_scoped(self):
+    def test_native_sections_remain_unmodified(self):
+        js = (APP / "public/js/login_chrome.js").read_text(encoding="utf-8")
+        self.assertNotIn("page.querySelectorAll(", js)
+        self.assertNotIn("MutationObserver", js)
         css = (APP / "public/css/login.css").read_text(encoding="utf-8")
         self.assertIn('body[data-path="login"]', css)
         self.assertIn(".ed-login-website", css)
+        self.assertIn('url("/assets/erpdevelopers/images/login-network.svg")', css)
+        self.assertTrue((APP / "public/images/login-network.svg").is_file())
 
     def test_site_setup_is_explicit_and_site_scoped(self):
         setup = (APP / "site_setup.py").read_text(encoding="utf-8")
