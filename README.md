@@ -54,3 +54,14 @@ curl -I -H 'Host: erpdev.localhost' http://127.0.0.1:8000/
 When the Frappe server uses hostname-based site selection, set an entry `127.0.0.1 erpdev.localhost` in the Mac's `/etc/hosts` and visit `http://erpdev.localhost:8000`.
 
 Do not bind the development server to a publicly accessible interface. No production traffic or data should be involved.
+
+## Governing Master Plan (source of truth)
+
+The full roadmap, security/architecture gates, issue board and live status are maintained on the `main` branch to avoid duplicating plans across versioned code branches:
+
+- [Master Implementation Plan](https://github.com/VoyaERP/erpdevelopers/blob/main/docs/MASTER_PLAN.md)
+- [Current Status](https://github.com/VoyaERP/erpdevelopers/blob/main/docs/STATUS.md)
+- [Rasheed/MacVMs Safe Audit and Mac UAT](https://github.com/VoyaERP/erpdevelopers/blob/main/docs/LOCAL_RASHEED.md)
+- [GitHub delivery issues](https://github.com/VoyaERP/erpdevelopers/issues)
+
+Only mark release work complete after real v16 test-site evidence, security checks and UAT; an app commit by itself is not deployment proof.
