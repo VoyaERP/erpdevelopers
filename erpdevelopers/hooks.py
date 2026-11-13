@@ -7,5 +7,11 @@ app_description = "Technology, collaboration, knowledge and intelligent transfor
 app_license = "MIT"
 app_version = app_version
 
-# Public website only. No permissions bypass, background tasks or privileged endpoints.
-web_include_css = ["/assets/erpdevelopers/css/brand.css"]
+# Frappe owns /login, 2FA, password reset, social login and sessions.
+# Website assets are loaded by Frappe's native website template only.
+# The login script and login stylesheet are strictly scoped to /login.
+web_include_css = [
+    "/assets/erpdevelopers/css/brand.css",
+    "/assets/erpdevelopers/css/login.css",
+]
+web_include_js = ["/assets/erpdevelopers/js/login_chrome.js"]
