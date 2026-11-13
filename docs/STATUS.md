@@ -4,6 +4,13 @@
 
 > حالة التنفيذ مبنية على أدلة من GitHub ومن مخرجات المستخدم فقط. لا يتم اعتبار الكود مختبرًا لمجرد رفعه.
 
+## 2026-11-14 — Second installation attempt: missing apps.txt registration
+
+- User fast-forwarded both source checkouts to `560b23f...`, verified the Frappe asset discovery path and passed **12/12 source tests**; new with-files backup succeeded (database, config, public and private archives).
+- Frappe `bench --site erp-developers.com install-app erpdevelopers` **stopped before site installation**: `App erpdevelopers not in apps.txt`. The first `bench get-app` had synchronized Bench apps before the missing `patches.txt` marker was fixed. No evidence of Frappe or ERPNext transaction data changes.
+- Confirmed against [Frappe v16.56.0 installer](https://github.com/frappe/frappe/blob/v16.56.0/frappe/installer.py#L295-L318) and [Bench 5.31 BenchApps.sync](https://github.com/frappe/bench/blob/v5.31.0/bench/bench.py#L264-L289): the Frappe app must be present in Bench-wide `sites/apps.txt`. This is not the same as a per-site installed app.
+- Committed guarded resume to `version-16` **bfe30a736d7484ab7af0b38e1795a08383715139**, which validates that the only newly discovered app is `erpdevelopers`, saves `apps.txt` and `apps.json` copies to the target's private backups, then calls Bench's own `BenchApps.sync` before attempting `install-app`. [GitHub CI PASS](https://github.com/VoyaERP/erpdevelopers/actions/runs/43527371529) (static only). App is **not yet reported as installed**; operator must fast-forward source/Bench Git checkouts and rerun the existing-site installer. Do not run `bench new-site`, delete the site, or restart shared services.
+
 ## 2026-11-14 — First existing-site installation blocked at Frappe asset discovery
 
 - User executed the guarded existing-site installer on erptest-lightnode. With-files backup succeeded (DB ~1007 KiB, site config and two archives). App cloned into `apps/erpdevelopers` at `dfbbaaa4...` but `bench get-app` stopped during its **automatic esbuild**, before the target-site `install-app`. Verified with `bench --site erp-developers.com list-apps`: only Frappe 16.56.0 and ERPNext 16.55.0; ERP Developers is **not installed**.
@@ -42,7 +49,7 @@
 | --- | --- | --- |
 | [ED-00 #1](https://github.com/VoyaERP/erpdevelopers/issues/1) Environment | **Blocked: disk capacity + compatibility review** | Current-host guarded installer available, 3.6GB fails >=8GiB preflight; MariaDB v12.3 compatibility, Mac smoke |
 | [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Green Box-style native login, homepage and static CI ready; UAT pending** | Final approved logo asset, EN/AR content, SEO, device/auth UAT |
-| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Backup succeeded; first install stopped at esbuild; missing patch marker fixed in GitHub/CI, server app still absent** | Fast-forward both source checkouts, rerun existing-site install, verify public route/2FA |
+| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Second install blocked at Bench apps.txt; guarded registration fix CI passed; server app absent** | Fast-forward both checkouts, rerun existing-site installer, verify apps/assets/HTTPS/auth |
 | [ED-02 #3](https://github.com/VoyaERP/erpdevelopers/issues/3) IAM/privacy | **Planned** | Role matrix + threat model |
 | [ED-03 #4](https://github.com/VoyaERP/erpdevelopers/issues/4) Community | **Planned** | ED-02 approval |
 | [ED-04 #5](https://github.com/VoyaERP/erpdevelopers/issues/5) Developer Hub | **Planned** | ED-02 approval |
