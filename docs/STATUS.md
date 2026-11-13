@@ -4,6 +4,13 @@
 
 > حالة التنفيذ مبنية على أدلة من GitHub ومن مخرجات المستخدم فقط. لا يتم اعتبار الكود مختبرًا لمجرد رفعه.
 
+## 2026-11-14 — Targeted Gunicorn restart resolved origin/public HTTP 500
+
+- Operator verified `./env/bin/python` imports both `erpdevelopers` and `erpdevelopers.erp_developers`. The deployed site remains `erpdevelopers 0.1.0`, SHA **39659d46422f7c45d9bc8ec75aafb91c1c1574e3**.
+- Service ownership verified: Supervisor `frappe-bench-web:frappe-bench-frappe-web`, old Gunicorn master PID `9801`. Operator performed **targeted web-only restart**, not shared Bench/Redis/Nginx/worker restart. New Gunicorn master PID `11707`; new 5 worker processes started at `2026-11-14 07:38:25 +0800` in log.
+- **Recovery confirmed:** direct local-Nginx Origin and Cloudflare **HTTP GET** for `/api/method/ping`, `/login` and `/` all returned **HTTP 200**. Previous tracebacks (`ModuleNotFoundError: erpdevelopers`, secondary `AttributeError: is_ajax`) were from old Gunicorn workers and no new exception appears after the restart in the provided log segment.
+- **Runtime incident resolved**, but not a full production release: user has not yet confirmed site appearance, public CSS/JS/SVG asset status, browser console, actual session login/2FA/password reset, EN/AR mobile responsiveness, or other shared-Bench websites. Keep [GitHub #13](https://github.com/VoyaERP/erpdevelopers/issues/13) **OPEN** pending UAT.
+
 ## 2026-11-14 — Root cause isolated to Gunicorn web runtime
 
 - Operator diagnostics: Cloudflare **and direct-local-Nginx** GET requests to `/`, `/login` and `/api/method/ping` all returned HTTP 500. Nginx listening 80/443; Gunicorn listening 127.0.0.1:8000 with 5 workers under `--preload`. This rules out a Cloudflare-only problem and shows the failure occurs before ordinary route handling.
@@ -71,7 +78,7 @@
 | --- | --- | --- |
 | [ED-00 #1](https://github.com/VoyaERP/erpdevelopers/issues/1) Environment | **Blocked: disk capacity + compatibility review** | Current-host guarded installer available, 3.6GB fails >=8GiB preflight; MariaDB v12.3 compatibility, Mac smoke |
 | [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Green Box-style native login, homepage and static CI ready; UAT pending** | Final approved logo asset, EN/AR content, SEO, device/auth UAT |
-| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Installed v0.1.0, build passed; public / and /login HTTP 500** | Direct-origin check, Frappe traceback and service health; then HTTPS and auth UAT |
+| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Installed v0.1.0; Origin + Cloudflare /, /login, ping HTTP 200** | Browser visual/asset/EN-AR/auth/2FA UAT and other-site regression |
 | [ED-02 #3](https://github.com/VoyaERP/erpdevelopers/issues/3) IAM/privacy | **Planned** | Role matrix + threat model |
 | [ED-03 #4](https://github.com/VoyaERP/erpdevelopers/issues/4) Community | **Planned** | ED-02 approval |
 | [ED-04 #5](https://github.com/VoyaERP/erpdevelopers/issues/5) Developer Hub | **Planned** | ED-02 approval |
