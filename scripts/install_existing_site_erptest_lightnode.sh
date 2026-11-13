@@ -10,7 +10,7 @@
 
   SITE="erp-developers.com"
   BENCH="/data/frappe/frappe-bench"
-  if [ -n "$ERPDEV_BENCH" ]; then BENCH="$ERPDEV_BENCH"; fi
+  if [ -n "${ERPDEV_BENCH:-}" ]; then BENCH="$ERPDEV_BENCH"; fi
   APP="$BENCH/apps/erpdevelopers"
   REPO="https://github.com/VoyaERP/erpdevelopers.git"
   REF="version-16"
@@ -99,7 +99,7 @@
     node --check "$APP/erpdevelopers/public/js/login_chrome.js"
   fi
 
-  echo "=== Install app on existing site; DO NOT run bench new-site ==="
+  echo "=== Install ERP Developers on existing site ==="
   bench --site "$SITE" install-app erpdevelopers
   bench --site "$SITE" migrate
 
