@@ -70,6 +70,14 @@
 - Frappe v16's published MariaDB **11.8** target differs from MacVMs MariaDB **12.3.2**: test compatibility only on a new database, never change the shared DB service for an unverified install.
 - This is for local development and Mac SSH-tunnel UAT only, **not production readiness**.
 
+## Private-repository SSH deployment refinement (2026-11-14)
+
+- GitHub repository `VoyaERP/erpdevelopers` is **private**. Git operations performed by erptest-lightnode must authenticate using an **existing SSH key authorized for this repository**; ChatGPT's GitHub connector does not confer server SSH access.
+- Corrected `erptest-lightnode` Bench default to `/data/frappe/frappe-bench` (not MacVMs' `~/frappe-bench`). Both installer and updater now honor an explicit `BENCH` override.
+- Preflight uses `ssh -o BatchMode=yes` with `git ls-remote`, to stop with guidance instead of blocking on an encrypted key's passphrase. Load the *existing* key into `ssh-agent` first; no new SSH key or token is created by the script.
+- Changes merged into `version-16` through [PR #14](https://github.com/VoyaERP/erpdevelopers/pull/14), commit **3a0f9bd11ad678370740c5ae2d91504e65e5a591**; runbook: [private GitHub access](https://github.com/VoyaERP/erpdevelopers/blob/version-16/docs/ERPTEST_LIGHTNODE.md).
+- **Server authentication check, site installation, CI and UAT remain unverified.** Track [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) before approving release.
+
 ## erptest-lightnode public site deployment (new scope, 2026-11-14)
 
 - Domain: **erp-developers.com**; distinct from existing MacVMs v15/Rasheed audit.
