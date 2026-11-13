@@ -103,6 +103,18 @@
     top.dir = direction;
     bottom.dir = direction;
 
+    // Keep Frappe's native locale selector usable beside our site navigation.
+    // This moves only the website picker; the authentication DOM is untouched.
+    const picker = document.getElementById("language-switcher");
+    if (picker) {
+      const select = picker.querySelector("select");
+      if (select && !select.getAttribute("aria-label")) {
+        select.setAttribute("aria-label", language === "ar" ? "اللغة" : "Language");
+      }
+      picker.classList.add("ed-login-language");
+      top.querySelector(".ed-login-current").before(picker);
+    }
+
     // Only add siblings to body. No changes inside native Frappe login DOM.
     document.body.classList.add("ed-login-website");
     document.body.dataset.edLoginEnhanced = "1";

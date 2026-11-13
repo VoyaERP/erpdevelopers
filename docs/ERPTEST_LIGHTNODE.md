@@ -13,7 +13,7 @@
 
 The previous Green Box implementation preserved the **native Frappe login form**, password reset, signup configuration, social login and 2FA. ERP Developers follows this same safe approach: page-scoped CSS and an idempotent website header/footer script. The intersecting background is a local original SVG, not a new login template or authentication form. All auth/session/OTP logic stays in Frappe 16. The original form is not reparented and credentials never pass through custom JavaScript.
 
-Arabic and English site chrome follow the server-rendered Frappe HTML language. The app does not overwrite the Frappe language or localize validation/status messages with brittle JavaScript replacements.
+Arabic and English site chrome follow the server-rendered Frappe HTML language. The site-scoped setup enables Frappe's own language picker; the native picker is moved into the branded header, without replacing its event handlers. The app does not overwrite the Frappe language or localize validation/status messages with brittle JavaScript replacements.
 
 ## 1. Read-only preflight on erptest-lightnode
 

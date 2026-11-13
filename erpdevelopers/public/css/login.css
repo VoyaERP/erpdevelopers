@@ -25,6 +25,9 @@
 .ed-login-nav a{font-size:13px;font-weight:650;text-decoration:none!important;color:#36516e!important}
 .ed-login-nav a:hover{color:var(--ed-login-blue)!important}
 .ed-login-current{border:1px solid #bfe6e5;background:#ecfaf8;border-radius:10px;color:#00645d;padding:10px 15px;font-size:13px;font-weight:750;white-space:nowrap}
+.ed-login-language{margin:0;flex:0 0 auto}
+.ed-login-language .form-control{font-size:13px;min-width:82px;max-width:140px;min-height:38px;padding:6px 9px;border:1px solid #c9dbe8;border-radius:9px;background:#fff;color:var(--ed-login-navy)}
+.ed-login-language.hide{display:none!important}
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website .web-header,
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website header.navbar,
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website .web-footer{display:none!important}

@@ -23,6 +23,7 @@ def configure_website():
         "app_logo": ICON,
         "favicon": ICON,
         "title_prefix": "ERP Developers",
+        "show_language_picker": 1,
     }
     changed = []
     for fieldname, value in desired.items():

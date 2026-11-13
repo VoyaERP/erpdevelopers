@@ -19,6 +19,7 @@ class TestNativeLogin(unittest.TestCase):
         self.assertIn('!== "/login"', js)
         self.assertIn("document.body.dataset.edLoginEnhanced", js)
         self.assertIn("document.body.prepend(skip, top)", js)
+        self.assertIn('document.getElementById("language-switcher")', js)
         for forbidden in ('innerHTML', 'create("form")', 'createElement("form")',
                           "frappe.call(", "fetch(", "XMLHttpRequest",
                           "document.documentElement.lang =", "wrapper.insertBefore("):
