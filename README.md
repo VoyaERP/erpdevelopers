@@ -76,3 +76,13 @@ Use [scripts/install_local_v16.sh](scripts/install_local_v16.sh) **only on MacVM
     bash scripts/install_local_v16.sh
 
 The canonical roadmap and environment state stay on `main` in `docs/MASTER_PLAN.md`, `docs/STATUS.md`, and `docs/LOCAL_RASHEED.md`.
+
+## ERP Developers public website on erptest-lightnode (Frappe 16)
+
+The current homepage route is **erp-developers-home** and the native Frappe 16 **/login** receives only a website header/footer, AI-themed decorative panel, and scoped CSS; there is **no replacement authentication handler or form**. The styling follows Green Box's verified native-login approach while using the ERP Developers navy/blue/teal brand.
+
+**Production target:** erp-developers.com (DNS, TLS and server deployment not yet executed).
+
+**Server installation and update:** See [erptest-lightnode deployment guide](docs/ERPTEST_LIGHTNODE.md). Scripts: [new-site installer](scripts/install_erptest_lightnode.sh) and [target-site updater](scripts/update_erptest_lightnode.sh). No shared Bench restart/Nginx rewrites are automated.
+
+The reference logo approved in conversation is not yet an exact source-vector asset. The app includes a small branded SVG mark approximating its selected growth/shield direction, with a pending visual approval step.

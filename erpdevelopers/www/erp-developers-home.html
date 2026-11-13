@@ -1,15 +1,17 @@
 {% extends "templates/web.html" %}
-{% block page_content %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block page_container %}
 <main class="ed-site" id="top">
   <header class="ed-nav" aria-label="Main navigation">
     <a href="#top" class="ed-brand" aria-label="ERP Developers home">
-      <span class="ed-brand-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+      <img class="ed-brand-icon" src="/assets/erpdevelopers/images/erp-mark.svg" width="43" height="43" alt="" aria-hidden="true">
       <span class="ed-brand-text"><strong>ERP</strong><small>Developers</small></span>
     </a>
     <nav aria-label="Site sections">
       <a href="#vision">Vision</a><a href="#ecosystem">Ecosystem</a><a href="#ai">AI & Innovation</a><a href="#roadmap">Roadmap</a>
     </nav>
-    <a class="ed-nav-cta" href="#ecosystem">Explore platform</a>
+    <a class="ed-nav-cta" href="/login">Member sign in</a>
   </header>
   <section class="ed-hero" aria-labelledby="ed-heading">
     <div class="ed-eyebrow"><span class="ed-pulse"></span> Human collaboration. Intelligent technology.</div>
@@ -36,6 +38,6 @@
   </section>
   <section id="ai" class="ed-ai ed-section"><div><p class="ed-kicker">INTELLIGENCE WITH PURPOSE</p><h2>AI should improve decisions, not replace judgment.</h2><p>We envision secure, human-reviewed assistants that accelerate discovery, knowledge sharing and solution delivery. AI capabilities are on the roadmap and are not active on this preview site.</p></div><div class="ed-ai-diagram" aria-hidden="true"><span>Knowledge</span><span>Reasoning</span><span>Human review</span><span>Progress</span></div></section>
   <section id="roadmap" class="ed-section ed-roadmap"><p class="ed-kicker">WHAT COMES NEXT</p><h2>Build trust first. Expand with intent.</h2><p>Phase 1: brand website and bilingual foundation. Phase 2: secure identities and community. Phase 3: learning, developer resources and verified jobs. Phase 4: opt-in intelligent services and integrations.</p></section>
-  <footer class="ed-footer"><div><strong>ERP</strong> <span>Developers</span><small>Engage. Reason. Progress.</small></div><p>Building a smarter, more connected technology community.</p><a href="#top">Back to top ↑</a></footer>
+  <footer class="ed-footer"><div><strong>ERP</strong> <span>Developers</span><small>Engage. Reason. Progress.</small></div><p>Building a smarter, more connected technology community.</p><a href="/login">Sign in</a><a href="#top">Back to top ↑</a></footer>
 </main>
 {% endblock %}

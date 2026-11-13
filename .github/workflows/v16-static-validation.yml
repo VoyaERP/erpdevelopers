@@ -1,0 +1,32 @@
+name: Frappe v16 static checks
+on:
+  push:
+    branches: [version-16, "feat/**", "fix/**"]
+  pull_request:
+    branches: [version-16]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Set up Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Python compile
+        run: python -m compileall -q erpdevelopers tests
+      - name: JS syntax
+        run: node --check erpdevelopers/public/js/login_chrome.js
+      - name: Bash syntax
+        run: |
+          bash -n scripts/install_erptest_lightnode.sh
+          bash -n scripts/update_erptest_lightnode.sh
+          bash -n scripts/install_local_v16.sh
+      - name: Contract tests
+        run: python -m unittest discover -s tests -v

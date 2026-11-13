@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class TestBrandContract(unittest.TestCase):
     def test_brand_words(self):
-        template = (ROOT / "erpdevelopers/www/index.html").read_text(encoding="utf-8")
+        template = (ROOT / "erpdevelopers/www/erp-developers-home.html").read_text(encoding="utf-8")
         for word in ("Engage.", "Reason.", "Progress.", "Developers", "AI"):
             self.assertIn(word, template)
 

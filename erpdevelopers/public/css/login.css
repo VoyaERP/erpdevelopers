@@ -1,0 +1,179 @@
+/* Native Frappe 16 /login only; it does not replace the login component or OTP.
+   All selectors are route + enhancement-class scoped, avoiding Desk/site regressions. */
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website {
+  --ed-login-navy:#081d3f;
+  --ed-login-deep:#0b2d60;
+  --ed-login-cyan:#178bdd;
+  --ed-login-teal:#0cb9aa;
+  --ed-login-muted:#5a6c83;
+  --ed-login-border:#dfe8f2;
+  color:var(--ed-login-navy);
+  background:linear-gradient(180deg,#f5faff 0%,#fff 95%);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+.ed-login-website *{box-sizing:border-box}
+.ed-login-skip{position:fixed;inset-inline-start:12px;top:-110px;background:#fff;color:#081d3f;z-index:10000;padding:11px 16px;border:2px solid #178bdd;border-radius:9px}
+.ed-login-skip:focus{top:12px}
+.ed-login-header{width:100%;background:#fff;border-bottom:1px solid #e9eef6;flex-shrink:0}
+.ed-login-header-inner{max-width:1240px;min-height:79px;padding:14px 28px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:26px}
+.ed-login-brand{display:flex;align-items:center;gap:11px;white-space:nowrap;text-decoration:none!important;color:#081d3f!important}
+.ed-login-brand-image{width:43px;height:43px;display:block;object-fit:contain}
+.ed-login-brand-name{display:flex;align-items:baseline;gap:6px;font-size:21px;letter-spacing:-.8px;color:#081d3f}
+.ed-login-brand-name strong{font-size:26px;font-weight:800}
+.ed-login-brand-name span{font-weight:500}
+.ed-login-nav{display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.ed-login-nav a{font-size:13px;font-weight:650;color:#344e6b!important;text-decoration:none!important}
+.ed-login-nav a:hover{color:#087bb9!important}
+.ed-login-current{border:1px solid #cce4ef;border-radius:10px;padding:10px 17px;font-size:13px;font-weight:750;background:#f0fbfc;color:#116c82}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login{
+  width:100%;
+  min-width:0;
+  flex:1 0 auto;
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper{
+  width:min(1100px,calc(100% - 42px));
+  max-width:none;
+  margin:clamp(36px,5vw,70px) auto;
+  padding:0;
+  display:grid;
+  grid-template-columns:minmax(0,1.06fr) minmax(345px,.94fr);
+  min-height:560px;
+  border:1px solid #e0eaf3;
+  border-radius:26px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:0 22px 65px rgba(15,57,112,.09);
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper > main{
+  grid-column:2;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  max-width:none;
+  min-width:0;
+  margin:0;
+  padding:40px clamp(22px,3.6vw,54px);
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-breadcrumbs,
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-header-wrapper,
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-footer{
+  display:none;
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page_content{
+  display:block;
+  width:100%;
+  max-width:440px;
+  min-width:0;
+  margin:0 auto;
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page_content > div{
+  width:100%;
+  max-width:100%;
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .login-content.page-card{
+  border:0;
+  box-shadow:none;
+  padding:0;
+  background:transparent;
+  width:100%;
+  max-width:100%;
+  margin:0 auto;
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head .app-logo{display:none!important}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head{
+  margin:0 0 20px;
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head h4{
+  font-size:clamp(26px,3vw,33px);font-weight:800;color:#081d3f;letter-spacing:-1px;
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head .page-card-subtitle{color:#61738a}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-group{width:100%}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-control{
+  width:100%;height:51px;min-height:51px;border:1px solid #d8e4ef;
+  border-radius:10px;padding:12px 14px;background:#fff;color:#081d3f;
+  font-size:15px;direction:ltr;text-align:start;
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-control:focus-visible{
+  outline:2px solid #167eca;outline-offset:1px;box-shadow:none
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .es-button[data-variant="solid"]{
+  background:#1269dc!important;color:#fff!important;border:1px solid #1269dc!important;
+  min-height:49px;border-radius:10px;font-weight:750
+}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .es-button[data-variant="solid"]:hover{background:#0c56b3!important}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .es-button[data-variant="solid"]:disabled{opacity:.55;cursor:not-allowed}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login a{color:#1269dc}
+:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login a:focus-visible,
+.ed-login-header a:focus-visible,.ed-login-footer a:focus-visible{outline:2px solid #0cb9aa;outline-offset:3px}
+.ed-login-story{
+  grid-column:1;
+  grid-row:1;
+  background:
+    radial-gradient(circle at 88% 20%,rgba(26,185,196,.22),transparent 38%),
+    radial-gradient(circle at 30% 90%,rgba(13,131,214,.3),transparent 45%),
+    linear-gradient(140deg,#071c3c 0%,#0b356b 57%,#115aa1 100%);
+  min-width:0;
+  color:#fff;
+  padding:clamp(32px,4vw,66px);
+  display:flex;
+  align-items:center;
+  position:relative;
+  isolation:isolate;
+}
+.ed-login-story::before{
+  content:"";position:absolute;inset:18px;opacity:.16;z-index:-1;pointer-events:none;
+  background-image:linear-gradient(90deg,transparent 96%,#d4faff 97%),linear-gradient(transparent 96%,#d4faff 97%);
+  background-size:32px 32px;mask-image:radial-gradient(circle at 65% 40%,#000,transparent 73%);
+}
+.ed-login-story-content{position:relative;max-width:460px}
+.ed-login-story-eyebrow{font-size:12px;letter-spacing:1.6px;font-weight:850;color:#76eade;margin-bottom:27px!important}
+.ed-login-story-title{font-size:clamp(30px,3.5vw,44px);line-height:1.2;letter-spacing:-1.2px;color:#fff;font-weight:800;margin:0 0 21px}
+.ed-login-story-description{color:#d6e7f6;font-size:16px;line-height:1.85;margin:0 0 40px}
+.ed-login-values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ed-login-value{border:1px solid #ffffff33;border-radius:12px;padding:12px 10px;background:#ffffff0d}
+.ed-login-value strong{display:block;font-size:14px;color:#fff}
+.ed-login-value small{display:block;color:#c8e4f0;font-size:11px;margin-top:5px}
+.ed-login-footer{flex-shrink:0;background:#071c3c;color:#bed1e4}
+.ed-login-footer-inner{max-width:1240px;margin:0 auto;padding:23px 28px;display:flex;gap:18px;align-items:center;justify-content:space-between}
+.ed-login-footer p{margin:0}
+.ed-login-footer-brand{white-space:nowrap;display:flex;align-items:baseline;gap:5px;color:#fff}
+.ed-login-footer-brand strong{font-size:18px;font-weight:850}
+.ed-login-footer-brand span{font-size:15px;color:#d5e3f1}
+.ed-login-footer-summary,.ed-login-footer-rights{font-size:12px;color:#bed1e4}
+@media(max-width:940px){
+  .ed-login-header-inner{padding:14px 19px}
+  .ed-login-nav{gap:14px}
+  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper{
+    grid-template-columns:minmax(0,1fr) minmax(330px,1fr);
+  }
+  .ed-login-story{padding:34px}
+  .ed-login-footer-inner{padding:21px 19px}
+}
+@media(max-width:720px){
+  .ed-login-header-inner{flex-wrap:wrap;gap:11px}
+  .ed-login-nav{order:3;width:100%;gap:18px}
+  .ed-login-current{margin-inline-start:auto}
+  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper{
+    grid-template-columns:minmax(0,1fr);width:min(540px,calc(100% - 28px));margin:22px auto 35px;min-height:0;border-radius:20px;
+  }
+  .ed-login-story{grid-column:1;grid-row:1;padding:27px;min-height:220px}
+  .ed-login-story-title{font-size:28px;margin-bottom:12px}
+  .ed-login-story-description{font-size:14px;margin-bottom:17px}
+  .ed-login-values{display:none}
+  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper > main{
+    grid-column:1;grid-row:2;padding:29px 24px 38px;
+  }
+  .ed-login-footer-inner{flex-wrap:wrap}
+}
+@media(max-width:420px){
+  .ed-login-nav{gap:10px}.ed-login-nav a{font-size:12px}
+  .ed-login-brand-name{font-size:18px}.ed-login-brand-name strong{font-size:22px}
+  .ed-login-story-title{font-size:24px}
+  .ed-login-story{padding:23px}
+}
+@media(prefers-reduced-motion:reduce){
+  .ed-login-website *{scroll-behavior:auto;transition:none!important}
+}
