@@ -186,6 +186,12 @@ Use proposed quality targets when applicable, not fabricated current results: WC
 7. **AI:** provider, storage/retention, model policy, cost and opt-in are decisions, not implicit requirements.
 8. **Scale/timeline:** estimate after R0 and MVP requirements are validated. No invented deadlines or progress percentages.
 
+## Public website hosting track — erptest-lightnode (2026-11-14)
+
+The ERP Developers public site is planned at **erp-developers.com** on the existing Frappe **v16** erptest-lightnode Bench, separate from MacVMs' **v15** environment. **Source** (native Frappe login styling and new homepage) has been merged at commit ae1a44a, but **deployment and release criteria are still open**. The operator-owned installation guide is [version-16/docs/ERPTEST_LIGHTNODE.md](https://github.com/VoyaERP/erpdevelopers/blob/version-16/docs/ERPTEST_LIGHTNODE.md), tracked by [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13).
+
+GitHub Actions is failing without accessible step logs, which requires diagnosis in [ED-09 #10](https://github.com/VoyaERP/erpdevelopers/issues/10). Never treat the merge as completed UAT or verified SSL. Final approved brand artwork and full website localization remain open R1 items.
+
 ## 9. First execution batch (next five controlled actions)
 
 1. Resolve [ED-00.1](https://github.com/VoyaERP/erpdevelopers/issues/11) using [safe host audit](LOCAL_RASHEED.md).

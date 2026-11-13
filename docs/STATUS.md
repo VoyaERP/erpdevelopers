@@ -1,13 +1,13 @@
 # ERP Developers — Execution Status / متابعة التنفيذ
 
-**Snapshot date:** 2026-11-13 · **Scope:** VoyaERP/erpdevelopers · **Source of task detail:** [GitHub Issues](https://github.com/VoyaERP/erpdevelopers/issues) · **Master plan:** [MASTER_PLAN.md](MASTER_PLAN.md)
+**Snapshot date:** 2026-11-14 · **Scope:** VoyaERP/erpdevelopers · **Source of task detail:** [GitHub Issues](https://github.com/VoyaERP/erpdevelopers/issues) · **Master plan:** [MASTER_PLAN.md](MASTER_PLAN.md)
 
 > حالة التنفيذ مبنية على أدلة من GitHub ومن مخرجات المستخدم فقط. لا يتم اعتبار الكود مختبرًا لمجرد رفعه.
 
 ## Observed baseline
 
 - **main:** repository entry/documentation branch; not a deployed release.
-- **version-16:** application scaffold pushed; last *observed code* commit before plan: **344c771a6df6c9ea617095104fc0a01ad798b17f**.
+- **version-16:** code includes branded native login, unique homepage, explicit site setup, and erptest-lightnode install/update scripts. Latest verified GitHub merge **ae1a44a777e89f7a55ee212a90a5c378321572df** (PR #12, merged). No erptest server deployment or UAT confirmed.
 - **version-15:** no such branch in this repository as of the snapshot; possible existing v15 elsewhere is **unverified**.
 - **MacVMs / existing Rasheed app:** actual host **MacVMs**, Arch Linux ARM aarch64. The existing `/home/manakhly/frappe-bench` runs **Frappe 15.118.0**, **ERPNext 15.121.0**, **rasheed app 0.0.1** and many other v15 apps; existing Frappe Git branch is `version-15`. This is a verified **v15 bench**, not a separate v16 host. User previously referred to “Rasheed local”; confirmed `rasheed` is an app present in this bench. Keep legacy workloads untouched. Python **3.14.7**, Node **20.20.2 by default**, **Node 24.22.3 installed successfully via user-level nvm** and verified **inside a subshell** (does not update default Node), Bench CLI **5.31.0**, Yarn **1.22.22**, Git **2.55.0**, Valkey **9.1.1**, MariaDB **12.3.2 server and client**. Ports `8000`, `9000`, `11000`, `13000`, `3306` are occupied; candidate alternative ports showed no listeners at the check instant.
 - **Deployment:** Frappe v16 installation and Mac UAT **not started/verified**. **Latest critical storage blocker:** VM root `/dev/vda2` is **30 GB**, **25 GB used**, **3.6 GB available (88% used)** as confirmed by the 2026-11-13 follow-up; inode use is only **32%**, so the limiting resource is free storage. RAM **3.8 GiB total, ~2.5 GiB available**, swap **4 GiB**. Risk of out-of-space/build OOM while v15 workloads are running: **do not run `bench init` yet**. Recommended planning target for parallel test bench: at least **15–20 GB free disk** and **8 GiB RAM total or larger**, subject to measured workload; these are capacity recommendations, not claimed official Frappe minima. MariaDB **12.3.2 server** is different from documented v16 **11.8** baseline: compatibility is **unverified**, avoid changing shared DB. Valkey **9.1.1** exceeds documented 6+ baseline but integration still untested. **Arch Linux ARM not officially supported** for Frappe hosting; consider a separate supported Debian/Ubuntu ARM64 test VM if resources cannot be expanded. Docker and Podman commands absent. New Bench still requires distinct ports, isolated site/database and explicit per-shell `nvm use 24`.
@@ -20,7 +20,8 @@
 | Epic | Observed status | Next evidence required |
 | --- | --- | --- |
 | [ED-00 #1](https://github.com/VoyaERP/erpdevelopers/issues/1) Environment | **Blocked: disk capacity + compatibility review** | Current-host guarded installer available, 3.6GB fails >=8GiB preflight; MariaDB v12.3 compatibility, Mac smoke |
-| [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Scaffold committed, UAT pending** | Approved asset + CMS/i18n/SEO + browser UAT |
+| [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Branded login/home source merged; deployment/UAT pending** | Final approved logo asset, EN/AR full content, SEO, visual/auth UAT |
+| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Source ready; not installed** | Server preflight, new site, DNS/TLS, native login UAT |
 | [ED-02 #3](https://github.com/VoyaERP/erpdevelopers/issues/3) IAM/privacy | **Planned** | Role matrix + threat model |
 | [ED-03 #4](https://github.com/VoyaERP/erpdevelopers/issues/4) Community | **Planned** | ED-02 approval |
 | [ED-04 #5](https://github.com/VoyaERP/erpdevelopers/issues/5) Developer Hub | **Planned** | ED-02 approval |
@@ -69,6 +70,16 @@
 - Frappe v16's published MariaDB **11.8** target differs from MacVMs MariaDB **12.3.2**: test compatibility only on a new database, never change the shared DB service for an unverified install.
 - This is for local development and Mac SSH-tunnel UAT only, **not production readiness**.
 
+## erptest-lightnode public site deployment (new scope, 2026-11-14)
+
+- Domain: **erp-developers.com**; distinct from existing MacVMs v15/Rasheed audit.
+- Frappe v16 source code staged and PR **[#12](https://github.com/VoyaERP/erpdevelopers/pull/12)** merged into **version-16**, commit **ae1a44a777e89f7a55ee212a90a5c378321572df**.
+- Green Box reference reviewed: **VoyaERP/greenbox.com.eg** retains native Frappe /login and layers website CSS and Chrome only. ERP Developers adaptation targets **native Frappe v16** markup and does not replace authentication, 2FA, forgot-password or social-login behavior.
+- Home route: **erp-developers-home** configured through explicit CLI-only method; site-specific install/update scripts and guide at [docs/ERPTEST_LIGHTNODE.md](https://github.com/VoyaERP/erpdevelopers/blob/version-16/docs/ERPTEST_LIGHTNODE.md).
+- First GitHub Actions static-validation workflow ran but returned **failure**, with no accessible step-level logs via the current connector. **CI remains unresolved**; do not mark R1 Done.
+- No actual erptest-lightnode SSH install, DNS, Nginx, HTTPS, responsive/auth browser UAT or public go-live has been verified. Source SVG is a directionally matched icon, **not** an exact editable conversion of the approved PNG.
+- Next owner action: execute read-only preflight and guarded install on erptest-lightnode, verify route and native login, then configure TLS safely. Track [Issue #13](https://github.com/VoyaERP/erpdevelopers/issues/13).
+
 ## Evidence ledger
 
 | Date | Scope | Evidence | Result |
@@ -80,6 +91,7 @@
 | 2026-11-13 | Storage/site inventory | 30G root, **3.6G free (88%)**, inodes 32%; Bench 6.1G; VS Code remote 3.1G; four v15 sites; ext4 `/dev/vda2` | **Blocker confirmed; expansion/VM isolation decision pending** |
 | 2026-11-13 | QEMU guest tool audit | `systemd-detect-virt=qemu`, `resize2fs` present, `growpart` absent, `vda2` ext4 | **Virtualization engine verified; Mac VM manager/backups remain unknown** |
 | 2026-11-13 | In-place v16 installation decision | User requests current MacVMs; guarded install script committed on `version-16` (Node24 scoped, free-space/port/v15 safety gates) | **Script ready, not run; disk preflight blocked at 3.6GiB free** |
+| 2026-11-14 | erptest-lightnode website/Login | PR #12 merged on version-16 commit ae1a44a; deployment guide + guarded script + v16-native /login CSS/JS | **Source merged; CI failure unresolved; no server/UAT proof** |
 | 2026-11-13 | Project governance | Master plan + epic issue board created | **Documented; execution gates pending** |
 
 ## How to update this file
