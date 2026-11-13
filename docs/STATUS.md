@@ -4,6 +4,13 @@
 
 > حالة التنفيذ مبنية على أدلة من GitHub ومن مخرجات المستخدم فقط. لا يتم اعتبار الكود مختبرًا لمجرد رفعه.
 
+## 2026-11-14 — Professional landing/login redesign and exact approved logo (awaiting deployment)
+
+- User requested remove excess whitespace, make public site more polished and **use the exact previously chosen logo**. The approved asset, concept **01 — Neural Intelligence**, was recovered as the original `erp_developers_01_neural_intelligence.svg` (SHA-256 `9ff7a4b8409a3bbf1f5cf438e5d73fc3d3fd28f564576c720c572d55f6d93293`). No artwork redrawn. The source is preserved verbatim in `erpdevelopers/public/images/erp-developers-neural-intelligence.svg`; display `erp-developers-logo.svg` only adjusts SVG viewport, and `erp-mark.svg` uses the symbol cropped from the exact master for favicon/illustration.
+- On `version-16`, latest SHA **88f2eba011df580bb8b0550fa6fa71c7918413c2**: redesigned homepage with compact responsive 2-column hero, original network symbol, balanced site navigation, denser 6 planned-module cards, security-conscious AI section, concise roadmap, compact footer; login spacing tightened, native Frappe form and locale/2FA preserved, branding unified across header/footer/login, site-specific Website Settings app logo updated.
+- Added regression contract for original logo SHA-256 and SVG crop fidelity, brand placement, mobile breakpoints and Frappe-native auth integrity; [GitHub Actions CI PASS](https://github.com/VoyaERP/erpdevelopers/actions/runs/43529628411). This is **source CI**, not live visual/UAT.
+- **Not deployed on server yet**: last operator-confirmed running commit `39659d46422f7c45d9bc8ec75aafb91c1c1574e3`. Deployment operator should update only the existing site using the guarded `scripts/update_erptest_lightnode.sh` with backup, check final SHA, recheck assets and routes and browser visuals. Do not invoke new-site installer, core upgrades or broad service restarts. Confirm native login, Arabic/English, responsive screen widths, 2FA and other Bench sites before marking production-ready.
+
 ## 2026-11-14 — Targeted Gunicorn restart resolved origin/public HTTP 500
 
 - Operator verified `./env/bin/python` imports both `erpdevelopers` and `erpdevelopers.erp_developers`. The deployed site remains `erpdevelopers 0.1.0`, SHA **39659d46422f7c45d9bc8ec75aafb91c1c1574e3**.
@@ -78,7 +85,7 @@
 | --- | --- | --- |
 | [ED-00 #1](https://github.com/VoyaERP/erpdevelopers/issues/1) Environment | **Blocked: disk capacity + compatibility review** | Current-host guarded installer available, 3.6GB fails >=8GiB preflight; MariaDB v12.3 compatibility, Mac smoke |
 | [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Green Box-style native login, homepage and static CI ready; UAT pending** | Final approved logo asset, EN/AR content, SEO, device/auth UAT |
-| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Installed v0.1.0; Origin + Cloudflare /, /login, ping HTTP 200** | Browser visual/asset/EN-AR/auth/2FA UAT and other-site regression |
+| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Installed app works at 39659d4; new compact UI + exact logo at 88f2eba PASS CI, not deployed** | Deploy UI update; browser visual/asset/EN-AR/auth/2FA UAT and other-site regression |
 | [ED-02 #3](https://github.com/VoyaERP/erpdevelopers/issues/3) IAM/privacy | **Planned** | Role matrix + threat model |
 | [ED-03 #4](https://github.com/VoyaERP/erpdevelopers/issues/4) Community | **Planned** | ED-02 approval |
 | [ED-04 #5](https://github.com/VoyaERP/erpdevelopers/issues/5) Developer Hub | **Planned** | ED-02 approval |
