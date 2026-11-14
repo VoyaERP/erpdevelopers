@@ -37,7 +37,7 @@
   {"fieldname":"city","fieldtype":"Data","label":"City","depends_on":"eval:doc.event_format != 'Online'","mandatory_depends_on":"eval:doc.event_format && doc.event_format != 'Online'"},
   {"fieldname":"location_column","fieldtype":"Column Break"},
   {"fieldname":"venue","fieldtype":"Data","length":240,"label":"Venue","depends_on":"eval:doc.event_format != 'Online'","mandatory_depends_on":"eval:doc.event_format && doc.event_format != 'Online'"},
-  {"fieldname":"event_url","fieldtype":"Data","options":"URL","length":1500,"label":"Official event URL","reqd":1,"description":"Paste a public website domain or URL. Saved as HTTPS. Public ERP Developers pages are allowed; private and administrative addresses are not."},
+  {"fieldname":"event_url","fieldtype":"Small Text","label":"Official event URL","reqd":1,"description":"Paste a public website domain or URL. Saved as HTTPS. Public ERP Developers pages are allowed; private and administrative addresses are not."},
   {"fieldname":"publication","fieldtype":"Section Break","label":"Publication"},
   {"fieldname":"published","fieldtype":"Check","label":"Published","default":"0","in_list_view":1},
   {"fieldname":"regional_relevance","fieldtype":"Check","label":"Relevant to the Middle East audience","default":"1"},
@@ -48,7 +48,7 @@
   {"fieldname":"source_event_id","fieldtype":"Data","length":200,"label":"External event ID"},
   {"fieldname":"source_key","fieldtype":"Data","label":"Source identity","read_only":1,"unique":1},
   {"fieldname":"source_column","fieldtype":"Column Break"},
-  {"fieldname":"source_url","fieldtype":"Data","options":"URL","length":1500,"label":"Source URL","description":"Optional public source link. Leave empty when it is the same as the official event page."},
+  {"fieldname":"source_url","fieldtype":"Small Text","label":"Source URL","description":"Optional public source link. Leave empty when it is the same as the official event page."},
   {"fieldname":"internal_notes","fieldtype":"Small Text","label":"Internal notes"},
   {"fieldname":"derived","fieldtype":"Section Break","hidden":1},
   {"fieldname":"start_utc","fieldtype":"Datetime","label":"Start UTC","read_only":1,"hidden":1,"search_index":1},
@@ -62,5 +62,5 @@
   {"role":"Website Manager","read":1,"create":1,"write":1,"delete":1,"report":1,"export":1}
  ],
  "actions":[],"links":[],"states":[],
- "creation":"2026-11-14 00:00:00","modified":"2026-11-14 00:00:00","owner":"Administrator","modified_by":"Administrator"
+ "creation":"2026-11-14 00:00:00","modified":"2026-11-14 12:30:00","owner":"Administrator","modified_by":"Administrator"
 }
