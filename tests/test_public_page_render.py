@@ -65,7 +65,6 @@ class TestPublicCatalogRendering(unittest.TestCase):
             web_page=None,
             external_url="https://docs.frappe.io/framework",
         )
-        # Frappe _dict provides both attribute and mapping access.
         record = type("FrappeRow", (dict,), {
             "__getattr__": lambda self, key: self[key],
         })({
@@ -115,15 +114,36 @@ class TestPublicCatalogTopicContext(unittest.TestCase):
              "description": "Reviewed", "level": "Intermediate",
              "language": "Arabic", "watch_url": "https://www.youtube.com/playlist?list=PLother"},
         ]
-        with patch.object(training, "public_playlists", return_value=rows), patch.object(
-            training, "authorized_private_playlists", return_value=[]
-        ), patch("frappe.session", create=True) as session, patch.object(
+        # Do not let unittest.mock introspect an unbound Frappe LocalProxy.
+        # A complete isolated module works both on Bench and without Frappe in CI.
+        fake_frappe = ModuleType("frappe")
+        fake_frappe.session = SimpleNamespace(user="Guest")
+        with patch.dict(sys.modules, {"frappe": fake_frappe}), patch.object(
+            training, "public_playlists", return_value=rows
+        ), patch.object(training, "authorized_private_playlists", return_value=[]), patch.object(
             training, "set_public_context", side_effect=lambda context, **_kwargs: None
         ):
-            session.user = "Guest"
             training.get_context(ctx)
+        self.assertFalse(ctx.is_authenticated)
         self.assertEqual(ctx.playlists, rows)
         self.assertEqual(ctx.topics, ["Cloud & DevOps", "Frappe & ERPNext"])
+
+    def test_training_context_combines_only_the_authorized_private_result(self):
+        from erpdevelopers.www import training
+
+        fake_frappe = ModuleType("frappe")
+        fake_frappe.session = SimpleNamespace(user="member@example.com")
+        private = [{"topic": "Cybersecurity", "title": "Authorized collection"}]
+        ctx = SimpleNamespace()
+        with patch.dict(sys.modules, {"frappe": fake_frappe}), patch.object(
+            training, "public_playlists", return_value=[]
+        ), patch.object(training, "authorized_private_playlists", return_value=private), patch.object(
+            training, "set_public_context", side_effect=lambda context, **_kwargs: None
+        ):
+            training.get_context(ctx)
+        self.assertTrue(ctx.is_authenticated)
+        self.assertEqual(ctx.playlists, private)
+        self.assertEqual(ctx.topics, ["Cybersecurity"])
 
     def test_insights_context_handles_real_published_dicts(self):
         from erpdevelopers.www import insights

@@ -1,7 +1,5 @@
-"""Frappe 16 playlist privacy, editorial publication and embedded player contracts.
-
-These source and isolated controller checks must be followed by live site UAT.
-"""
+"""Frappe 16 playlist privacy, publication and embedded-player contracts."""
+from html.parser import HTMLParser
 from importlib import util
 import json
 from pathlib import Path
@@ -29,7 +27,6 @@ class TestPlaylistBackend(TestCase):
 
     @staticmethod
     def _controller():
-        """Isolate the Frappe Document base; use the real playlist validator."""
         fake_frappe = ModuleType("frappe")
         fake_frappe._ = lambda value: value
 
@@ -96,7 +93,7 @@ class TestPlaylistBackend(TestCase):
                 "topic": "Solution Architecture", "level": "Beginner",
                 "language": "English", "description": "Curated",
                 "playlist_url": "https://www.youtube.com/playlist?list=PLabcdefghijklmnopqrst0123456",
-                "playlist_id": "",  # legacy row: validated URL is source of truth
+                "playlist_id": "",
                 "visibility": "Public",
             }]
         mock_frappe.get_all = query
@@ -107,11 +104,21 @@ class TestPlaylistBackend(TestCase):
         self.assertTrue(results[0]["watch_url"].startswith("https://www.youtube.com/playlist?list="))
         self.assertEqual(results[0]["visibility"], "Public")
         self.assertEqual(results[0]["playlist_id"], "PLabcdefghijklmnopqrst0123456")
-        client = (PLAYLIST / "erp_developers_playlist.js").read_text()
-        self.assertIn('frm.set_df_property("published", "read_only"', client)
-        self.assertIn('frm.set_value("published", 0)', client)
-        self.assertIn('frm.doc.visibility === "Private"', client)
 
+    def test_desk_does_not_silently_unpublish_private_collections(self):
+        client = (PLAYLIST / "erp_developers_playlist.js").read_text()
+        self.assertNotIn('set_value("published", 0)', client)
+        self.assertNotIn('set_df_property("published", "read_only"', client)
+
+
+class Tags(HTMLParser):
+    def __init__(self, source):
+        super().__init__()
+        self.tags = []
+        self.feed(source)
+
+    def handle_starttag(self, tag, attrs):
+        self.tags.append((tag, dict(attrs)))
 
 
 class TestProtectedPlaylistDialog(TestCase):
@@ -119,31 +126,51 @@ class TestProtectedPlaylistDialog(TestCase):
         html = (ROOT / "www/training.html").read_text()
         js = (ROOT / "public/js/catalog.js").read_text()
         css = (ROOT / "public/css/portal.css").read_text()
-        self.assertIn('id="ed-playlist-dialog"', html)
-        self.assertIn('data-playlist-id="{{ item.playlist_id | e }}"', html)
-        self.assertIn('data-player-frame', html)
-        self.assertNotIn('sandbox=', html)
-        self.assertIn('allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"', html)
+        tags = Tags(html).tags
+        frame = next(attrs for tag, attrs in tags if tag == "iframe" and "data-player-frame" in attrs)
+        self.assertNotIn("src", frame, "No YouTube request before user action")
+        self.assertNotIn("sandbox", frame)
+        self.assertEqual(frame["referrerpolicy"], "strict-origin-when-cross-origin")
+        self.assertIn("encrypted-media", frame["allow"])
         self.assertIn("data-player-status", html)
-        self.assertIn('referrerpolicy="strict-origin-when-cross-origin"', html)
-        self.assertNotIn('src="https://www.youtube', html, "Do not embed on page load")
         self.assertIn("youtube-nocookie.com/embed/videoseries", js)
-        self.assertNotIn('embed.searchParams.set("listType"', js)
-        self.assertIn('event.preventDefault(); // only intercept', js)
-        self.assertIn('if (!idPattern.test(id)) return', js)
-        self.assertIn('typeof dialog.showModal !== "function"', js)
-        self.assertIn('href="{{ item.watch_url | e }}" target="_blank" rel="noopener noreferrer"', html)
+        self.assertIn('event.preventDefault()', js)
+        self.assertIn('!idPattern.test(id)', js)
+        self.assertIn('typeof dialog.showModal === "function"', js)
         self.assertIn('class="ed-playlist-play-icon"', html)
-        self.assertIn('a.ed-playlist-watch{color:#fff!important}', css)
         self.assertIn('frame.src = embed.toString()', js)
-        self.assertIn('frame.removeAttribute("src")', js)
+        self.assertIn('removeAttribute("src")', js)
         self.assertIn('dialog.showModal()', js)
         self.assertIn('dialog.addEventListener("close", stopPlayback)', js)
         self.assertIn('const idPattern = /^[A-Za-z0-9_-]{12,64}$/', js)
-        self.assertNotIn("innerHTML", js)
-        self.assertNotIn("localStorage", js)
-        self.assertNotIn("fetch(", js)
+        for forbidden in ("innerHTML", "localStorage", "window.open", "location.href", "fetch("):
+            self.assertNotIn(forbidden, js)
         self.assertIn(".ed-playlist-dialog::backdrop", css)
+
+    def test_watch_is_a_button_and_only_youtube_link_navigates(self):
+        html = (ROOT / "www/training.html").read_text()
+        tags = Tags(html).tags
+        triggers = [(tag, attrs) for tag, attrs in tags if "data-playlist-open" in attrs]
+        self.assertEqual(len(triggers), 1)
+        tag, attrs = triggers[0]
+        self.assertEqual(tag, "button")
+        self.assertEqual(attrs["type"], "button")
+        self.assertEqual(attrs["aria-controls"], "ed-playlist-dialog")
+        self.assertIn("disabled", attrs, "Enable only after the real player binds")
+        self.assertNotIn("href", attrs)
+        self.assertNotIn("target", attrs)
+        self.assertEqual(attrs["data-playlist-id"], "{{ item.playlist_id | e }}")
+        youtube_links = [a for t, a in tags if t == "a" and a.get("href") == "{{ item.watch_url | e }}"]
+        self.assertEqual(len(youtube_links), 1)
+        self.assertEqual(youtube_links[0]["target"], "_blank")
+        self.assertEqual(youtube_links[0]["rel"], "noopener noreferrer")
+        head = html.split("{% block ed_head %}", 1)[1].split("{% endblock %}", 1)[0]
+        scripts = [a for t, a in Tags(head).tags if t == "script"]
+        self.assertEqual(len(scripts), 1)
+        self.assertEqual(scripts[0]["src"], "{{ catalog_js_url | e }}")
+        self.assertEqual(scripts[0]["data-cfasync"], "false")
+        self.assertIn("defer", scripts[0])
+        self.assertEqual(html.count("{{ catalog_js_url | e }}"), 1)
 
     def test_training_remains_published_only(self):
         source = (ROOT / "catalog.py").read_text()

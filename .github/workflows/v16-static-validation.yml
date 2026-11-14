@@ -16,7 +16,7 @@ jobs:
         with:
           python-version: "3.14"
       - name: Python compile
-        run: python -m compileall -q erpdevelopers tests
+        run: python -m compileall -q erpdevelopers tests scripts/test_training_browser.py
       - name: Bash syntax
         run: |
           bash -n scripts/install_erptest_lightnode.sh
@@ -33,3 +33,18 @@ jobs:
           node --check erpdevelopers/public/js/catalog.js
           node --test tests/test_catalog_player.mjs
           node --check erpdevelopers/erp_developers/doctype/erp_developers_playlist/erp_developers_playlist.js
+  training-browser:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Install isolated browser-test dependencies
+        run: |
+          python -m pip install Jinja2==3.1.6 playwright==1.57.0
+          python -m playwright install --with-deps chromium firefox
+      - name: Test actual Training template in Chromium and Firefox
+        run: python scripts/test_training_browser.py

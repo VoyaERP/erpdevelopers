@@ -58,8 +58,10 @@
   test -f "$APP/erpdevelopers/patches.txt"
   "$BENCH/env/bin/python" -m compileall -q "$APP/erpdevelopers" "$APP/tests"
   "$BENCH/env/bin/python" -m unittest discover -s "$APP/tests" -v
-  # This release has no custom website JavaScript. The old login script
-  # was removed; never check a file that the application no longer ships.
+  command -v node >/dev/null
+  node --check "$APP/erpdevelopers/public/js/catalog.js"
+  node --test "$APP/tests/test_catalog_player.mjs"
+  # Native login stays CSS-first; the removed login script must not return.
   test ! -e "$APP/erpdevelopers/public/js/login_chrome.js"
   test ! -e "$APP/tests/login_chrome_dom.test.cjs"
   APPROVED_SHA="250df1886e13229aa0e260949f66cb91a627b220a03c36b5c1d4ede1ad06d95d"

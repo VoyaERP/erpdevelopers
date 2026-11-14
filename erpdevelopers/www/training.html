@@ -1,4 +1,7 @@
 {% extends "templates/includes/erpdevelopers_page_base.html" %}
+{% block ed_head %}
+<script data-cfasync="false" defer src="{{ catalog_js_url | e }}"></script>
+{% endblock %}
 {% block ed_content %}
 <section class="ed-page-hero" aria-labelledby="ed-training-title">
   <div class="ed-shell ed-page-hero-inner">
@@ -52,16 +55,15 @@
         <div class="ed-card-bottom">
           <span>{{ _(item.language) | e }}</span>
           <div class="ed-playlist-actions">
-            <a class="ed-playlist-watch" data-playlist-open
-               href="{{ item.watch_url | e }}" target="_blank" rel="noopener noreferrer"
-               data-playlist-id="{{ item.playlist_id | e }}"
-               data-playlist-title="{% if boot.lang == 'ar' and item.title_ar %}{{ item.title_ar | e }}{% else %}{{ item.title | e }}{% endif %}">
+            <button type="button" class="ed-playlist-watch" data-playlist-open disabled
+                    aria-haspopup="dialog" aria-controls="ed-playlist-dialog"
+                    data-playlist-id="{{ item.playlist_id | e }}"
+                    data-playlist-title="{% if boot.lang == 'ar' and item.title_ar %}{{ item.title_ar | e }}{% else %}{{ item.title | e }}{% endif %}">
               <span class="ed-playlist-play-icon" aria-hidden="true">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" focusable="false"><path d="M8 5.8a1 1 0 0 1 1.51-.86l9.1 6.2a1.05 1.05 0 0 1 0 1.72l-9.1 6.2A1 1 0 0 1 8 18.2Z"></path></svg>
               </span>
               <span>{{ _("Watch here") }}</span>
-              <span class="ed-playlist-watch-cue" aria-hidden="true">↗</span>
-            </a>
+            </button>
             <a href="{{ item.watch_url | e }}" target="_blank" rel="noopener noreferrer">
               {{ _("Open on YouTube") }} <span aria-hidden="true">↗</span>
             </a>
@@ -92,13 +94,15 @@
             aria-label="{{ _('Close video player') }}">×</button>
   </div>
   <div class="ed-playlist-player">
-    <p class="ed-player-status" data-player-status role="status">{{ _("Loading playlist… If unavailable, use Open on YouTube below.") }}</p>
     <iframe data-player-frame title="{{ _('YouTube playlist player') | e }}"
-            loading="lazy" referrerpolicy="strict-origin-when-cross-origin"
+            loading="eager" referrerpolicy="strict-origin-when-cross-origin"
             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
   </div>
   <div class="ed-playlist-dialog-foot">
-    <p id="ed-playlist-privacy">{{ _("YouTube loads only when you choose to watch. Some videos cannot be embedded; use Open on YouTube if needed. Close to stop playback.") }}</p>
+    <div>
+      <p data-player-status role="status" hidden>{{ _("Loading playlist… If unavailable, use Open on YouTube below.") }}</p>
+      <p id="ed-playlist-privacy">{{ _("YouTube loads only when you choose to watch. Some videos cannot be embedded; use Open on YouTube if needed. Close to stop playback.") }}</p>
+    </div>
     <a data-player-external href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">
       {{ _("Open on YouTube") }} <span aria-hidden="true">↗</span>
     </a>
@@ -120,5 +124,4 @@
     </div>
   </div>
 </section>
-<script defer src="{{ catalog_js_url | e }}"></script>
 {% endblock %}
