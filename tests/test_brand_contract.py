@@ -235,7 +235,7 @@ class TestSiteScopedBranding(TestCase):
         self.assertEqual(result["desk_changed_fields"], ["app_logo"])
         self.assertEqual(calls["save"], 1)
         self.assertEqual(calls["commit"], 1)
-        self.assertEqual(website, branding.website_settings_values())
+        self.assertEqual(website, {**branding.website_settings_values(), "robots_txt": ROBOTS_TXT})
         self.assertEqual(desk, branding.desk_navbar_settings_values())
 
 
