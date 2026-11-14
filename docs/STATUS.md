@@ -4,6 +4,16 @@
 
 > حالة التنفيذ مبنية على أدلة من GitHub ومن مخرجات المستخدم فقط. لا يتم اعتبار الكود مختبرًا لمجرد رفعه.
 
+## 2026-11-14 — Restore original orbit design, English/Arabic and single login header (CI passed; live deploy pending)
+
+- User preferred the **earlier orbit-based visual direction and bilingual experience** and requested only tighter spacing, the exact selected PNG, and a fix for login loading two things. The earlier `ae1a44a` landing/login history and Frappe v16.56.0 template were reviewed before changes.
+- Verified source-level duplicate-header condition: in Frappe 16, `www/login.html` renders the native `<nav class="navbar">` when `show_language_picker` is enabled; ERP Developers JS inserted another website header; old CSS hid `header.navbar` but not `nav.navbar`. Corrected scoped CSS hides the native navbar **only when the custom header has initialized**, reuses/moves its existing `#language-switcher`, suppresses redundant logo/footer chrome and restores a compact bilingual story aside next to the **unchanged Frappe auth form**. This is a source diagnosis; exact live meaning of the user's "2 things" still requires new screenshot/UAT.
+- Restored the original bright/orbit hero and mission structure, but removed oversized 640px hero and 92px section padding; orbit center uses the **approved PNG's derived favicon**, not an invented substitute logo. Existing exact full customer logo preserved at header/footer and native login. Kept six typed planned ecosystem modules/AI/roadmap from the refactor.
+- Restored native Frappe `#language-switcher` in custom homepage header (no separate cookie handler) and added **63 English-to-Arabic translations** in `erpdevelopers/translations/ar.csv`, rendered via server-side `_()`, Arabic-friendly CSS and Frappe RTL support. Original brand wording/tagline stays intact.
+- Expanded source validation: Python translations coverage, screenshot-regression selectors, one-time native login JS behavior and zero-dependency Node DOM simulation verifying **one** header/story/footer/picker and a preserved original `<form>` even when JS executes twice. Enhanced read-only `scripts/verify_frontend.sh` checks Origin stylesheet/PNG bytes, six cards, English and Arabic render via `?_lang=en|ar`, native login markup, and public CSS/JS/HTTP.
+- **Final source:** `version-16` commit **9a12af65800e623f19c6a15b34fbfcb588ead276**; [GitHub Actions CI PASS](https://github.com/VoyaERP/erpdevelopers/actions/runs/43534766440) (Python 3.14, Node 24 JS+DOM, Bash syntax, contracts).
+- **Not yet deployed or visually UAT-tested** on `erp-developers.com`. The previously reported unstyled homepage and doubled-login symptom need live before/after confirmation after a pinned backup-first existing-site update, site-only migration/build/cache clear, coordinated **web-only** Gunicorn restart, smoke checks and real English/Arabic/RTL/auth/2FA/other-site checks. Keep [Issue #13](https://github.com/VoyaERP/erpdevelopers/issues/13) open.
+
 ## 2026-11-14 — Maintainability/security refactor completed in GitHub (deployment and browser UAT pending)
 
 - **Refactored `version-16` HEAD:** **404cfa128f47327fbc8467ba626fe3a4a85d380f**, [GitHub Actions CI PASS](https://github.com/VoyaERP/erpdevelopers/actions/runs/43533258437): Python 3.14 compile, JavaScript syntax, Bash syntax and source/behavior tests passed. This is **not** a live Bench integration run.
@@ -109,7 +119,7 @@
 | --- | --- | --- |
 | [ED-00 #1](https://github.com/VoyaERP/erpdevelopers/issues/1) Environment | **Blocked: disk capacity + compatibility review** | Current-host guarded installer available, 3.6GB fails >=8GiB preflight; MariaDB v12.3 compatibility, Mac smoke |
 | [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Green Box-style native login, homepage and static CI ready; UAT pending** | Final approved logo asset, EN/AR content, SEO, device/auth UAT |
-| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Refactor 404cfa1 CI PASS; source ready, CSS screenshot issue pending live validation** | Pinned deploy to existing site, targeted web restart, Origin CSS/logo/card smoke, auth/RTL UAT |
+| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Original orbit layout + EN/AR + duplicate-login fix 9a12af6 CI PASS; not live yet** | Pinned deploy, coordinated web restart, Origin EN/AR/CSS/auth UAT and shared-site checks |
 | [ED-02 #3](https://github.com/VoyaERP/erpdevelopers/issues/3) IAM/privacy | **Planned** | Role matrix + threat model |
 | [ED-03 #4](https://github.com/VoyaERP/erpdevelopers/issues/4) Community | **Planned** | ED-02 approval |
 | [ED-04 #5](https://github.com/VoyaERP/erpdevelopers/issues/5) Developer Hub | **Planned** | ED-02 approval |
