@@ -1,33 +1,22 @@
-"""Explicit per-site branding for erp-developers.com.
+"""Explicit, idempotent branding for the existing ERP Developers site only.
 
-CLI-only setup. This is deliberately NOT a whitelisted API method or an
-after-install hook: no existing Frappe site is changed by installing the app.
+This file is intentionally not an after-install hook or a whitelisted API.
+Run via bench --site erp-developers.com execute erpdevelopers.site_setup.configure_website.
 """
 
 import frappe
 
-EXPECTED_SITE = "erp-developers.com"
-HOME_ROUTE = "erp-developers-home"
-ICON = "/assets/erpdevelopers/images/erpdevelopers-selected-favicon.png"
-BRAND_LOGO = "/assets/erpdevelopers/images/erpdevelopers-selected-logo.png"
+from erpdevelopers.branding import EXPECTED_SITE, HOME_ROUTE, website_settings_values
 
 
 def configure_website():
-    """Run only with: bench --site erp-developers.com execute erpdevelopers.site_setup.configure_website."""
+    """Synchronize approved branding without changing any other Frappe site."""
     if frappe.local.site != EXPECTED_SITE:
         raise RuntimeError("Refusing to change Website Settings on an unexpected site.")
 
     settings = frappe.get_single("Website Settings")
-    desired = {
-        "home_page": HOME_ROUTE,
-        "app_name": "ERP Developers",
-        "app_logo": BRAND_LOGO,
-        "favicon": ICON,
-        "title_prefix": "ERP Developers",
-        "show_language_picker": 1,
-    }
     changed = []
-    for fieldname, value in desired.items():
+    for fieldname, value in website_settings_values().items():
         if settings.get(fieldname) != value:
             settings.set(fieldname, value)
             changed.append(fieldname)
@@ -36,4 +25,9 @@ def configure_website():
         settings.save(ignore_permissions=True)
         frappe.db.commit()
         frappe.clear_cache()
-    return {"site": EXPECTED_SITE, "changed_fields": changed, "home_page": HOME_ROUTE}
+
+    return {
+        "site": EXPECTED_SITE,
+        "changed_fields": changed,
+        "home_page": HOME_ROUTE,
+    }

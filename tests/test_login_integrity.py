@@ -67,7 +67,7 @@ class TestNativeLogin(unittest.TestCase):
 
     def test_site_setup_is_explicit_and_site_scoped(self):
         setup = (APP / "site_setup.py").read_text(encoding="utf-8")
-        self.assertIn('EXPECTED_SITE = "erp-developers.com"', setup)
+        self.assertIn("from erpdevelopers.branding import EXPECTED_SITE", setup)
         self.assertIn("frappe.local.site != EXPECTED_SITE", setup)
         self.assertNotIn("@frappe.whitelist", setup)
 

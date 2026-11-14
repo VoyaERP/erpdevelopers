@@ -2,7 +2,7 @@
 {# Homepage CSS is loaded here independently of globally cached web hooks. #}
 {% block head_include %}
 {{ super() }}
-<link rel="stylesheet" href="/assets/erpdevelopers/css/brand.css?v=20261114-website-fix-1">
+<link rel="stylesheet" href="{{ homepage_css_url | e }}">
 {% endblock %}
 {% block navbar %}{% endblock %}
 {% block footer %}{% endblock %}
@@ -12,7 +12,7 @@
   <header class="ed-nav">
     <div class="ed-shell ed-nav-inner">
       <a href="/" class="ed-brand" aria-label="ERP Developers home">
-        <img src="/assets/erpdevelopers/images/erpdevelopers-selected-logo.png" width="210" height="84" alt="ERP Developers — Engage. Reason. Progress.">
+        <img src="{{ brand_logo_url | e }}" width="210" height="84" alt="ERP Developers — Engage. Reason. Progress.">
       </a>
       <nav aria-label="Main navigation">
         <a href="#vision">Our vision</a>
@@ -38,7 +38,7 @@
         </div>
         <div class="ed-visual" aria-label="ERP Developers connected ecosystem">
           <div class="ed-visual-heading"><span class="ed-visual-indicator" aria-hidden="true"></span> CONNECTED BY PURPOSE</div>
-          <img class="ed-visual-logo" src="/assets/erpdevelopers/images/erpdevelopers-selected-logo.png" width="340" height="113" alt="ERP Developers — Engage. Reason. Progress.">
+          <img class="ed-visual-logo" src="{{ brand_logo_url | e }}" width="340" height="113" alt="ERP Developers — Engage. Reason. Progress.">
           <p class="ed-visual-description">People, knowledge and technology working together.</p>
           <div class="ed-visual-stages" aria-label="Our approach">
             <div><span>01</span><strong>Connect</strong><small>Share experience</small></div>
@@ -117,7 +117,7 @@
   <footer class="ed-footer">
     <div class="ed-shell ed-footer-inner">
       <a href="/" class="ed-footer-brand" aria-label="ERP Developers home">
-        <img src="/assets/erpdevelopers/images/erpdevelopers-selected-logo.png" width="183" height="73" alt="ERP Developers — Engage. Reason. Progress.">
+        <img src="{{ brand_logo_url | e }}" width="183" height="73" alt="ERP Developers — Engage. Reason. Progress.">
       </a>
       <p>Connecting people, knowledge and possibility.</p>
       <div class="ed-footer-links"><a href="/login">Member sign in</a><a href="#top">Back to top ↑</a></div>
