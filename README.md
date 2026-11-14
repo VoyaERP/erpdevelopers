@@ -11,7 +11,7 @@ Frappe custom app powering the ERP Developers website. This is a **public landin
 - Framework: Frappe 16.x (no ERPNext dependency)
 - Frappe 15 is a separate compatibility target; do not install this branch on a v15 bench.
 
-## Install on an existing isolated Frappe 16 bench
+## Install on a NEW isolated development site only (not the live site)
 
 ```bash
 cd /path/to/frappe-v16-bench
@@ -30,6 +30,19 @@ Run the isolated development bench with `bench start` and visit the site. Set th
 The canonical ERP Developers brand asset is the **exact original image uploaded by the customer**, preserved byte-for-byte at `erpdevelopers/public/images/erpdevelopers-selected-logo.png` (RGBA PNG, 2048 × 682, transparent background, SHA-256 `250df1886e13229aa0e260949f66cb91a627b220a03c36b5c1d4ede1ad06d95d`). No regenerated artwork or reconstructed wordmark is used.
 
 `erpdevelopers/public/images/erpdevelopers-selected-favicon.png` is an icon-only crop of the same approved image, supplied for favicon use. All active website, native login branding, and site-specific Website Settings point to these assets. The old unrelated Neural Intelligence SVG concept was removed.
+
+## Refactored website architecture
+
+- `erpdevelopers/branding.py`: one pure-Python source of truth for identity, site targeting, uploaded PNG and favicon, and a content-hashed homepage CSS URL.
+- `erpdevelopers/www/erp_developers_home.py`: route controller supplies branded assets and SEO context. Frappe v16 maps `erp-developers-home.html` to the underscore-named Python controller.
+- `erpdevelopers/www/erp-developers-home.html`: Jinja page with one explicit stylesheet link in its supported `head_include` block and no duplicate Frappe navbar/footer.
+- `public/css/brand.css`: homepage-only rules and scoped variables. `public/css/login.css`: independent styles restricted to the native `/login` page.
+- `public/js/login_chrome.js`: decorative login header/footer only; shares a single brand-image helper and never handles credentials.
+- `site_setup.py`: explicit administrator command for exactly `erp-developers.com`, idempotent and site-scoped. No after-install mutation or public API.
+- `scripts/update_erptest_lightnode.sh`: guarded backup, optional pinned `EXPECTED_SHA`, source validation **before** target-site migration, then assets build and cache clearing.
+- `scripts/verify_frontend.sh`: read-only direct-origin/public checks for rendered CSS fingerprint, actual stylesheet bytes, exact selected logo and favicon.
+
+See [architecture and trust boundaries](docs/ARCHITECTURE.md) for design invariants and release gates.
 
 ## Security and scope
 
@@ -89,18 +102,9 @@ The current homepage route is **erp-developers-home** and the native Frappe 16 *
 
 The exact user-selected PNG is now used across the homepage, login and site branding. The native Frappe authentication handlers remain untouched.
 
-### Public HTTPS deployment for erptest-lightnode
+### Existing-site updates (do not create the site again)
 
-**Existing-site update (2026-11-14):** The server already has a site named `erp-developers.com` with Frappe 16.56.0 and ERPNext 16.55.0, but `erpdevelopers` is not installed. The new-site installer intentionally stops here. **For this actual environment, use** [scripts/install_existing_site_erptest_lightnode.sh](scripts/install_existing_site_erptest_lightnode.sh) **after cloning the public repo**; see the existing-site path in [docs/ERPTEST_LIGHTNODE.md](docs/ERPTEST_LIGHTNODE.md). That script backs up the existing site and installs ERP Developers on it; it does not run `bench new-site` or erase ERPNext.
+The app is already installed on `erp-developers.com` in the shared Frappe 16 Bench at `/data/frappe/frappe-bench`. The site and ERPNext database must not be recreated or overwritten.
 
-
-
-The repository is now **public**. Clone branch version-16 over anonymous HTTPS: no GitHub App, SSH key, deploy key or PAT is required for source downloads. The guarded installer creates only the new ERP Developers Frappe 16 site on the validated Bench. See [deployment steps](docs/ERPTEST_LIGHTNODE.md).
-
-~~~bash
-git clone --branch version-16 --single-branch https://github.com/VoyaERP/erpdevelopers.git "$HOME/erpdevelopers-deploy-source"
-BENCH=/data/frappe/frappe-bench bash "$HOME/erpdevelopers-deploy-source/scripts/install_erptest_lightnode.sh"
-~~~
-
-**Important:** verify hostname, Bench version/path, disk, site-name availability and backup strategy first. DNS, HTTPS, proxy changes and restarting shared Bench services are separate operator-controlled steps.
+Use the reviewed, **pinned** commit with the guarded updater; the current deployment commands and frontend checks are maintained in [docs/ERPTEST_LIGHTNODE.md](docs/ERPTEST_LIGHTNODE.md). Update the web-only Gunicorn service separately when Python/hooks change (brief shared Bench HTTP impact). Static CI is not a substitute for browser or authentication UAT.
 

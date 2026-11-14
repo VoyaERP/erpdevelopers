@@ -1,5 +1,52 @@
 # ERP Developers — deployment on erptest-lightnode
 
+## Current update procedure (existing site, not a new installation)
+
+**Current state (2026-11-14):** `erp-developers.com` already exists and `erpdevelopers` was installed on it. Earlier site-creation and missing-module/app-registration sections below are preserved as **incident history only**. Never run a new-site installer, `bench get-app`, `bench update`, `drop-site` or any database reset on this existing site.
+
+Use a clean `version-16` checkout; select a **reviewed 40-character commit SHA** that passed GitHub CI. From `/data/frappe/frappe-bench`, stage the update script **outside the Git checkout** so Git cannot replace the script while it is executing:
+
+~~~bash
+(
+  set -Eeuo pipefail
+  BENCH="/data/frappe/frappe-bench"
+  APP="$BENCH/apps/erpdevelopers"
+  RELEASE_SHA="<reviewed-40-character-commit>"
+  test -f "$BENCH/sites/erp-developers.com/site_config.json"
+  test -z "$(git -C "$APP" status --porcelain)"
+  test "$(git -C "$APP" branch --show-current)" = "version-16"
+  test "$(git -C "$APP" remote get-url upstream)" = "https://github.com/VoyaERP/erpdevelopers.git"
+  git -C "$APP" fetch upstream version-16
+  test "$(git -C "$APP" rev-parse FETCH_HEAD)" = "$RELEASE_SHA"
+  TEMP_SCRIPT="$(mktemp)"
+  trap 'rm -f "$TEMP_SCRIPT"' EXIT
+  git -C "$APP" show "$RELEASE_SHA:scripts/update_erptest_lightnode.sh" > "$TEMP_SCRIPT"
+  BENCH="$BENCH" EXPECTED_SHA="$RELEASE_SHA" bash "$TEMP_SCRIPT"
+)
+~~~
+
+The updater creates another **site-targeted DB + files backup**, checks exact remote SHA and fast-forward, validates Python/JS/source logo, runs tests **before migrate**, changes only that site's Website Settings, builds assets and clears caches. It intentionally does **not** restart shared services.
+
+After scheduling the impact with other site users, verify the actual Supervisor-managed Gunicorn program and restart **web only**:
+
+~~~bash
+sudo supervisorctl status frappe-bench-web:frappe-bench-frappe-web
+sudo supervisorctl restart frappe-bench-web:frappe-bench-frappe-web
+~~~
+
+Now run:
+
+~~~bash
+cd /data/frappe/frappe-bench
+BENCH=/data/frappe/frappe-bench bash apps/erpdevelopers/scripts/verify_frontend.sh
+~~~
+
+This checks rendered HTML includes `/assets/erpdevelopers/css/brand.css?v=<content-hash>`, compares direct-origin CSS/logo/favicon response bytes to the files on disk, and verifies public `/`, `/login`, `/api/method/ping`, CSS and image assets. A 200 response alone is not sufficient to prove CSS delivery.
+
+Finally inspect desktop (at least 1440 and 1024px), tablet and mobile (390px) screens; EN/AR, keyboard focus/skip link, native sign-in, password reset, configured 2FA and other sites sharing the Bench. Keep deployment/UAT issue open until these pass.
+
+
+
 - **Public domain:** https://erp-developers.com
 - **Host:** erptest-lightnode
 - **Repository:** https://github.com/VoyaERP/erpdevelopers (public)
@@ -171,24 +218,7 @@ The public curl checks only pass once DNS and HTTPS are live. Browser UAT must c
 
 ## 5. Update an already installed target site
 
-Only use this path when the site and app are already installed on erptest-lightnode:
-
-~~~bash
-(
-  set -Eeuo pipefail
-  export PATH="$HOME/.local/bin:$PATH"
-  SRC="$HOME/erpdevelopers-deploy-source"
-  test -d "$SRC/.git" || { echo "STOP: source checkout is missing"; exit 2; }
-  test -z "$(git -C "$SRC" status --porcelain)" || { echo "STOP: source checkout is dirty"; exit 2; }
-  test "$(git -C "$SRC" branch --show-current)" = "version-16" || {
-    echo "STOP: unexpected branch"; exit 2;
-  }
-  git -C "$SRC" pull --ff-only origin version-16
-  BENCH="/data/frappe/frappe-bench" bash "$SRC/scripts/update_erptest_lightnode.sh"
-)
-~~~
-
-The updater validates the target and clean checkout, backs up **erp-developers.com** with files, fast-forwards only the ERP Developers app, migrates the target site, builds assets and clears caches. Review impact on other sites using the same app; manual shared-service restart remains a separate gate.
+Follow the **Current update procedure** at the top of this guide. Do not run a stale, unpinned `git pull` script or re-install the app. Update only the existing `erp-developers.com` site, record the exact deployed commit and backup location, and run the origin/public frontend integrity checker after a reviewed web-only reload.
 
 ## Security and rollback
 
