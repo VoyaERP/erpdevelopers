@@ -2,13 +2,13 @@
 
 **Engage. Reason. Progress.**
 
-Frappe custom app powering the ERP Developers website. This is a **public landing-page MVP**, not a completed LMS, community, job aggregation service or AI assistant.
+Frappe custom app powering the ERP Developers public website on ERPNext 16. The public hub includes curated training playlists, reviewed knowledge sources and an appointment-request workflow. It is **not** a completed LMS, member community, jobs aggregator or AI inference service.
 
 ## Compatibility
 
 - Branch: `version-16`
 - Python: 3.14+ (Frappe 16 runtime)
-- Framework: Frappe 16.x (no ERPNext dependency)
+- Runtime: Frappe 16.x + ERPNext 16.x (ERPNext required for consultation-to-Lead integration)
 - Frappe 15 is a separate compatibility target; do not install this branch on a v15 bench.
 
 ## Install on a NEW isolated development site only (not the live site)
@@ -16,7 +16,9 @@ Frappe custom app powering the ERP Developers website. This is a **public landin
 ```bash
 cd /path/to/frappe-v16-bench
 bench get-app --branch version-16 https://github.com/VoyaERP/erpdevelopers.git
+bench get-app --branch version-16 https://github.com/frappe/erpnext.git
 bench new-site erpdev.localhost
+bench --site erpdev.localhost install-app erpnext
 bench --site erpdev.localhost install-app erpdevelopers
 bench --site erpdev.localhost migrate
 bench build --app erpdevelopers
@@ -67,9 +69,19 @@ Bench upgrade. After deployment, authenticate as a permitted ERPNext System
 User and verify the ERPNext tile and dock use the compact shield, including
 legacy Desktop Icons mode if enabled, while other sites retain their own icons.
 
+## Public hub — Training, Insights, Let's Talk (release candidate)
+
+**Routes:** `/training`, `/insights`, `/lets-talk`, `/privacy`. The homepage uses shared bilingual navigation and footer and now labels the authorized staff action **Team Login**. Static FAQ quick-guide content remains on-device only; it is **not AI**. No LinkedIn OAuth or job feed has been enabled.
+
+**ERPNext-backed content:** Website Managers and System Managers maintain **ERP Developers Playlist** and **ERP Developers Resource** records, publishing curated YouTube collections, authored Frappe Web Pages and attributed external sources. Content is explicitly unpublished by default; guest users see only approved fields, without DocType read permission. Staff coordinate appointments through private **ERP Developers Consultation** records. The guarded staff CRM action creates or links an authorized **ERPNext Lead**, and a **Frappe Event** is required before status can become Confirmed.
+
+**Critical setup:** Guest consultation requests are disabled until `erpdev_consultation_open=1` is deliberately configured after privacy review, ownership, spam/consent and retention controls. The public website explains that submitting preferred availability is *not* an actual booking. Avoid adding third-party booking widgets that bypass this security boundary.
+
+See [Public Hub documentation](docs/PUBLIC_HUB.md) for permissions, editorial workflow, curriculum ideas, controlled activation, LinkedIn feasibility, AI integration gates and real-site UAT. Deployment of this source has **not** been confirmed; follow the pinned, backup-first existing-site procedure and validate the actual backend/browser before enabling intake.
+
 ## Desk sign-in and deployment recovery (2026-11-14)
 
-The two staff sign-in links on the public homepage now use a **single** URL from `branding.DESK_SIGNIN_URL`: `/login?redirect-to=/desk`. Frappe v16's native `login.js` prioritizes the sanitized `redirect-to` query when sign-in succeeds; without it, Frappe navigates to the server-provided `home_page`, which on this public site is the branded homepage. The link is visibly labeled **Desk sign in / دخول لوحة التحكم**; it is for authorized **System Users** only. Future website-member login/portal routes must remain separate; this release does not introduce a member portal or change auth permissions.
+The two staff sign-in links on the public homepage now use a **single** URL from `branding.DESK_SIGNIN_URL`: `/login?redirect-to=/desk`. Frappe v16's native `login.js` prioritizes the sanitized `redirect-to` query when sign-in succeeds; without it, Frappe navigates to the server-provided `home_page`, which on this public site is the branded homepage. The staff link is visibly labeled **Team Login / دخول فريق العمل**; it is for authorized **System Users** only. Future website-member login/portal routes must remain separate; this release does not introduce a member portal or change auth permissions.
 
 The previous deployment was interrupted **after Git fast-forward and 27 passing source tests, before migration/website setup/build/cache clear**, because the updater still called `node --check` on the deleted `login_chrome.js`. The updater no longer does that and instead asserts the obsolete JS and DOM test are absent. Re-run the **pinned existing-site** updater on the already-clean `version-16` checkout; it backs up again, runs tests before migration and finishes website config/build/cache. Restart the shared Gunicorn **web-only** service separately, then run `scripts/verify_frontend.sh`, which confirms the first-paint CSS and selected logo plus both Desk sign-in links.
 
@@ -101,9 +113,9 @@ See [architecture and trust boundaries](docs/ARCHITECTURE.md) for design invaria
 
 ## Security and scope
 
-- No privileged API endpoints or guest-writable records.
+- No guest-readable DocTypes. The one guest POST consultation API is opt-in, rate-limited, validated and creates only a private request; it is disabled by default.
 - No direct LinkedIn scraping or unapproved third-party job APIs.
-- No active AI inference or personal-data processing.
+- No active AI inference, LinkedIn connection or third-party transfer. Consultation data is processed only if the site administrator explicitly enables intake and approves privacy/retention.
 - Use Frappe's server-side permission checks for future authenticated routes.
 - Community, LMS, and job connections must be introduced as independently tested modules.
 
