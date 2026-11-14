@@ -1,8 +1,16 @@
 # ERP Developers — deployment on erptest-lightnode
 
+## Login first-paint / logo correction (2026-11-14)
+
+Previous bug: Frappe's own login page rendered normally; after `DOMContentLoaded`, the ERP Developers JavaScript inserted its own header/story/footer, causing the user to see the standard layout **flash and then be replaced**. The old navbar also did not reliably show the approved logo.
+
+**Corrected architecture:** `version-16` no longer includes or loads `login_chrome.js`. Instead, Frappe's **original** login template/navbar/form render with a fingerprinted, render-blocking `/assets/erpdevelopers/css/login.css?v=<SHA256>`. Its split-panel appearance is pure CSS from the first paint, in EN/AR. `Website Settings.app_logo`, `brand_html` and `banner_image` now all use the **exact original selected PNG** so the navbar contains the correct logo in server-rendered HTML. The form's redundant duplicate logo is hidden by CSS.
+
+Deploy through the **existing-site, pinned backup-first** procedure below and coordinate the web-only Gunicorn reload because Frappe Python hooks change. The read-only `verify_frontend.sh` checks the native login's HTML, approved logo reference, fingerprinted CSS response and **absence of the old DOM-replacement script**. Then test live login, OTP/2FA, password recovery, Arabic/English and mobile. Static checks do not prove browser visual acceptance.
+
 ## Bilingual UI and login duplication regression (2026-11-14)
 
-The initial orbit-based layout and original bilingual story login have been restored, with compact spacing and the exact approved logo. The earlier doubled header arose because Frappe 16's `login.html` renders a native navbar for the language picker and the custom script also added a header; CSS hid `header.navbar` but not the actual `nav.navbar`.
+Historical context: the earlier orbit layout returned with compact spacing, but the intermediate login fix still used JS and could flash. The replacement described **above** is the current implementation.
 
 A reviewed deployment must confirm after the **web-only** Gunicorn reload: the homepage is styled (skip link visible only on focus); the English/Arabic picker changes the homepage translations and direction; `/login` shows **one** website header, **one** picker, and the native sign-in form beside a single story panel; forgotten-password, signup/LDAP/social login and 2FA retain Frappe's native behavior where enabled. Confirm there is no duplicate footer and all shared-Bench sites remain functional.
 
@@ -33,7 +41,7 @@ Use a clean `version-16` checkout; select a **reviewed 40-character commit SHA**
 )
 ~~~
 
-The updater creates another **site-targeted DB + files backup**, checks exact remote SHA and fast-forward, validates Python/JS/source logo, runs tests **before migrate**, changes only that site's Website Settings, builds assets and clears caches. It intentionally does **not** restart shared services.
+The updater creates another **site-targeted DB + files backup**, checks exact remote SHA and fast-forward, validates Python/source logo, runs tests **before migrate**, changes only that site's Website Settings, builds assets and clears caches. It intentionally does **not** restart shared services.
 
 After scheduling the impact with other site users, verify the actual Supervisor-managed Gunicorn program and restart **web only**:
 
@@ -49,7 +57,7 @@ cd /data/frappe/frappe-bench
 BENCH=/data/frappe/frappe-bench bash apps/erpdevelopers/scripts/verify_frontend.sh
 ~~~
 
-This checks rendered HTML includes `/assets/erpdevelopers/css/brand.css?v=<content-hash>`, compares direct-origin CSS/logo/favicon response bytes to the files on disk, and verifies public `/`, `/login`, `/api/method/ping`, CSS and image assets. A 200 response alone is not sufficient to prove CSS delivery.
+This checks rendered HTML includes `/assets/erpdevelopers/css/brand.css?v=<content-hash>`, compares direct-origin CSS/logo/favicon response bytes to the files on disk, and verifies public `/`, `/login`, `/api/method/ping`, CSS and image assets. It also checks the **login CSS fingerprint and original navbar logo**. A 200 response alone is not sufficient to prove CSS delivery.
 
 Finally inspect desktop (at least 1440 and 1024px), tablet and mobile (390px) screens; EN/AR, keyboard focus/skip link, native sign-in, password reset, configured 2FA and other sites sharing the Bench. Keep deployment/UAT issue open until these pass.
 

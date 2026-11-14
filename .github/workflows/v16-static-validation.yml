@@ -15,10 +15,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.14"
-      - name: Set up Node 24
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
       - name: Python compile
         run: python -m compileall -q erpdevelopers tests
       - name: Bash syntax

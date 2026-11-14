@@ -37,7 +37,9 @@ The original human-collaboration/orbit hero composition has been restored with *
 
 **English + Arabic** site content is translated through `erpdevelopers/translations/ar.csv`; Frappe's native `#language-switcher` appears in the custom homepage header and uses the framework's own locale cookie. For any language without supplied product-copy translations, website copy falls back to English. The literal approved logo and its tagline are not redrawn or reworded.
 
-Frappe 16 [login.html](https://github.com/frappe/frappe/blob/v16.56.0/frappe/www/login.html) renders its standard navbar while `show_language_picker` is enabled. The previous enhancement added another navbar, resulting in **two headers**. The scoped new CSS hides Frappe's navbar and footer **only when** the custom login header/footer have been added, while moving the **same native picker** to that header. Original split-panel styling returns as a sibling aside to the original Frappe `<main>`. No login/signup/reset/2FA form or endpoint is duplicated or replaced. A zero-dependency Node DOM test executes the login script twice and verifies idempotence and native form preservation.
+**No login-page JavaScript or DOM swapping remains.** The previous JavaScript waited until page load, then inserted a second header and split-panel story, producing a standard-form-to-new-form flash. The current design is applied **by a render-blocking, fingerprinted CSS stylesheet in Frappe's HTML head**. Frappe's original server-rendered navbar, language selector and login form stay in place from the first paint; a CSS-only split-panel illustration supplies the visual design (English/Arabic copy through the page language).
+
+The exact original approved PNG is configured **server-side** in `Website Settings.app_logo`, `brand_html` and `banner_image`, while the icon crop remains the favicon. No other logo or generated illustration replaces it. `login_chrome.js` and its obsolete DOM test were removed. Native Frappe login/signup/recovery/2FA, session logic and language switching remain untouched.
 
 `scripts/verify_frontend.sh` now checks Origin CSS bytes, exact logo/favicons, six rendered modules, English/Arabic server responses, the native login's language picker and public asset routes. This is distinct from visual browser UAT.
 
@@ -48,7 +50,7 @@ Frappe 16 [login.html](https://github.com/frappe/frappe/blob/v16.56.0/frappe/www
 - `erpdevelopers/content.py`: immutable, typed content lists for 3 brand principles, 6 planned ecosystem capabilities, 4 AI steps and 4 roadmap milestones; no repeated card markup.
 - `erpdevelopers/www/erp-developers-home.html`: Jinja page with one explicit stylesheet link in its supported `head_include` block, loop-driven sections and no duplicate Frappe navbar/footer.
 - `public/css/brand.css`: homepage-only rules and scoped variables. `public/css/login.css`: independent styles restricted to the native `/login` page.
-- `public/js/login_chrome.js`: decorative login header/footer only; shares a single brand-image helper and never handles credentials.
+- No login DOM script exists: Frappe's original `/login` template is styled from the first paint by a content-hashed `public/css/login.css` loaded in `web_include_css`; this prevents a late form/header replacement.
 - `site_setup.py`: explicit administrator command for exactly `erp-developers.com`, idempotent and site-scoped. No after-install mutation or public API.
 - `scripts/update_erptest_lightnode.sh`: guarded backup, optional pinned `EXPECTED_SHA`, source validation **before** target-site migration, then assets build and cache clearing.
 - `scripts/verify_frontend.sh`: read-only direct-origin/public checks for rendered CSS fingerprint, actual stylesheet bytes, exact selected logo and favicon.

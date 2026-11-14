@@ -63,8 +63,8 @@
     echo "STOP: fingerprinted login CSS not linked"; exit 3;
   }
   grep -Fq 'navbar-brand' "$TMP/login.html"
-  grep -Fq 'erpdevelopers-selected-logo.png' "$TMP/login.html" || {
-    echo "STOP: approved logo not in native HTML"; exit 3;
+  grep -Fq '<img src="/assets/erpdevelopers/images/erpdevelopers-selected-logo.png"' "$TMP/login.html" || {
+    echo "STOP: approved ORIGINAL logo is not in rendered navbar Brand HTML"; exit 3;
   }
   if grep -Fq 'login_chrome.js' "$TMP/login.html"; then
     echo "STOP: stale script still reinserts the login layout"; exit 3;
