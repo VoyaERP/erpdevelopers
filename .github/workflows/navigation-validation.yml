@@ -18,7 +18,7 @@ jobs:
         run: |
           python -m pip install Babel==2.17.0 Jinja2==3.1.6 playwright==1.57.0
           python -m playwright install --with-deps chromium firefox
-      - name: Measure original shift and corrected header on real templates
+      - name: Verify visible language control, navigation and first-paint stability
         run: python scripts/test_navigation_browser.py
       - name: Retain navigation previews and measurements
         if: always()

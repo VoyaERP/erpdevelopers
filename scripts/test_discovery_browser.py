@@ -82,7 +82,7 @@ def main():
                             page.on("pageerror", lambda error: errors.append(str(error)))
                             page.goto(f"{origin}/?_lang={lang}")
                             page.locator('a[href="/#vision"]').click()
-                            expect(page).to_have_url(f"{origin}/#vision")
+                            expect(page).to_have_url(f"{origin}/?_lang={lang}#vision")
                             vision = page.locator("#vision")
                             expect(vision).to_be_visible()
                             signature = vision.locator("[data-brand-slogan]")
