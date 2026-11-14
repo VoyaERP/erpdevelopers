@@ -131,6 +131,13 @@
   grep -Fq 'data-player-frame' "$TMP/training.html" || {
     echo "STOP: playlist frame is missing"; exit 3;
   }
+  grep -Fq 'class="ed-playlist-watch" data-playlist-open' "$TMP/training.html" || {
+    # No public playlists may be published on a new site; inspect only when
+    # the server has rendered at least one candidate.
+    if grep -Fq 'class="ed-resource-card"' "$TMP/training.html"; then
+      echo "STOP: published playlist card missing fallback Watch link"; exit 3;
+    fi
+  }
   grep -Fq 'sandbox="allow-scripts allow-same-origin allow-presentation"' "$TMP/training.html" || {
     echo "STOP: playlist player sandbox is missing"; exit 3;
   }

@@ -96,7 +96,7 @@ class TestPlaylistBackend(TestCase):
                 "topic": "Solution Architecture", "level": "Beginner",
                 "language": "English", "description": "Curated",
                 "playlist_url": "https://www.youtube.com/playlist?list=PLabcdefghijklmnopqrst0123456",
-                "playlist_id": "PLabcdefghijklmnopqrst0123456",
+                "playlist_id": "",  # legacy row: validated URL is source of truth
                 "visibility": "Public",
             }]
         mock_frappe.get_all = query
@@ -106,6 +106,7 @@ class TestPlaylistBackend(TestCase):
         self.assertEqual(len(results), 1)
         self.assertTrue(results[0]["watch_url"].startswith("https://www.youtube.com/playlist?list="))
         self.assertEqual(results[0]["visibility"], "Public")
+        self.assertEqual(results[0]["playlist_id"], "PLabcdefghijklmnopqrst0123456")
         client = (PLAYLIST / "erp_developers_playlist.js").read_text()
         self.assertIn('frm.set_df_property("published", "read_only"', client)
         self.assertIn('frm.set_value("published", 0)', client)
@@ -124,7 +125,14 @@ class TestProtectedPlaylistDialog(TestCase):
         self.assertIn('sandbox="allow-scripts allow-same-origin allow-presentation"', html)
         self.assertIn('referrerpolicy="strict-origin-when-cross-origin"', html)
         self.assertNotIn('src="https://www.youtube', html, "Do not embed on page load")
-        self.assertIn("youtube-nocookie.com/embed", js)
+        self.assertIn("youtube-nocookie.com/embed/videoseries", js)
+        self.assertNotIn('embed.searchParams.set("listType"', js)
+        self.assertIn('event.preventDefault(); // only intercept', js)
+        self.assertIn('if (!idPattern.test(id)) return', js)
+        self.assertIn('typeof dialog.showModal !== "function"', js)
+        self.assertIn('href="{{ item.watch_url | e }}" target="_blank" rel="noopener noreferrer"', html)
+        self.assertIn('class="ed-playlist-play-icon"', html)
+        self.assertIn('a.ed-playlist-watch{color:#fff!important}', css)
         self.assertIn('frame.src = embed.toString()', js)
         self.assertIn('frame.removeAttribute("src")', js)
         self.assertIn('dialog.showModal()', js)

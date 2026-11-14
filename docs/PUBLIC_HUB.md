@@ -109,13 +109,16 @@ the existing **ERP Developers Playlist** DocType at
    `visibility = Public` as a defense in depth. Private rows are never
    serialized to the public HTML, including their YouTube URLs.
 4. Set Display Order, Save, and check the validated Playlist ID. Published
-   Public items appear on `/training`; choose **Watch here** to open
-   the in-page modal, or **Open on YouTube** for direct playback.
-5. The iframe uses only a server-validated playlist ID to construct a
-   `youtube-nocookie.com` embed URL, and the client verifies the ID
-   again. It starts loading **only on a click**, runs in a sandboxed
-   frame, and drops its src on close to stop playback. No automated
-   YouTube scraping or playlists are seeded.
+   Public items appear on `/training`; **Watch here** opens the in-page
+   player when the page script and browser support it, and otherwise
+   opens the validated YouTube playlist in a new tab. **Open on YouTube**
+   remains available independently.
+5. The iframe uses only an ID validated from the canonical YouTube URL,
+   even if an older Desk record has a stale `playlist_id`. It opens a
+   `https://www.youtube-nocookie.com/embed/videoseries?list=...` URL
+   and loads **only on an explicit click**, in a sandboxed frame.
+   Closing the dialog removes the iframe source. No automated YouTube
+   scraping or playlists are seeded.
 
 **Important distinction:** Frappe's Private option means **Desk-only
 metadata**; it is not a DRM or private-video-streaming service. A
@@ -127,7 +130,9 @@ YouTube embed availability depends on the owner's embed settings,
 geographic restrictions, viewer permissions, and the site's CSP
 allowlisting `https://www.youtube-nocookie.com` in `frame-src`.
 Never weaken the shared Bench or global CSP for a single app; use
-site-scoped CSP configuration if separately approved.
+site-scoped CSP configuration if separately approved. If Watch still
+fails, inspect the browser Console for CSP / iframe restrictions and
+verify the source playlist permits embedding; never disable CSP globally.
 
 A YouTube player may contact Google/YouTube and process visitor data
 after explicit activation; Privacy Enhanced Mode is not a guarantee
