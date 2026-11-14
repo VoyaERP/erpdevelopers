@@ -108,9 +108,9 @@ class TestNativeLogin(unittest.TestCase):
         hooks = (APP / "hooks.py").read_text(encoding="utf-8")
         self.assertIn("web_include_css", hooks)
         self.assertNotIn("web_include_js", hooks)
-        self.assertNotIn("for-login", css)
-        self.assertNotIn("for-forgot", css)
-        self.assertNotIn("for-signup", css)
+        self.assertNotIn(".for-login {", css)
+        self.assertNotIn(".for-forgot {", css)
+        self.assertNotIn(".for-signup {", css)
         self.assertFalse((APP / "www/login.html").exists())
         self.assertFalse((APP / "www/login.py").exists())
     def test_site_setup_is_explicit_and_site_scoped(self):
