@@ -124,6 +124,20 @@
   grep -Fq "href=\"$PORTAL_CSS\"" "$TMP/training.html" || {
     echo "STOP: public hub CSS fingerprint missing"; exit 3;
   }
+  echo "=== Training: protected click-to-load playlist player ==="
+  grep -Fq 'id="ed-playlist-dialog"' "$TMP/training.html" || {
+    echo "STOP: playlist dialog is missing"; exit 3;
+  }
+  grep -Fq 'data-player-frame' "$TMP/training.html" || {
+    echo "STOP: playlist frame is missing"; exit 3;
+  }
+  grep -Fq 'sandbox="allow-scripts allow-same-origin allow-presentation"' "$TMP/training.html" || {
+    echo "STOP: playlist player sandbox is missing"; exit 3;
+  }
+  # The external frame must never be embedded until a visitor clicks Watch.
+  if grep -Eq 'src="https://www.youtube(-nocookie)?.com/embed' "$TMP/training.html"; then
+    echo "STOP: training page eagerly embeds YouTube content"; exit 3;
+  fi
   curl -kfsSL --connect-timeout 5 --max-time 20 \
     --resolve "$SITE:443:127.0.0.1" "https://$SITE$PORTAL_CSS" -o "$TMP/portal.css"
   cmp -s "$APP/erpdevelopers/public/css/portal.css" "$TMP/portal.css" || {

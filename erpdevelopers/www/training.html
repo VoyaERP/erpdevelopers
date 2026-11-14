@@ -5,7 +5,7 @@
     <div>
       <p class="ed-kicker">{{ _("CURATED LEARNING") }}</p>
       <h1 id="ed-training-title">{{ _("Learn with a clear path.") }}</h1>
-      <p>{{ _("Discover vetted public YouTube playlists across enterprise applications, architecture, development and emerging technology.") }}</p>
+      <p>{{ _("Explore reviewed video playlists on our website, with a privacy-conscious player that loads only when you choose to watch.") }}</p>
       <div class="ed-actions">
         <a class="ed-btn ed-btn-primary" href="#playlists">{{ _("Explore playlists") }}</a>
         <a class="ed-btn ed-btn-secondary" href="/lets-talk">{{ _("Discuss a training plan") }}</a>
@@ -25,7 +25,7 @@
         <p class="ed-kicker">{{ _("LEARNING LIBRARY") }}</p>
         <h2 id="ed-playlist-heading">{{ _("Video playlists") }}</h2>
       </div>
-      <p>{{ _("Each collection is reviewed before it appears. Videos open on YouTube; no tracking player is embedded on this page.") }}</p>
+      <p>{{ _("Choose Watch here to open a protected video frame. YouTube content is not loaded until you open the player.") }}</p>
     </div>
     <div class="ed-filter-row">
       <label for="ed-topic-filter">{{ _("Filter by topic") }}</label>
@@ -50,9 +50,16 @@
         <p>{{ item.description | e }}</p>
         <div class="ed-card-bottom">
           <span>{{ _(item.language) | e }}</span>
-          <a href="{{ item.watch_url | e }}" target="_blank" rel="noopener noreferrer">
-            {{ _("Watch playlist on YouTube") }} <span aria-hidden="true">↗</span>
-          </a>
+          <div class="ed-playlist-actions">
+            <button type="button" class="ed-playlist-watch" data-playlist-open
+                    data-playlist-id="{{ item.playlist_id | e }}"
+                    data-playlist-title="{% if boot.lang == 'ar' and item.title_ar %}{{ item.title_ar | e }}{% else %}{{ item.title | e }}{% endif %}">
+              {{ _("Watch here") }} <span aria-hidden="true">▶</span>
+            </button>
+            <a href="{{ item.watch_url | e }}" target="_blank" rel="noopener noreferrer">
+              {{ _("Open on YouTube") }} <span aria-hidden="true">↗</span>
+            </a>
+          </div>
         </div>
       </article>
       {% endfor %}
@@ -65,6 +72,29 @@
     {% endif %}
   </div>
 </section>
+<dialog id="ed-playlist-dialog" class="ed-playlist-dialog"
+        aria-labelledby="ed-playlist-dialog-title" aria-describedby="ed-playlist-privacy">
+  <div class="ed-playlist-dialog-header">
+    <div>
+      <span class="ed-booking-overline">{{ _("VIDEO LIBRARY") }}</span>
+      <h2 id="ed-playlist-dialog-title">{{ _("Watch playlist") }}</h2>
+    </div>
+    <button type="button" class="ed-playlist-close" data-player-close
+            aria-label="{{ _('Close video player') }}">×</button>
+  </div>
+  <div class="ed-playlist-player">
+    <iframe data-player-frame title="{{ _('YouTube playlist player') | e }}"
+            loading="lazy" referrerpolicy="strict-origin-when-cross-origin"
+            sandbox="allow-scripts allow-same-origin allow-presentation"
+            allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>
+  </div>
+  <div class="ed-playlist-dialog-foot">
+    <p id="ed-playlist-privacy">{{ _("YouTube is contacted only when you open this player. Close the window to stop playback.") }}</p>
+    <a data-player-external href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">
+      {{ _("Open on YouTube") }} <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+</dialog>
 <section class="ed-section ed-learning-paths">
   <div class="ed-shell">
     <div class="ed-section-head">
