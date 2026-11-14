@@ -52,9 +52,9 @@
 
     <section class="ed-values" aria-label="ERP Developers values">
       <div class="ed-shell ed-values-inner">
-        <div><span>01</span><strong>Engage.</strong><small>Connect ideas and people</small></div>
-        <div><span>02</span><strong>Reason.</strong><small>Think with clarity and purpose</small></div>
-        <div><span>03</span><strong>Progress.</strong><small>Turn learning into impact</small></div>
+        {% for value in values_items %}
+        <div><span>{{ value.index | e }}</span><strong>{{ value.title | e }}</strong><small>{{ value.description | e }}</small></div>
+        {% endfor %}
       </div>
     </section>
 
@@ -72,12 +72,14 @@
           <p>Six focused destinations, designed to grow on shared identity, usability and strong security foundations.</p>
         </div>
         <div class="ed-grid">
-          <article class="ed-tile"><span class="ed-tile-index">01 <i aria-hidden="true"></i></span><h3>Developer Hub</h3><p>Engineering knowledge, reusable patterns and collaboration across technology stacks.</p><span class="ed-tile-status">Planned module</span></article>
-          <article class="ed-tile"><span class="ed-tile-index">02 <i aria-hidden="true"></i></span><h3>Community</h3><p>Focused conversations, expert connections and valuable peer-to-peer learning.</p><span class="ed-tile-status">Planned module</span></article>
-          <article class="ed-tile"><span class="ed-tile-index">03 <i aria-hidden="true"></i></span><h3>Learning Academy</h3><p>Structured paths, assessments and practical skills for career growth.</p><span class="ed-tile-status">Planned module</span></article>
-          <article class="ed-tile"><span class="ed-tile-index">04 <i aria-hidden="true"></i></span><h3>Career Connections</h3><p>Opportunities and employer networks, with approved integrations when available.</p><span class="ed-tile-status">Planned module</span></article>
-          <article class="ed-tile"><span class="ed-tile-index">05 <i aria-hidden="true"></i></span><h3>Solutions Marketplace</h3><p>Discover products, business solutions and independent expertise.</p><span class="ed-tile-status">Planned module</span></article>
-          <article class="ed-tile"><span class="ed-tile-index">06 <i aria-hidden="true"></i></span><h3>Intelligent Advisory</h3><p>Human-reviewed architecture insight and evidence-led technology decisions.</p><span class="ed-tile-status">Planned module</span></article>
+          {% for item in ecosystem_items %}
+          <article class="ed-tile">
+            <span class="ed-tile-index">{{ item.index | e }} <i aria-hidden="true"></i></span>
+            <h3>{{ item.title | e }}</h3>
+            <p>{{ item.description | e }}</p>
+            <span class="ed-tile-status">Planned module</span>
+          </article>
+          {% endfor %}
         </div>
       </div>
     </section>
@@ -92,10 +94,9 @@
             <a href="#roadmap" class="ed-ai-link">See the roadmap <span aria-hidden="true">↗</span></a>
           </div>
           <div class="ed-ai-flow" aria-hidden="true">
-            <div><span>01</span><strong>Knowledge</strong><small>Discover context</small></div>
-            <div><span>02</span><strong>Reasoning</strong><small>Evaluate options</small></div>
-            <div><span>03</span><strong>Human review</strong><small>Validate decisions</small></div>
-            <div><span>04</span><strong>Progress</strong><small>Improve outcomes</small></div>
+            {% for step in ai_flow_items %}
+            <div><span>{{ step.index | e }}</span><strong>{{ step.title | e }}</strong><small>{{ step.description | e }}</small></div>
+            {% endfor %}
           </div>
         </div>
       </div>
@@ -105,10 +106,9 @@
       <div class="ed-shell">
         <div class="ed-roadmap-title"><div><p class="ed-kicker">THE ROAD AHEAD</p><h2 id="ed-roadmap-heading">Built deliberately. Ready to grow.</h2></div><p>Our foundation starts with a secure public experience; new capabilities will follow through independent delivery and testing.</p></div>
         <div class="ed-steps">
-          <div><span>01</span><strong>Foundation</strong><small>Brand and secure website</small></div>
-          <div><span>02</span><strong>Connection</strong><small>Identity and community</small></div>
-          <div><span>03</span><strong>Opportunity</strong><small>Learning, developers and careers</small></div>
-          <div><span>04</span><strong>Intelligence</strong><small>Opt-in AI and integrations</small></div>
+          {% for step in roadmap_items %}
+          <div><span>{{ step.index | e }}</span><strong>{{ step.title | e }}</strong><small>{{ step.description | e }}</small></div>
+          {% endfor %}
         </div>
       </div>
     </section>

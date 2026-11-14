@@ -73,6 +73,25 @@ class TestBrandContract(TestCase):
         self.assertNotIn("erp-developers-logo.svg", home + js + setup)
         self.assertNotIn("erpdevelopers-selected-logo.png", home)
 
+    def test_static_content_is_typed_and_declared_once(self):
+        from erpdevelopers import content
+        home = (APP / "www" / "erp-developers-home.html").read_text(encoding="utf-8")
+        self.assertEqual(len(content.VALUES), 3)
+        self.assertEqual(len(content.ECOSYSTEM), 6)
+        self.assertEqual(len(content.AI_FLOW), 4)
+        self.assertEqual(len(content.ROADMAP), 4)
+        for collection in (content.VALUES, content.ECOSYSTEM, content.AI_FLOW, content.ROADMAP):
+            self.assertEqual(len({entry.index for entry in collection}), len(collection))
+            for entry in collection:
+                self.assertTrue(entry.title.strip())
+                self.assertTrue(entry.description.strip())
+        self.assertIn("{% for item in ecosystem_items %}", home)
+        self.assertIn("{% for value in values_items %}", home)
+        self.assertIn("{% for step in ai_flow_items %}", home)
+        self.assertIn("{% for step in roadmap_items %}", home)
+        self.assertNotIn("<h3>Developer Hub</h3>", home)
+        self.assertIn("Planned module", home)
+
     def test_html_copy_does_not_claim_roadmap_features_are_running(self):
         home = (APP / "www" / "erp-developers-home.html").read_text(encoding="utf-8")
         for word in ("Engage.", "Reason.", "Progress.", "Developers", "AI"):
