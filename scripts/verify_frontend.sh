@@ -73,10 +73,10 @@
   grep -Fq "$LOGIN_CSS" "$TMP/login.html" || {
     echo "STOP: fingerprinted login CSS not linked"; exit 3;
   }
-  grep -Fq 'navbar-brand' "$TMP/login.html"
-  grep -Fq '<img src="/assets/erpdevelopers/images/erpdevelopers-selected-logo.png"' "$TMP/login.html" || {
-    echo "STOP: approved ORIGINAL logo is not in rendered navbar Brand HTML"; exit 3;
-  }
+  # Parse the actual <a class="navbar-brand"> image structurally.
+  # Exact "<img src=..." grep incorrectly rejects valid attributes/quotes.
+  "$BENCH/env/bin/python" "$APP/scripts/inspect_login_brand.py" "$TMP/login.html" \
+    --site "$SITE"
   if grep -Fq 'login_chrome.js' "$TMP/login.html"; then
     echo "STOP: stale script still reinserts the login layout"; exit 3;
   fi

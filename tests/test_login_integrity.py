@@ -83,12 +83,45 @@ class TestNativeLogin(unittest.TestCase):
         self.assertIn('test ! -e "$APP/erpdevelopers/public/js/login_chrome.js"', script)
         self.assertLess(script.index("unittest discover"), script.index('bench --site "$SITE" migrate'))
 
+    def test_native_navbar_logo_parser_accepts_equivalent_html(self):
+        from importlib.util import module_from_spec, spec_from_file_location
+        spec = spec_from_file_location(
+            "inspect_login_brand", ROOT / "scripts/inspect_login_brand.py"
+        )
+        module = module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        logo = "/assets/erpdevelopers/images/erpdevelopers-selected-logo.png"
+        for markup in (
+            '<a class="navbar-brand"><img src="' + logo + '" alt="ERP Developers"></a>',
+            "<a href='/' class='navbar-brand'><img width='210' alt='ERP Developers' src='"
+            + logo + "'></a>",
+            '<a class="navbar-brand"><img class="brand" src="https://erp-developers.com'
+            + logo + '?v=4"></a>',
+        ):
+            with self.subTest(markup=markup):
+                self.assertTrue(module.inspect_markup(markup)[0])
+
+        self.assertFalse(
+            module.inspect_markup('<a class="navbar-brand">ERP Developers</a>')[0]
+        )
+        self.assertFalse(
+            module.inspect_markup('<a class="navbar-brand"><img src="/wrong.png"></a>'
+                                  '<img class="app-logo" src="' + logo + '">')[0]
+        )
+        self.assertFalse(
+            module.inspect_markup('<a class="navbar-brand">'
+                                  '<img src="https://other.example' + logo + '"></a>')[0]
+        )
+
     def test_frontend_verifier_compares_real_css_and_images(self):
         script = (ROOT / "scripts/verify_frontend.sh").read_text(encoding="utf-8")
         self.assertIn("--resolve", script)
         self.assertIn("brand.css?v=$DIGEST", script)
         self.assertIn('cmp -s "$APP/erpdevelopers/public/css/brand.css" "$TMP/brand.css"', script)
         self.assertIn("erpdevelopers-selected-logo.png", script)
+        self.assertIn('scripts/inspect_login_brand.py', script)
+        self.assertNotIn("grep -Fq '<img src=", script)
         self.assertIn("erpdevelopers-selected-favicon.png", script)
         self.assertIn('CARD_COUNT=', script)
         self.assertIn("Learning Academy", script)
