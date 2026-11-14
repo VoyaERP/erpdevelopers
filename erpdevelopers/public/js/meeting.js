@@ -1,5 +1,5 @@
 /* ERP Developers meeting calendar. ERPNext is the slot and appointment authority.
- * No fabricated availability, localStorage, third-party calendar or CRM writes.
+ * No fabricated availability, browser persistence, third-party calendar or CRM writes.
  */
 (() => {
   "use strict";

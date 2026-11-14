@@ -111,8 +111,8 @@ class TestNativeAPIBoundary(TestCase):
         app.PermissionError = PermissionError
         app._ = lambda value: value
         app.as_json = json.dumps
-        def fail(message, *unused):
-            raise ValueError(message)
+        def fail(message, exception=ValueError):
+            raise exception(message)
         app.throw = fail
         limits = ModuleType("frappe.rate_limiter")
         limits.rate_limit = lambda **kw: lambda fn: fn

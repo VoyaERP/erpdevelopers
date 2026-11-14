@@ -157,7 +157,7 @@ class TestBrandContract(TestCase):
         self.assertIn(".ed-site {", css)
         self.assertNotIn(":root {", css)
         self.assertIn(".ed-hero-inner{", css)
-        self.assertIn(".ed-skip {", css)
+        self.assertIn(".ed-skip{", css)
         self.assertIn("@media(max-width:540px)", css)
         self.assertIn('body[data-path="login"]', login)
         self.assertIn('url("/assets/erpdevelopers/images/login-network.svg")', login)
