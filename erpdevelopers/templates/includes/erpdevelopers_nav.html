@@ -1,11 +1,12 @@
 <a class="ed-skip" href="#content">{{ _("Skip to content") }}</a>
-<header class="ed-nav">
+{# Pin the rendered header language/direction while Frappe loads its native picker. #}
+<header class="ed-nav" lang="{{ boot.lang | e }}" dir="{{ 'rtl' if boot.lang.startswith('ar') else 'ltr' }}">
   <div class="ed-shell ed-nav-inner">
     <a href="/" class="ed-brand" aria-label="ERP Developers">
       <img src="{{ brand_logo_url | e }}" width="222" height="74"
            alt="ERP Developers — Engage. Reason. Progress.">
     </a>
-    <nav aria-label="{{ _('Main navigation') }}">
+    <nav class="ed-nav-links" aria-label="{{ _('Main navigation') }}">
       <a href="/#vision">{{ _("Our vision") }}</a>
       <a href="/#ecosystem">{{ _("Ecosystem") }}</a>
       <a href="/training">{{ _("Training") }}</a>

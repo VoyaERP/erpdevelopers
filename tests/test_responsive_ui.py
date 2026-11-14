@@ -1,8 +1,4 @@
-"""Regression checks for the website's bilingual responsive layout.
-
-These tests inspect shipped styles and templates. They cannot replace visual
-browser UAT on the deployed Frappe/ERPNext site.
-"""
+"""Bilingual responsive contracts; browser tests also measure real layout."""
 from pathlib import Path
 from unittest import TestCase
 
@@ -25,12 +21,11 @@ class TestResponsiveWebsite(TestCase):
         self.assertIn("@media(max-width:1100px){", BRAND)
         self.assertIn("overflow-x:auto;scrollbar-width:thin", BRAND)
         self.assertIn("@media(max-width:480px){", BRAND)
-        for phrase in (
-            ".ed-nav-tools{display:contents}",
-            ".ed-nav-cta{grid-column:2;grid-row:2",
-            ".ed-nav nav{grid-column:1;grid-row:2",
-        ):
-            self.assertIn(phrase, BRAND)
+        self.assertIn("grid-row:2;grid-column:1/-1", BRAND)
+        self.assertIn(".ed-nav-tools{grid-row:1;grid-column:2", BRAND)
+        self.assertIn("flex-wrap:nowrap", BRAND)
+        self.assertNotIn(".ed-nav-tools{display:contents}", BRAND)
+        self.assertNotIn(".ed-nav-cta{grid-column:2;grid-row:2", BRAND)
 
     def test_decorative_labels_never_force_text_overlap(self):
         self.assertNotIn("min-width:max-content", BRAND)
@@ -46,10 +41,10 @@ class TestResponsiveWebsite(TestCase):
         self.assertIn("--ed-header-anchor-offset:95px", BRAND)
         self.assertIn("scroll-margin-top:var(--ed-header-anchor-offset)", BRAND)
         self.assertIn("--ed-header-anchor-offset:145px", BRAND)
-        self.assertIn("--ed-header-anchor-offset:165px", BRAND)
         nav = (APP / "templates/includes/erpdevelopers_nav.html").read_text()
-        self.assertIn('<header class="ed-nav">', nav)
+        self.assertIn('<header class="ed-nav" lang="{{ boot.lang | e }}"', nav)
         self.assertIn('href="/lets-talk#meeting-start"', nav)
+        self.assertIn('dir="{{', nav)
 
     def test_guide_does_not_cover_footer_and_remains_keyboard_accessible(self):
         assistant = (APP / "templates/includes/erpdevelopers_assistant.html").read_text()
@@ -78,13 +73,9 @@ class TestResponsiveWebsite(TestCase):
         self.assertIn(".ed-booking-pane[hidden]{display:none!important}", MEETING)
         self.assertIn("@media(max-width:900px){", MEETING)
         self.assertIn("@media(max-width:700px){", MEETING)
-        self.assertIn('id="ed-meeting-form"', html)
+        for marker in ("ed-meeting-form", "ed-meeting-consent", "ed-meeting-month", "ed-meeting-slots", "ed-meet-aside-selection", "meeting-start"):
+            self.assertIn(f'id="{marker}"', html)
         self.assertEqual(html.count('<form id="ed-meeting-form"'), 1)
-        self.assertIn('id="ed-meeting-consent"', html)
-        self.assertIn('id="ed-meeting-month"', html)
-        self.assertIn('id="ed-meeting-slots"', html)
-        self.assertIn('id="ed-meet-aside-selection"', html)
-        self.assertIn('id="meeting-start"', html)
         self.assertIn('data-booking-ready=', html)
         self.assertIn('{% if not booking_enabled %}', html)
         self.assertIn('class="ed-meet-fields" {% if not booking_enabled %}disabled{% endif %}', html)
@@ -104,7 +95,7 @@ class TestResponsiveWebsite(TestCase):
         hook = (APP / "hooks.py").read_text(encoding="utf-8")
         for css in (BRAND, PORTAL, MEETING):
             self.assertNotIn("!important;transform:scaleX(-1);transform:scaleX(-1)", css)
-            self.assertNotIn("body[data-path=\"app\"]", css)
+            self.assertNotIn('body[data-path="app"]', css)
         self.assertNotIn('web_include_css = ["css/brand.css"]', hook)
 
 
