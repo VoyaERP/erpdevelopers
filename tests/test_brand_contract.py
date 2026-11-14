@@ -46,8 +46,14 @@ class TestBrandContract(TestCase):
         self.assertIn('rel="stylesheet"', home)
         self.assertNotIn('/assets/erpdevelopers/css/brand.css', home)
         self.assertNotIn('/assets/erpdevelopers/css/brand.css', hooks)
-        self.assertIn('login.css', hooks)
-        self.assertIn('login_chrome.js', hooks)
+        self.assertIn('login_stylesheet_url()', hooks)
+        self.assertNotIn('web_include_js', hooks)
+        self.assertNotIn('login_chrome.js', hooks)
+        self.assertEqual(
+            branding.login_stylesheet_url(),
+            "/assets/erpdevelopers/css/login.css?v="
+            + sha256((APP / "public/css/login.css").read_bytes()).hexdigest()[:16],
+        )
 
     def test_page_controller_binds_frappe_hyphenated_route(self):
         self.assertTrue((APP / "www" / (branding.HOME_ROUTE + ".html")).is_file())
@@ -65,14 +71,13 @@ class TestBrandContract(TestCase):
 
     def test_brand_assets_have_one_authoritative_source(self):
         home = (APP / "www" / "erp-developers-home.html").read_text(encoding="utf-8")
-        js = (APP / "public" / "js" / "login_chrome.js").read_text(encoding="utf-8")
         setup = (APP / "site_setup.py").read_text(encoding="utf-8")
         self.assertEqual(home.count('{{ brand_logo_url | e }}'), 2)
         self.assertEqual(home.count('{{ brand_icon_url | e }}'), 1)
-        self.assertIn(branding.LOGO_URL, js)  # fallback for native login chrome
+        self.assertIn(branding.LOGO_URL, branding.NAVBAR_BRAND_HTML)
         self.assertIn('website_settings_values()', setup)
-        self.assertNotIn("erp-mark.svg", home + js + setup)
-        self.assertNotIn("erp-developers-logo.svg", home + js + setup)
+        self.assertNotIn("erp-mark.svg", home + branding.NAVBAR_BRAND_HTML + setup)
+        self.assertNotIn("erp-developers-logo.svg", home + setup)
         self.assertNotIn("erpdevelopers-selected-logo.png", home)
 
     def test_static_content_is_typed_and_declared_once(self):

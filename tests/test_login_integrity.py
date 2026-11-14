@@ -6,46 +6,43 @@ APP = ROOT / "erpdevelopers"
 
 
 class TestNativeLogin(unittest.TestCase):
-    def test_assets_not_auth_overrides(self):
+    def test_css_first_paint_without_auth_overrides(self):
         hooks = (APP / "hooks.py").read_text(encoding="utf-8")
-        self.assertIn("web_include_js", hooks)
-        self.assertIn("login_chrome.js", hooks)
-        self.assertIn("login.css", hooks)
+        self.assertIn("web_include_css = [login_stylesheet_url()]", hooks)
+        self.assertNotIn("web_include_js", hooks)
+        self.assertNotIn("login_chrome.js", hooks)
         self.assertNotIn("override_whitelisted_methods", hooks)
-
-    def test_no_custom_form_or_auth_interception(self):
-        js = (APP / "public/js/login_chrome.js").read_text(encoding="utf-8")
-        self.assertIn('document.getElementById("page-login")', js)
-        self.assertIn('const LOGIN_PATH = "/login"', js)
-        self.assertIn('if (path !== LOGIN_PATH)', js)
-        self.assertIn("document.body.dataset.edLoginEnhanced", js)
-        self.assertIn("document.body.prepend(skip, top)", js)
-        self.assertIn('document.getElementById("language-switcher")', js)
-        for forbidden in ('innerHTML', 'create("form")', 'createElement("form")',
-                          "frappe.call(", "fetch(", "XMLHttpRequest",
-                          "document.documentElement.lang =", "wrapper.insertBefore("):
-            self.assertNotIn(forbidden, js)
-
-    def test_dom_simulation_is_run_by_ci(self):
-        workflow = (ROOT / ".github/workflows/v16-static-validation.yml").read_text(encoding="utf-8")
-        self.assertIn("node --test tests/login_chrome_dom.test.cjs", workflow)
-        self.assertTrue((ROOT / "tests/login_chrome_dom.test.cjs").is_file())
-
-    def test_login_uses_one_header_and_native_auth_view(self):
-        js = (APP / "public/js/login_chrome.js").read_text(encoding="utf-8")
+        self.assertNotIn("base_template_map", hooks)
+        self.assertFalse((APP / "public/js/login_chrome.js").exists())
+        self.assertFalse((ROOT / "tests/login_chrome_dom.test.cjs").exists())
+    def test_native_frappe_login_is_styled_without_dom_replacement(self):
         css = (APP / "public/css/login.css").read_text(encoding="utf-8")
-        self.assertIn('document.querySelector(".ed-login-header")', js)
-        self.assertEqual(js.count('document.body.prepend(skip, top)'), 1)
-        self.assertEqual(js.count('wrapper.prepend(aside)'), 1)
-        self.assertIn('document.getElementById("language-switcher")', js)
-        self.assertIn('top.querySelector(".ed-login-current").before(picker)', js)
-        self.assertIn('.ed-login-website nav.navbar', css)
-        self.assertIn('.ed-login-website .web-footer', css)
-        self.assertIn('.page-card-head .app-logo {display:none!important}', css)
-        self.assertIn('grid-template-columns:minmax(0,1.04fr) minmax(340px,.96fr)', css)
-        self.assertNotIn('create("form"', js)
-        self.assertNotIn("window.location.reload()", js)
-
+        self.assertIn("FIRST PAINT", css)
+        self.assertIn('body[data-path="login"]', css)
+        self.assertIn('> nav.navbar', css)
+        self.assertIn("#language-switcher", css)
+        self.assertIn(".page-content-wrapper::before", css)
+        self.assertIn(".page-content-wrapper > main", css)
+        self.assertIn(".page-card-head .app-logo", css)
+        self.assertIn("login-network.svg", css)
+        self.assertIn('html[lang^="ar"]', css)
+        self.assertIn("@media(max-width:720px)", css)
+        self.assertNotIn(".ed-login-website", css)
+        self.assertTrue((APP / "public/images/login-network.svg").is_file())
+    def test_ci_checks_static_css_first_paint_contract(self):
+        workflow = (ROOT / ".github/workflows/v16-static-validation.yml").read_text(encoding="utf-8")
+        self.assertIn("python -m unittest discover -s tests -v", workflow)
+        self.assertNotIn("login_chrome_dom", workflow)
+        self.assertNotIn("login_chrome.js", workflow)
+    def test_navbar_and_login_logo_use_unmodified_approved_png(self):
+        from erpdevelopers import branding
+        settings = branding.website_settings_values()
+        self.assertEqual(settings["app_logo"], branding.LOGO_URL)
+        self.assertEqual(settings["banner_image"], branding.LOGO_URL)
+        self.assertEqual(settings["favicon"], branding.FAVICON_URL)
+        self.assertIn('src="' + branding.LOGO_URL + '"', settings["brand_html"])
+        self.assertIn('alt="ERP Developers', settings["brand_html"])
+        self.assertEqual(settings["show_language_picker"], 1)
     def test_declared_frappe_modules_are_python_packages(self):
         # Frappe v16 install sync_for imports app_name + "." + scrub(module).
         # A missing package caused ModuleNotFoundError during site installation.
@@ -92,6 +89,10 @@ class TestNativeLogin(unittest.TestCase):
         self.assertIn("erpdevelopers-selected-favicon.png", script)
         self.assertIn('CARD_COUNT=', script)
         self.assertIn("Learning Academy", script)
+        self.assertIn("LOGIN_DIGEST=", script)
+        self.assertIn("LOGIN_CSS=", script)
+        self.assertIn("login_chrome.js", script)
+        self.assertIn('cmp -s "$APP/erpdevelopers/public/css/login.css" "$TMP/login.css"', script)
         self.assertIn("?_lang=ar", script)
         self.assertIn("بوابة المطورين", script)
         self.assertIn('id="language-switcher"', script)
@@ -102,16 +103,16 @@ class TestNativeLogin(unittest.TestCase):
         self.assertIn("for name in upstream origin", installer)
         self.assertNotIn("remote set-url", installer)
 
-    def test_native_sections_remain_unmodified(self):
-        js = (APP / "public/js/login_chrome.js").read_text(encoding="utf-8")
-        self.assertNotIn("page.querySelectorAll(", js)
-        self.assertNotIn("MutationObserver", js)
+    def test_native_login_views_stay_under_frappe_control(self):
         css = (APP / "public/css/login.css").read_text(encoding="utf-8")
-        self.assertIn('body[data-path="login"]', css)
-        self.assertIn(".ed-login-website", css)
-        self.assertIn('url("/assets/erpdevelopers/images/login-network.svg")', css)
-        self.assertTrue((APP / "public/images/login-network.svg").is_file())
-
+        hooks = (APP / "hooks.py").read_text(encoding="utf-8")
+        self.assertIn("web_include_css", hooks)
+        self.assertNotIn("web_include_js", hooks)
+        self.assertNotIn("for-login", css)
+        self.assertNotIn("for-forgot", css)
+        self.assertNotIn("for-signup", css)
+        self.assertFalse((APP / "www/login.html").exists())
+        self.assertFalse((APP / "www/login.py").exists())
     def test_site_setup_is_explicit_and_site_scoped(self):
         setup = (APP / "site_setup.py").read_text(encoding="utf-8")
         self.assertIn("from erpdevelopers.branding import EXPECTED_SITE", setup)

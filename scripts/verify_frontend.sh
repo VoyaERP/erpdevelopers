@@ -15,6 +15,8 @@
   CSS="/assets/erpdevelopers/css/brand.css?v=$DIGEST"
   LOGO="/assets/erpdevelopers/images/erpdevelopers-selected-logo.png"
   FAVICON="/assets/erpdevelopers/images/erpdevelopers-selected-favicon.png"
+  LOGIN_DIGEST="$(sha256sum "$APP/erpdevelopers/public/css/login.css" | cut -c1-16)"
+  LOGIN_CSS="/assets/erpdevelopers/css/login.css?v=$LOGIN_DIGEST"
 
   echo "=== Origin homepage: stylesheet URL and real CSS bytes ==="
   curl -kfsSL --connect-timeout 5 --max-time 20 \
@@ -56,6 +58,24 @@
   grep -Fq 'for-login' "$TMP/login.html"
   grep -Fq 'id="language-switcher"' "$TMP/login.html"
 
+  echo "=== First-paint login CSS and approved navbar logo ==="
+  grep -Fq "$LOGIN_CSS" "$TMP/login.html" || {
+    echo "STOP: fingerprinted login CSS not linked"; exit 3;
+  }
+  grep -Fq 'navbar-brand' "$TMP/login.html"
+  grep -Fq 'erpdevelopers-selected-logo.png' "$TMP/login.html" || {
+    echo "STOP: approved logo not in native HTML"; exit 3;
+  }
+  if grep -Fq 'login_chrome.js' "$TMP/login.html"; then
+    echo "STOP: stale script still reinserts the login layout"; exit 3;
+  fi
+  curl -kfsSL --connect-timeout 5 --max-time 20 \
+    --resolve "$SITE:443:127.0.0.1" \
+    "https://$SITE$LOGIN_CSS" -o "$TMP/login.css"
+  cmp -s "$APP/erpdevelopers/public/css/login.css" "$TMP/login.css" || {
+    echo "STOP: native login CSS does not match deployed file"; exit 3;
+  }
+
   echo "=== Origin selected logo and favicon ==="
   curl -kfsSL --connect-timeout 5 --max-time 20 \
     --resolve "$SITE:443:127.0.0.1" "https://$SITE$LOGO" -o "$TMP/logo.png"
@@ -65,7 +85,7 @@
   cmp -s "$APP/erpdevelopers/public/images/erpdevelopers-selected-favicon.png" "$TMP/favicon.png"
 
   echo "=== Public Cloudflare HTTPS GET checks ==="
-  for route in / /login /api/method/ping "$CSS" "$LOGO" "$FAVICON" /assets/erpdevelopers/css/login.css /assets/erpdevelopers/js/login_chrome.js; do
+  for route in / /login /api/method/ping "$CSS" "$LOGIN_CSS" "$LOGO" "$FAVICON"; do
     status="$(curl -fsSL --connect-timeout 5 --max-time 20 \
       -o /dev/null -w '%{http_code}' "https://$SITE$route")" || {
         echo "STOP: public route failed: $route"; exit 4;
