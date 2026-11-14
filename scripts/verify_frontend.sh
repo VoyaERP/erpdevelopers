@@ -71,7 +71,7 @@
     echo "STOP: Team Login label not rendered"; exit 3;
   }
   for entry in "training:ed-training-title" "insights:ed-insights-title" \
-               "lets-talk:ed-talk-title" "privacy:ed-privacy-title"; do
+               "lets-talk:ed-meet-title" "privacy:ed-privacy-title"; do
     route="${entry%%:*}"
     marker="${entry#*:}"
     curl -kfsSL --connect-timeout 5 --max-time 20 \
