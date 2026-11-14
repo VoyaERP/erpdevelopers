@@ -1,5 +1,4 @@
 {% extends "templates/web.html" %}
-{# Homepage CSS is loaded here independently of globally cached web hooks. #}
 {% block head_include %}
 {{ super() }}
 <link rel="stylesheet" href="{{ homepage_css_url | e }}">
@@ -8,19 +7,28 @@
 {% block footer %}{% endblock %}
 {% block page_container %}
 <main class="ed-site" id="top">
-  <a class="ed-skip" href="#content">Skip to content</a>
+  <a class="ed-skip" href="#content">{{ _("Skip to content") }}</a>
+
   <header class="ed-nav">
     <div class="ed-shell ed-nav-inner">
-      <a href="/" class="ed-brand" aria-label="ERP Developers home">
-        <img src="{{ brand_logo_url | e }}" width="210" height="84" alt="ERP Developers — Engage. Reason. Progress.">
+      <a href="/" class="ed-brand" aria-label="ERP Developers">
+        <img src="{{ brand_logo_url | e }}" width="222" height="74"
+             alt="ERP Developers — Engage. Reason. Progress.">
       </a>
-      <nav aria-label="Main navigation">
-        <a href="#vision">Our vision</a>
-        <a href="#ecosystem">Ecosystem</a>
-        <a href="#ai">AI &amp; Innovation</a>
-        <a href="#roadmap">Roadmap</a>
+      <nav aria-label="{{ _('Main navigation') }}">
+        <a href="#vision">{{ _("Our vision") }}</a>
+        <a href="#ecosystem">{{ _("Ecosystem") }}</a>
+        <a href="#ai">{{ _("AI & Innovation") }}</a>
+        <a href="#roadmap">{{ _("Roadmap") }}</a>
       </nav>
-      <a class="ed-nav-cta" href="/login">Member sign in <span aria-hidden="true">↗</span></a>
+      <div class="ed-nav-tools">
+        {# Frappe 16 populates this native picker; no second language handler. #}
+        <div id="language-switcher" class="ed-language-switcher form-group mb-0 hide">
+          <label for="ed-language-select">{{ _("Language") }}</label>
+          <select class="form-control" id="ed-language-select" aria-label="{{ _('Language') }}"></select>
+        </div>
+        <a class="ed-nav-cta" href="/login">{{ _("Member sign in") }} <span aria-hidden="true">↗</span></a>
+      </div>
     </div>
   </header>
 
@@ -28,56 +36,59 @@
     <section class="ed-hero" aria-labelledby="ed-heading">
       <div class="ed-shell ed-hero-inner">
         <div class="ed-hero-copy">
-          <p class="ed-eyebrow"><span class="ed-status-dot" aria-hidden="true"></span> A CONNECTED TECHNOLOGY COMMUNITY</p>
-          <h1 id="ed-heading">Build better technology. <span>Together.</span></h1>
-          <p class="ed-hero-lead">A professional space for developers, architects, learners and businesses to share expertise, discover opportunities and build meaningful progress — beyond any single platform.</p>
+          <p class="ed-eyebrow"><span class="ed-pulse" aria-hidden="true"></span> {{ _("Human collaboration. Intelligent technology.") }}</p>
+          <h1 id="ed-heading">{{ _("Technology grows stronger") }} <em>{{ _("together.") }}</em></h1>
+          <p class="ed-hero-lead">{{ _("ERP Developers brings people, expertise and intelligent systems into one connected technology ecosystem — not limited to a single ERP, vendor or platform.") }}</p>
           <div class="ed-actions">
-            <a class="ed-btn ed-btn-primary" href="#ecosystem">Explore the ecosystem <span aria-hidden="true">↗</span></a>
-            <a class="ed-btn ed-btn-secondary" href="#vision">Discover our vision</a>
+            <a class="ed-btn ed-btn-primary" href="#ecosystem">{{ _("Explore our ecosystem") }} <span aria-hidden="true">↗</span></a>
+            <a class="ed-btn ed-btn-secondary" href="#vision">{{ _("Our philosophy") }}</a>
+          </div>
+          <div class="ed-principles" aria-label="{{ _('Brand values') }}">
+            {% for value in values_items %}
+            <span><b>{{ value.index | e }}</b> {{ _(value.title) | e }}</span>
+            {% endfor %}
           </div>
         </div>
-        <div class="ed-visual" aria-label="ERP Developers connected ecosystem">
-          <div class="ed-visual-heading"><span class="ed-visual-indicator" aria-hidden="true"></span> CONNECTED BY PURPOSE</div>
-          <img class="ed-visual-logo" src="{{ brand_logo_url | e }}" width="340" height="113" alt="ERP Developers — Engage. Reason. Progress.">
-          <p class="ed-visual-description">People, knowledge and technology working together.</p>
-          <div class="ed-visual-stages" aria-label="Our approach">
-            <div><span>01</span><strong>Connect</strong><small>Share experience</small></div>
-            <div><span>02</span><strong>Learn</strong><small>Grow expertise</small></div>
-            <div><span>03</span><strong>Build</strong><small>Create impact</small></div>
-          </div>
-          <div class="ed-visual-bottom">Beyond ERP. Open to possibility. <span aria-hidden="true">↗</span></div>
-        </div>
-      </div>
-    </section>
 
-    <section class="ed-values" aria-label="ERP Developers values">
-      <div class="ed-shell ed-values-inner">
-        {% for value in values_items %}
-        <div><span>{{ value.index | e }}</span><strong>{{ value.title | e }}</strong><small>{{ value.description | e }}</small></div>
-        {% endfor %}
+        {# Restore the original orbit motif, using only the approved customer icon. #}
+        <div class="ed-art" aria-hidden="true">
+          <div class="ed-art-grid"></div>
+          <div class="ed-orbit ed-orbit-one"></div>
+          <div class="ed-orbit ed-orbit-two"></div>
+          <span class="ed-orb ed-orb-one"></span>
+          <span class="ed-orb ed-orb-two"></span>
+          <div class="ed-art-core">
+            <img src="{{ brand_icon_url | e }}" width="130" height="130" alt="">
+          </div>
+          <span class="ed-art-badge">AI</span>
+          <div class="ed-art-caption">{{ _("Connect knowledge") }} <span>→</span> {{ _("Create progress") }}</div>
+        </div>
       </div>
     </section>
 
     <section id="vision" class="ed-section ed-vision" aria-labelledby="ed-vision-heading">
       <div class="ed-shell ed-intro">
-        <div><p class="ed-kicker">OUR VISION</p><h2 id="ed-vision-heading">Beyond platforms.<br><span>Connected by purpose.</span></h2></div>
-        <p>Technology is most valuable when knowledge is shared and decisions are better informed. We want to connect technical talent, business expertise and responsible innovation in one open-minded community.</p>
+        <div>
+          <p class="ed-kicker">{{ _("OUR MISSION") }}</p>
+          <h2 id="ed-vision-heading">{{ _("More than software.") }}<br><span>{{ _("An ecosystem for progress.") }}</span></h2>
+        </div>
+        <p>{{ _("We connect developers, architects, organizations and learners around useful technology, responsible AI and measurable business outcomes.") }}</p>
       </div>
     </section>
 
     <section id="ecosystem" class="ed-section ed-ecosystem" aria-labelledby="ed-ecosystem-heading">
       <div class="ed-shell">
         <div class="ed-section-head">
-          <div><p class="ed-kicker">EXPLORE THE ECOSYSTEM</p><h2 id="ed-ecosystem-heading">One vision. Many possibilities.</h2></div>
-          <p>Six focused destinations, designed to grow on shared identity, usability and strong security foundations.</p>
+          <div><p class="ed-kicker">{{ _("THE ECOSYSTEM") }}</p><h2 id="ed-ecosystem-heading">{{ _("One platform. Many possibilities.") }}</h2></div>
+          <p>{{ _("Designed as modular destinations that can grow independently, with shared identity and security foundations.") }}</p>
         </div>
         <div class="ed-grid">
           {% for item in ecosystem_items %}
           <article class="ed-tile">
-            <span class="ed-tile-index">{{ item.index | e }} <i aria-hidden="true"></i></span>
-            <h3>{{ item.title | e }}</h3>
-            <p>{{ item.description | e }}</p>
-            <span class="ed-tile-status">Planned module</span>
+            <div class="ed-tile-index">{{ item.index | e }} <i aria-hidden="true"></i></div>
+            <h3>{{ _(item.title) | e }}</h3>
+            <p>{{ _(item.description) | e }}</p>
+            <span class="ed-tile-status">{{ _("Planned module") }}</span>
           </article>
           {% endfor %}
         </div>
@@ -85,29 +96,30 @@
     </section>
 
     <section id="ai" class="ed-section ed-ai" aria-labelledby="ed-ai-heading">
-      <div class="ed-shell">
-        <div class="ed-ai-panel">
-          <div class="ed-ai-copy">
-            <p class="ed-kicker">INTELLIGENCE WITH PURPOSE</p>
-            <h2 id="ed-ai-heading">Smarter technology.<br>Better human decisions.</h2>
-            <p>Our vision for AI combines useful automation with trusted data, clear oversight and accountable outcomes. AI services are planned and are not active on this preview site.</p>
-            <a href="#roadmap" class="ed-ai-link">See the roadmap <span aria-hidden="true">↗</span></a>
-          </div>
-          <div class="ed-ai-flow" aria-hidden="true">
-            {% for step in ai_flow_items %}
-            <div><span>{{ step.index | e }}</span><strong>{{ step.title | e }}</strong><small>{{ step.description | e }}</small></div>
-            {% endfor %}
-          </div>
+      <div class="ed-shell ed-ai-panel">
+        <div class="ed-ai-copy">
+          <p class="ed-kicker">{{ _("INTELLIGENCE WITH PURPOSE") }}</p>
+          <h2 id="ed-ai-heading">{{ _("AI should improve decisions, not replace judgment.") }}</h2>
+          <p>{{ _("We envision secure, human-reviewed assistants that accelerate discovery, knowledge sharing and solution delivery. AI capabilities are on the roadmap and are not active on this preview site.") }}</p>
+          <a class="ed-ai-link" href="#roadmap">{{ _("See the roadmap") }} <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="ed-ai-flow" aria-hidden="true">
+          {% for step in ai_flow_items %}
+          <div><span>{{ step.index | e }}</span><strong>{{ _(step.title) | e }}</strong><small>{{ _(step.description) | e }}</small></div>
+          {% endfor %}
         </div>
       </div>
     </section>
 
     <section id="roadmap" class="ed-section ed-roadmap" aria-labelledby="ed-roadmap-heading">
       <div class="ed-shell">
-        <div class="ed-roadmap-title"><div><p class="ed-kicker">THE ROAD AHEAD</p><h2 id="ed-roadmap-heading">Built deliberately. Ready to grow.</h2></div><p>Our foundation starts with a secure public experience; new capabilities will follow through independent delivery and testing.</p></div>
+        <div class="ed-roadmap-title">
+          <div><p class="ed-kicker">{{ _("WHAT COMES NEXT") }}</p><h2 id="ed-roadmap-heading">{{ _("Build trust first. Expand with intent.") }}</h2></div>
+          <p>{{ _("Our foundation starts with a secure public experience; new capabilities will follow through independent delivery and testing.") }}</p>
+        </div>
         <div class="ed-steps">
           {% for step in roadmap_items %}
-          <div><span>{{ step.index | e }}</span><strong>{{ step.title | e }}</strong><small>{{ step.description | e }}</small></div>
+          <div><span>{{ step.index | e }}</span><strong>{{ _(step.title) | e }}</strong><small>{{ _(step.description) | e }}</small></div>
           {% endfor %}
         </div>
       </div>
@@ -116,11 +128,15 @@
 
   <footer class="ed-footer">
     <div class="ed-shell ed-footer-inner">
-      <a href="/" class="ed-footer-brand" aria-label="ERP Developers home">
-        <img src="{{ brand_logo_url | e }}" width="183" height="73" alt="ERP Developers — Engage. Reason. Progress.">
+      <a href="/" class="ed-footer-brand" aria-label="ERP Developers">
+        <img src="{{ brand_logo_url | e }}" width="183" height="62"
+             alt="ERP Developers — Engage. Reason. Progress.">
       </a>
-      <p>Connecting people, knowledge and possibility.</p>
-      <div class="ed-footer-links"><a href="/login">Member sign in</a><a href="#top">Back to top ↑</a></div>
+      <p>{{ _("Building a smarter, more connected technology community.") }}</p>
+      <div class="ed-footer-links">
+        <a href="/login">{{ _("Sign in") }}</a>
+        <a href="#top">{{ _("Back to top") }} ↑</a>
+      </div>
     </div>
   </footer>
 </main>
