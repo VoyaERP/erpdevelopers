@@ -24,6 +24,8 @@ def booking_state():
         return {"enabled": False}
     # The native portal creates Unverified records and emails a verification
     # link. Do not offer bookings if the confirmation email cannot be sent.
+    if not frappe.db.exists("Holiday List", settings.holiday_list):
+        return {"enabled": False}
     if not frappe.db.exists("Email Account", {"enable_outgoing": 1, "default_outgoing": 1}):
         return {"enabled": False}
 

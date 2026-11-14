@@ -5,6 +5,7 @@ emails, Lead/Customer linking, agent assignment and Frappe Calendar Events.
 No separate meeting series, Lead, Event or third-party calendar is created.
 """
 import json
+from urllib.parse import urlsplit
 
 import frappe
 from frappe import _
@@ -18,6 +19,7 @@ from erpdevelopers.meeting_rules import (
     validate_slot_time,
 )
 from erpdevelopers.meeting_status import booking_state
+from erpdevelopers.branding import EXPECTED_SITE
 
 
 def _enabled_state():
@@ -57,6 +59,14 @@ def get_meeting_slots(date, timezone):
 def book_meeting(date, time, timezone, contact):
     """Submit to ERPNext's email-verification portal; never confirm on POST."""
     state = _enabled_state()
+    # Frappe provides CSRF enforcement; reject explicitly foreign origins as
+    # an additional, site-specific safeguard against cross-origin booking.
+    request = getattr(frappe.local, "request", None)
+    origin = request.headers.get("Origin") if request is not None else None
+    if origin:
+        parsed = urlsplit(origin)
+        if parsed.scheme != "https" or parsed.hostname != EXPECTED_SITE or parsed.port not in (None, 443):
+            frappe.throw(_("Meeting requests must originate from this website."), frappe.PermissionError)
     try:
         day = validate_booking_date(date, timezone, state["advance_booking_days"])
         slot_time = validate_slot_time(time)

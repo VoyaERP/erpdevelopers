@@ -157,6 +157,39 @@ class TestNativeAPIBoundary(TestCase):
         self.assertNotIn("lead", result)
         self.assertNotIn("appointment", result)
 
+    def test_foreign_origin_is_rejected_before_booking(self):
+        mods, day, calls = self._modules()
+        mods["frappe"].local = SimpleNamespace(
+            request=SimpleNamespace(headers={"Origin": "https://untrusted.example"})
+        )
+        with patch.dict(sys.modules, mods):
+            sys.modules.pop("erpdevelopers.meeting_booking", None)
+            module = importlib.import_module("erpdevelopers.meeting_booking")
+            with patch.object(module, "booking_state", lambda: {
+                "enabled": True, "advance_booking_days": 14
+            }):
+                with self.assertRaises(PermissionError):
+                    module.book_meeting(day, "11:30:00", "UTC", {
+                        "name": "Visitor", "email": "visitor@example.org",
+                        "topic": TOPICS[0], "consent": 1
+                    })
+        self.assertEqual(calls, [])
+
+    def test_rejects_multiple_email_recipients(self):
+        mods, day, calls = self._modules()
+        with patch.dict(sys.modules, mods):
+            sys.modules.pop("erpdevelopers.meeting_booking", None)
+            module = importlib.import_module("erpdevelopers.meeting_booking")
+            with patch.object(module, "booking_state", lambda: {
+                "enabled": True, "advance_booking_days": 14
+            }):
+                with self.assertRaisesRegex(ValueError, "Review"):
+                    module.book_meeting(day, "11:30:00", "UTC", {
+                        "name": "Visitor", "email": "one@example.org, two@example.org",
+                        "topic": TOPICS[0], "consent": 1
+                    })
+        self.assertEqual(calls, [])
+
     def test_book_unavailable_slot_does_not_create_appointment(self):
         mods, day, calls = self._modules(available=False)
         with patch.dict(sys.modules, mods):
