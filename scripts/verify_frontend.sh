@@ -124,6 +124,17 @@
   grep -Fq "href=\"$PORTAL_CSS\"" "$TMP/training.html" || {
     echo "STOP: public hub CSS fingerprint missing"; exit 3;
   }
+  echo "=== Verify catalog JavaScript matches page fingerprint and served bytes ==="
+  CATALOG_DIGEST="$(sha256sum "$APP/erpdevelopers/public/js/catalog.js" | cut -c1-16)"
+  CATALOG_JS="/assets/erpdevelopers/js/catalog.js?v=$CATALOG_DIGEST"
+  grep -Fq "src=\"$CATALOG_JS\"" "$TMP/training.html" || {
+    echo "STOP: Training page does not reference current catalog.js"; exit 3;
+  }
+  curl -kfsSL --connect-timeout 5 --max-time 20 \
+    --resolve "$SITE:443:127.0.0.1" "https://$SITE$CATALOG_JS" -o "$TMP/catalog.js"
+  cmp -s "$APP/erpdevelopers/public/js/catalog.js" "$TMP/catalog.js" || {
+    echo "STOP: current catalog.js is not served by origin"; exit 3;
+  }
   echo "=== Training: protected click-to-load playlist player ==="
   grep -Fq 'id="ed-playlist-dialog"' "$TMP/training.html" || {
     echo "STOP: playlist dialog is missing"; exit 3;
