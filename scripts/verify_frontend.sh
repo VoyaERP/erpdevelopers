@@ -34,8 +34,27 @@
   test "$CARD_COUNT" = "6" || {
     echo "STOP: expected six ecosystem cards but rendered $CARD_COUNT"; exit 3;
   }
-  grep -Fq 'Developer Hub' "$TMP/home.html"
-  grep -Fq 'Learning Academy' "$TMP/home.html"
+  echo "=== Verify English and Arabic using Frappe's native _lang request ==="
+  curl -kfsSL --connect-timeout 5 --max-time 20 \
+    --resolve "$SITE:443:127.0.0.1" \
+    "https://$SITE/erp-developers-home?_lang=en" -o "$TMP/home-en.html"
+  grep -Fq 'Developer Hub' "$TMP/home-en.html"
+  grep -Fq 'Learning Academy' "$TMP/home-en.html"
+  curl -kfsSL --connect-timeout 5 --max-time 20 \
+    --resolve "$SITE:443:127.0.0.1" \
+    "https://$SITE/erp-developers-home?_lang=ar" -o "$TMP/home-ar.html"
+  grep -Fq 'بوابة المطورين' "$TMP/home-ar.html" || {
+    echo "STOP: missing Arabic homepage translation"; exit 3;
+  }
+  grep -Fq 'أكاديمية التعلم' "$TMP/home-ar.html"
+
+  echo "=== Confirm native Frappe login and language picker render ==="
+  curl -kfsSL --connect-timeout 5 --max-time 20 \
+    --resolve "$SITE:443:127.0.0.1" \
+    "https://$SITE/login?_lang=en" -o "$TMP/login.html"
+  grep -Fq 'id="page-login"' "$TMP/login.html"
+  grep -Fq 'for-login' "$TMP/login.html"
+  grep -Fq 'id="language-switcher"' "$TMP/login.html"
 
   echo "=== Origin selected logo and favicon ==="
   curl -kfsSL --connect-timeout 5 --max-time 20 \
@@ -53,5 +72,5 @@
       }
     echo "$status $route"
   done
-  echo "PASS: public routes, homepage stylesheet, original PNG and favicon"
+  echo "PASS: EN/AR translation, native login, CSS, approved PNG and public routes"
 )

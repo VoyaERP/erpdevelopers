@@ -87,6 +87,9 @@ class TestNativeLogin(unittest.TestCase):
         self.assertIn("erpdevelopers-selected-favicon.png", script)
         self.assertIn('CARD_COUNT=', script)
         self.assertIn("Learning Academy", script)
+        self.assertIn("?_lang=ar", script)
+        self.assertIn("بوابة المطورين", script)
+        self.assertIn('id="language-switcher"', script)
         self.assertNotIn("bench migrate", script)
 
     def test_existing_site_installer_recognizes_upstream_remote(self):
