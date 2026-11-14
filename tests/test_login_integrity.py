@@ -26,6 +26,21 @@ class TestNativeLogin(unittest.TestCase):
                           "document.documentElement.lang =", "wrapper.insertBefore("):
             self.assertNotIn(forbidden, js)
 
+    def test_login_uses_one_header_and_native_auth_view(self):
+        js = (APP / "public/js/login_chrome.js").read_text(encoding="utf-8")
+        css = (APP / "public/css/login.css").read_text(encoding="utf-8")
+        self.assertIn('document.querySelector(".ed-login-header")', js)
+        self.assertEqual(js.count('document.body.prepend(skip, top)'), 1)
+        self.assertEqual(js.count('wrapper.prepend(aside)'), 1)
+        self.assertIn('document.getElementById("language-switcher")', js)
+        self.assertIn('top.querySelector(".ed-login-current").before(picker)', js)
+        self.assertIn('.ed-login-website nav.navbar', css)
+        self.assertIn('.ed-login-website .web-footer', css)
+        self.assertIn('.page-card-head .app-logo {display:none!important}', css)
+        self.assertIn('grid-template-columns:minmax(0,1.04fr) minmax(340px,.96fr)', css)
+        self.assertNotIn('create("form"', js)
+        self.assertNotIn("window.location.reload()", js)
+
     def test_declared_frappe_modules_are_python_packages(self):
         # Frappe v16 install sync_for imports app_name + "." + scrub(module).
         # A missing package caused ModuleNotFoundError during site installation.

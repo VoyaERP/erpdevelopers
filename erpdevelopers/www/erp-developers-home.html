@@ -45,7 +45,7 @@
           </div>
           <div class="ed-principles" aria-label="{{ _('Brand values') }}">
             {% for value in values_items %}
-            <span><b>{{ value.index | e }}</b> {{ _(value.title) | e }}</span>
+            <span><b>{{ value.index | e }}</b> {{ value.title | e }}</span>
             {% endfor %}
           </div>
         </div>

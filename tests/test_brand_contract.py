@@ -58,6 +58,7 @@ class TestBrandContract(TestCase):
         context = SimpleNamespace()
         get_context(context)
         self.assertEqual(context.brand_logo_url, branding.LOGO_URL)
+        self.assertEqual(context.brand_icon_url, branding.FAVICON_URL)
         self.assertEqual(context.homepage_css_url, branding.homepage_stylesheet_url())
         self.assertEqual(context.title, branding.APP_NAME + " | " + branding.TAGLINE)
         self.assertEqual(context.no_cache, 1)
@@ -66,7 +67,8 @@ class TestBrandContract(TestCase):
         home = (APP / "www" / "erp-developers-home.html").read_text(encoding="utf-8")
         js = (APP / "public" / "js" / "login_chrome.js").read_text(encoding="utf-8")
         setup = (APP / "site_setup.py").read_text(encoding="utf-8")
-        self.assertEqual(home.count('{{ brand_logo_url | e }}'), 3)
+        self.assertEqual(home.count('{{ brand_logo_url | e }}'), 2)
+        self.assertEqual(home.count('{{ brand_icon_url | e }}'), 1)
         self.assertIn(branding.LOGO_URL, js)  # fallback for native login chrome
         self.assertIn('website_settings_values()', setup)
         self.assertNotIn("erp-mark.svg", home + js + setup)
@@ -98,6 +100,30 @@ class TestBrandContract(TestCase):
             self.assertIn(word, home)
         self.assertIn("Planned module", home)
         self.assertIn("not active on this preview site", home)
+
+    def test_native_frappe_bilingual_selector_and_translation_coverage(self):
+        import csv
+        import re
+        from erpdevelopers import content
+        home = (APP / "www" / "erp-developers-home.html").read_text(encoding="utf-8")
+        with (APP / "translations" / "ar.csv").open(encoding="utf-8", newline="") as f:
+            rows = list(csv.reader(f))
+        self.assertGreaterEqual(len(rows), 50)
+        self.assertTrue(all(len(row) == 2 and row[0] and row[1] for row in rows))
+        translations = {source: target for source, target in rows}
+        self.assertEqual(len(translations), len(rows), "Arabic keys must be unique")
+        literal_strings = set(re.findall(r'_\\("([^"]+)"\\)', home))
+        dynamic_strings = set()
+        for items in (content.ECOSYSTEM, content.AI_FLOW, content.ROADMAP):
+            dynamic_strings.update(item.title for item in items)
+            dynamic_strings.update(item.description for item in items)
+        missing = (literal_strings | dynamic_strings) - set(translations)
+        self.assertFalse(missing, f"Untranslated website copy: {sorted(missing)}")
+        self.assertIn('id="language-switcher"', home)
+        self.assertIn('id="ed-language-select"', home)
+        self.assertIn('class="form-control"', home)
+        self.assertIn("{{ _(item.title) | e }}", home)
+        self.assertIn("{{ _(step.description) | e }}", home)
 
     def test_css_rules_scoped_and_responsive(self):
         css = (APP / "public" / "css" / "brand.css").read_text(encoding="utf-8")
