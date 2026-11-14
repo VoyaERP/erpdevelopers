@@ -29,3 +29,73 @@
 - **Next validation:** evidence needed.
 
 No timeline, compliance claim or licensing assumption becomes an accepted decision simply because a draft mentions it.
+
+## Dated additions — 2026-11-14
+
+### ADR-013 — Refactor existing application and separate production source
+
+**Status:** Accepted implementation scope; operator deployment and operational approval pending.
+
+The user requested a refactor of the existing app, a production branch, and updated
+GitHub plan/README. `main` continues to hold canonical governance; `version-16`
+continues as the integration branch. `production-v16` is the stable source branch,
+created at tested commit `3054ebf389179c829e827d552b727c3291b8d28e`. This extends
+ADR-003 without replacing its separation of application and planning history.
+
+Reuse shared native/public catalog and image checks rather than duplicate them.
+Preserve native Frappe authentication, existing DocTypes/endpoints, publication
+filters, previous schema correction, the three-link footer and approved branding.
+Keep one source-check runner for CI and pre-migration validation. Existing import
+paths remain compatibility aliases, not parallel implementations.
+
+The normal release path permits only pinned, clean, fast-forward updates. The
+first `version-16` to `production-v16` server switch requires explicit operator
+approval. Source promotion does not deploy, change repository protections, alter
+credentials, recreate a site or approve launch. No forced history update was used.
+
+**Next validation:** staging full migration, actual editorial/private/auth flows,
+backup restore and shared-process restart acceptance. Evidence and CI links are
+in [STATUS.md](STATUS.md). Existing release workstream: issue #10.
+
+### ADR-014 — New entities and operational project portal remain deferred
+
+**Status:** Recorded user ideas — Deferred / do not execute.
+
+The user explicitly supplied `bedya`, `bdanexus`, `voyatours` and others as future
+entities, requested recording our own development work as projects, and described
+later ERPNext Project/Task linking, task assignment and an owner/assignee portal.
+The instruction "dont execute" / "انا بسجل افكار" is the execution boundary.
+
+Document these as IDEA-001..004 in [DEFERRED_IDEAS.md](DEFERRED_IDEAS.md). Do not
+create entity records/DocTypes, operational project links, task automation, portal
+roles/endpoints or public statements of ownership. Exact names, entity semantics,
+mappings and permissions remain open. Prefer native Project/Task reuse later.
+
+The existing public Projects page remains an explicitly reviewed publication
+catalog, not an operational delivery portal. A future business project owner must
+not be inferred from Frappe's creator field; assignment of one task must not grant
+all-project visibility. These are design constraints to approve and test later,
+not implemented authorization behavior.
+
+**Resume gate:** explicit new implementation instruction, approved scope and
+object-level access matrix, including cross-project/entity denial and revocation.
+
+### ADR-015 — Observed deployment and branding evidence supersede stale assumptions
+
+**Status:** Observed, limited to supplied evidence.
+
+The successful operator log identifies `erp-developers.com` on `erptest-lightnode`
+at `/data/frappe/frappe-bench`, with c8cb0de migration/build/readiness/frontend and
+Arabic-login HTML checks complete. This resolves the observed public domain/host
+portion of ADR-010 for this deployment only; business model, legal ownership,
+markets, payments and providers remain undecided. ADR-011/012 are historical
+separate-environment notes and do not authorize changing MacVMs/v15 workloads.
+
+The exact approved PNG is already in application source, with SHA-256
+`250df1886e13229aa0e260949f66cb91a627b220a03c36b5c1d4ede1ad06d95d`.
+Its bytes and hierarchy remain unchanged, updating the source-asset state described
+in ADR-002. An Arabic logo name has not been approved and no substitute is generated.
+
+The latest supplied live evidence is c8cb0de, not the later Projects/Advice source
+or the new refactor. Source CI and production branch creation are recorded
+separately from deployment, interactive UAT and operational acceptance.
