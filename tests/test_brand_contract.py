@@ -112,7 +112,7 @@ class TestBrandContract(TestCase):
         self.assertTrue(all(len(row) == 2 and row[0] and row[1] for row in rows))
         translations = {source: target for source, target in rows}
         self.assertEqual(len(translations), len(rows), "Arabic keys must be unique")
-        literal_strings = set(re.findall(r'_\\("([^"]+)"\\)', home))
+        literal_strings = set(re.findall(r'_\("([^"]+)"\)', home))
         dynamic_strings = set()
         for items in (content.ECOSYSTEM, content.AI_FLOW, content.ROADMAP):
             dynamic_strings.update(item.title for item in items)
