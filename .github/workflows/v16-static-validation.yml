@@ -34,7 +34,8 @@ jobs:
           node --test tests/test_catalog_player.mjs
           node --check erpdevelopers/erp_developers/doctype/erp_developers_playlist/erp_developers_playlist.js
   training-browser:
-    runs-on: ubuntu-latest
+    # Match the operating system supported by the pinned Playwright release.
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:

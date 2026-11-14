@@ -9,10 +9,11 @@ app_license = "MIT"
 app_version = app_version
 
 # Frappe owns the entire /login DOM, language selector, authentication and 2FA.
-# Load scoped, fingerprinted stylesheets before rendering the native form.
+# Keep the native login stylesheet first, followed by the Arabic-only typography.
 # No website JS is injected: no second header, form swap or first-paint flash.
 # The homepage loads its own independent brand.css via the Jinja head block.
-web_include_css = [login_stylesheet_url(), versioned_public_asset("css/arabic_typography.css")]
+web_include_css = [login_stylesheet_url()]
+web_include_css.append(versioned_public_asset("css/arabic_typography.css"))
 
 # Frappe v16 app tiles and fallback logo resolve the same approved source.
 # Hooks apply per installed site; other websites in this Bench are unchanged.

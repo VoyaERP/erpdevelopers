@@ -58,8 +58,8 @@ def website_settings_values():
         "home_page": HOME_ROUTE,
         "app_name": APP_NAME,
         "app_logo": LOGO_URL,
-        "brand_html": NAVBAR_BRAND_HTML,
         "banner_image": LOGO_URL,
+        "brand_html": NAVBAR_BRAND_HTML,
         "favicon": FAVICON_URL,
         "title_prefix": APP_NAME,
         "show_language_picker": 1,
@@ -82,6 +82,7 @@ def versioned_public_asset(relative_path):
     allowed = {
         "css/portal.css", "js/catalog.js", "js/assistant.js",
         "js/consultation.js", "css/meeting.css", "js/meeting.js",
+        "css/arabic_typography.css",
     }
     if relative_path not in allowed:
         raise ValueError("Unexpected public asset")
