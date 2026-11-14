@@ -1,6 +1,7 @@
 /* ERP Developers public website, Frappe 16. No global Desk or login overrides. */
 .ed-site {
   --ed-navy:#071c3c;--ed-blue:#1269dc;--ed-teal:#05b9ac;--ed-muted:#5c6e85;--ed-border:#e2eaf3;
+  --ed-header-anchor-offset:95px;
   background:#fff;color:var(--ed-navy);font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
   line-height:1.6;font-size:15px;overflow-x:clip;overflow-y:visible;width:100%;
 }
@@ -12,11 +13,11 @@
 .ed-site a:focus-visible{outline:3px solid var(--ed-teal);outline-offset:3px}
 .page-content-wrapper:has(>.ed-site){margin:0!important;padding:0!important}
 .ed-shell{width:min(1180px,calc(100% - 44px));margin-inline:auto}
-.ed-skip{position:fixed;top:-100px;inset-inline-start:12px;z-index:100;background:#fff;color:var(--ed-navy);padding:9px 13px;border:2px solid var(--ed-blue);border-radius:7px}
+.ed-skip{position:fixed;top:-100px;inset-inline-start:12px;z-index:300;background:#fff;color:var(--ed-navy);padding:9px 13px;border:2px solid var(--ed-blue);border-radius:7px}
 .ed-skip:focus{top:12px}
 
 /* Navigation: shared across every public destination. */
-.ed-nav{border-bottom:1px solid var(--ed-border);background:#fff;position:relative;z-index:30}
+.ed-nav{position:sticky;top:0;z-index:110;border-bottom:1px solid var(--ed-border);background:#fff;box-shadow:0 8px 22px #0c305310}
 .ed-nav-inner{min-height:75px;display:flex;justify-content:space-between;align-items:center;gap:22px;min-width:0}
 .ed-brand{display:flex;align-items:center;flex-shrink:0;min-width:0}
 .ed-brand img{display:block;width:207px;height:auto;object-fit:contain}
@@ -30,6 +31,9 @@
 .ed-language-switcher select{width:118px;min-height:38px;max-width:125px;max-height:41px;padding:6px 26px 6px 10px;border:1px solid #d6e4ef;border-radius:9px;background:#fff;color:#274765;font-size:12px;font-weight:600}
 .ed-nav-cta{display:inline-flex;align-items:center;gap:10px;white-space:nowrap;padding:10px 14px;border:1px solid #cddde9;border-radius:9px;color:var(--ed-navy)!important;font-size:12px;font-weight:750}
 .ed-nav-cta:hover{background:#f1f9ff;border-color:#9ac8df}
+
+/* Anchors remain visible beneath the always-on navigation at every breakpoint. */
+.ed-site :is(#content,#discover,#vision,#ecosystem,#ai,#book-meeting,#meeting-start){scroll-margin-top:var(--ed-header-anchor-offset)}
 
 /* Hero: interactive editorial visual, original approved icon, no fabricated logos. */
 .ed-hero{background:radial-gradient(ellipse at 79% 52%,#d9f5f8 0%,transparent 49%),linear-gradient(126deg,#fff 6%,#f5faff 67%,#eaf6ff);border-bottom:1px solid #e7eff6}
@@ -139,6 +143,7 @@
 
 /* Responsive editorial layout: content has room to grow; no fixed text heights. */
 @media(max-width:1100px){
+  .ed-site{--ed-header-anchor-offset:145px}
   .ed-shell{width:calc(100% - 38px)}
   .ed-brand img{width:185px}
   .ed-nav-inner{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 14px;padding-block:9px}
@@ -201,6 +206,7 @@
   .ed-footer-links{flex-wrap:wrap}
 }
 @media(max-width:480px){
+  .ed-site{--ed-header-anchor-offset:165px}
   .ed-nav-inner{grid-template-columns:minmax(0,1fr) auto;gap:5px 10px}
   .ed-brand{grid-column:1;grid-row:1}
   .ed-nav-tools{display:contents}

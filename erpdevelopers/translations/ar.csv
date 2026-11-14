@@ -368,3 +368,4 @@
 "Choose a date and time to begin.","اختر التاريخ والوقت للبدء."
 "A meaningful discussion, not a sales pitch.","مناقشة مفيدة، لا عرض بيع تقليدي."
 "Email verification is required to finalize an available appointment.","يشترط تأكيد البريد الإلكتروني لإتمام حجز الموعد المتاح."
+"Choose an available time in Let’s Talk, then verify the appointment through the email link. Booking is available only after our ERPNext calendar is configured.","اختر وقتًا متاحًا من صفحة «لنتحدث»، ثم أكّد الموعد عبر الرابط المرسل إلى بريدك الإلكتروني. يتاح الحجز بعد اكتمال إعداد تقويم ERPNext."

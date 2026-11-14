@@ -57,9 +57,9 @@
 .ed-small-note{background:#f5faff;border:1px solid #dce8f3;padding:16px;border-radius:11px}
 .ed-nav nav a.ed-nav-talk{color:#08798d;font-weight:800}
 .ed-footer-links{flex-wrap:wrap}
-.ed-assistant{position:fixed;inset-inline-end:18px;bottom:19px;z-index:200;max-width:min(370px,calc(100vw - 35px));font-family:inherit}
+.ed-assistant{position:fixed;inset-inline-end:18px;bottom:calc(19px + var(--ed-guide-footer-visible,0px));z-index:200;max-width:min(370px,calc(100vw - 35px));font-family:inherit}
 .ed-assistant-toggle{border:1px solid #096c90;border-radius:30px;padding:12px 18px;background:#0c5ca4;color:#fff;font-size:13px;font-weight:780;line-height:1.6;max-width:100%;white-space:normal;box-shadow:0 7px 19px #0e488a38;cursor:pointer}
-.ed-assistant-panel{background:#fff;border:1px solid #cfe2ef;border-radius:16px;box-shadow:0 14px 46px #0c34583d;padding:18px;margin-bottom:8px;max-height:min(520px,75vh);overflow-y:auto}
+.ed-assistant-panel{background:#fff;border:1px solid #cfe2ef;border-radius:16px;box-shadow:0 14px 46px #0c34583d;padding:18px;margin-bottom:8px;max-height:min(520px,calc(100dvh - 165px - var(--ed-guide-footer-visible,0px)));overflow-y:auto;overscroll-behavior:contain}
 .ed-assistant-panel[hidden]{display:none}
 .ed-assistant-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#071c3c}
 .ed-assistant-heading strong{font-size:16px}
@@ -75,7 +75,7 @@
 html[lang^="ar"] .ed-page-hero-aside span,html[lang^="ar"] .ed-link-card small{letter-spacing:0}
 @media(max-width:1100px){.ed-resource-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:960px){.ed-page-hero-inner{grid-template-columns:minmax(0,1fr);gap:20px}.ed-page-hero{padding-block:38px}.ed-form-layout{grid-template-columns:1fr;gap:24px}}
-@media(max-width:540px){.ed-page-hero h1{font-size:clamp(34px,8.5vw,40px)}.ed-resource-grid{grid-template-columns:1fr}.ed-form-grid{grid-template-columns:1fr}.ed-form-card{padding:20px}.ed-path-callout{flex-direction:column;align-items:flex-start;padding:21px}.ed-catalog-count{margin-inline-start:0}.ed-assistant{inset-inline-end:10px;bottom:10px}}
+@media(max-width:540px){.ed-page-hero h1{font-size:clamp(34px,8.5vw,40px)}.ed-resource-grid{grid-template-columns:1fr}.ed-form-grid{grid-template-columns:1fr}.ed-form-card{padding:20px}.ed-path-callout{flex-direction:column;align-items:flex-start;padding:21px}.ed-catalog-count{margin-inline-start:0}.ed-assistant{inset-inline-end:10px;bottom:calc(10px + var(--ed-guide-footer-visible,0px))}}
 @media(prefers-reduced-motion:reduce){.ed-link-card{transition:none}.ed-link-card:hover{transform:none}}
 /* Unnumbered learning ideas; compact rather than a step-by-step lecture. */
 .ed-learning-lanes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}

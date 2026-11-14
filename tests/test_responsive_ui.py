@@ -40,6 +40,34 @@ class TestResponsiveWebsite(TestCase):
         self.assertIn("max-width:43%", BRAND)
         self.assertIn("overflow-x:clip;overflow-y:visible", BRAND)
 
+    def test_header_is_sticky_and_in_page_links_clear_it(self):
+        self.assertIn(".ed-nav{position:sticky;top:0;z-index:110", BRAND)
+        self.assertIn(".ed-skip{position:fixed;top:-100px;inset-inline-start:12px;z-index:300", BRAND)
+        self.assertIn("--ed-header-anchor-offset:95px", BRAND)
+        self.assertIn("scroll-margin-top:var(--ed-header-anchor-offset)", BRAND)
+        self.assertIn("--ed-header-anchor-offset:145px", BRAND)
+        self.assertIn("--ed-header-anchor-offset:165px", BRAND)
+        nav = (APP / "templates/includes/erpdevelopers_nav.html").read_text()
+        self.assertIn('<header class="ed-nav">', nav)
+        self.assertIn('href="/lets-talk#meeting-start"', nav)
+
+    def test_guide_does_not_cover_footer_and_remains_keyboard_accessible(self):
+        assistant = (APP / "templates/includes/erpdevelopers_assistant.html").read_text()
+        guide_js = (APP / "public/js/assistant.js").read_text()
+        self.assertIn("bottom:calc(19px + var(--ed-guide-footer-visible,0px))", PORTAL)
+        self.assertIn("bottom:calc(10px + var(--ed-guide-footer-visible,0px))", PORTAL)
+        self.assertIn("--ed-guide-footer-visible", guide_js)
+        self.assertIn('footer.getBoundingClientRect()', guide_js)
+        self.assertIn('window.addEventListener("scroll", scheduleFooterSync, { passive: true })', guide_js)
+        self.assertIn('window.addEventListener("resize", scheduleFooterSync, { passive: true })', guide_js)
+        self.assertIn('new ResizeObserver(scheduleFooterSync).observe(footer)', guide_js)
+        self.assertIn('aria-expanded="false"', assistant)
+        self.assertIn('Escape', guide_js)
+        self.assertNotIn("A team member confirms the slot", assistant)
+        self.assertIn("verify the appointment through the email link", assistant)
+        self.assertNotIn("frappe.call", guide_js)
+        self.assertNotIn("fetch(", guide_js)
+
     def test_booking_form_adapts_and_preserves_accessible_fields(self):
         html = (APP / "www/lets-talk.html").read_text(encoding="utf-8")
         self.assertIn(".ed-meet-booking-layout{display:grid;grid-template-columns:minmax(0,1.47fr)", MEETING)
