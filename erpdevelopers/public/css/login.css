@@ -12,7 +12,7 @@
 .ed-login-header{background:rgba(255,255,255,.97);border-bottom:1px solid #e7eef5;flex-shrink:0;z-index:5}
 .ed-login-header-inner{width:min(1160px,100%);min-height:79px;padding:3px 25px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .ed-login-brand{display:flex;align-items:center;text-decoration:none!important;flex:0 0 auto}
-.ed-login-brand-image{display:block;width:200px;height:auto;max-height:79px;object-fit:contain}
+.ed-login-brand-image{display:block;width:216px;height:auto;max-height:79px;object-fit:contain}
 .ed-login-nav{display:flex;align-items:center;justify-content:center;gap:clamp(12px,2vw,27px);flex-wrap:wrap}
 .ed-login-nav a{font-size:13px;font-weight:700;text-decoration:none!important;white-space:nowrap;color:#405b79!important}
 .ed-login-nav a:hover{color:#0e66d7!important}
@@ -26,8 +26,8 @@
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login{width:100%;min-width:0;flex:1 0 auto}
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper{
   position:relative;isolation:isolate;display:flex;align-items:center;justify-content:flex-end;
-  width:min(1030px,calc(100% - 38px));max-width:none;min-height:426px;
-  margin:17px auto 21px;padding:24px 30px;border:1px solid var(--ed-login-edge);
+  width:min(1030px,calc(100% - 38px));max-width:none;min-height:402px;
+  margin:12px auto 16px;padding:20px 27px;border:1px solid var(--ed-login-edge);
   border-radius:22px;overflow:hidden;background:#f7fbff;box-shadow:0 18px 40px #184b8213;
 }
 :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper::before{
