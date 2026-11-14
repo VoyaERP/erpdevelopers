@@ -1,197 +1,133 @@
-# ERP Developers — Frappe 16
+# ERP Developers - Frappe 16
 
-**Engage. Reason. Progress.**
+**ERP: Engage. Reason. Progress.** Developers is the supporting brand signature.
 
-Frappe custom app powering the ERP Developers public website on ERPNext 16. The public hub includes curated training playlists, reviewed knowledge sources and native ERPNext appointment booking with email verification. It is **not** a completed LMS, member community, jobs aggregator or AI inference service.
+A bilingual public technology website and editorial application built on Frappe
+16 and ERPNext 16. Existing public pages are not a completed member community,
+LMS, job aggregator, AI service, or operational project portal.
 
-## Compatibility
+## Branches and evidence
 
-- Branch: `version-16`
-- Python: 3.14+ (Frappe 16 runtime)
-- Runtime: Frappe 16.x + ERPNext 16.x (ERPNext required for native Appointment, CRM Lead and Calendar integration)
-- Frappe 15 is a separate compatibility target; do not install this branch on a v15 bench.
+| Branch | Purpose |
+| --- | --- |
+| `main` | Canonical plan, decisions and execution status; not application deployment source |
+| `version-16` | Integration and ongoing Frappe 16 development |
+| `production-v16` | Reviewed, commit-pinned release baseline; creation is not deployment or UAT sign-off |
+| `refactor/*`, `feat/*`, `fix/*` | Isolated work, validated before promotion |
 
-## Install on a NEW isolated development site only (not the live site)
+Frappe and ERPNext must remain on 16.x; declared Python runtime is 3.14+.
+No Frappe 15 compatibility is asserted. CI tests Python 3.14 and browser fixtures;
+a real Bench migration, authentication test and operational acceptance are separate.
 
-```bash
-cd /path/to/frappe-v16-bench
-bench get-app --branch version-16 https://github.com/VoyaERP/erpdevelopers.git
-bench get-app --branch version-16 https://github.com/frappe/erpnext.git
-bench new-site erpdev.localhost
-bench --site erpdev.localhost install-app erpnext
-bench --site erpdev.localhost install-app erpdevelopers
-bench --site erpdev.localhost migrate
-bench build --app erpdevelopers
-bench --site erpdev.localhost list-apps
-```
+**Last supplied deployment evidence:** `c8cb0deeb4eaeb14b30d3a931f717ad1dfe2bf60`
+on `erp-developers.com`, with completed migration, asset checks and Arabic login
+HTML verification. `3cddab9beb2d4b49427458befc1421bf7e8bcf71` introduced Projects,
+Team Advice and the minimal footer in source; no later operator deployment log
+was supplied during this refactor. Do not turn source/CI status into a live claim.
 
-Run the isolated development bench with `bench start` and visit the site. Set the Host header to `erpdev.localhost` when accessing through a port or SSH tunnel. For a dedicated site, use `bench use erpdev.localhost` only on the isolated bench.
+## Implemented capabilities
 
-## Branding — exact selected PNG
+| Surface | Route / management |
+| --- | --- |
+| Brand website and full-height Vision | `/`, native EN/AR, Tajawal Arabic typography |
+| Training playlists | `/training`; ERP Developers Playlist; public or permission-scoped private catalog |
+| Reviewed knowledge sources | `/insights`; ERP Developers Resource and native Web Page |
+| Regional events and photos | `/events`; ERP Developers Event, cover plus up to 8 gallery images |
+| Public project stories | `/projects`; ERP Developers Publication, type Project |
+| Team-authored advice | `/team-advice`; the same publication editor, type Team Advice |
+| ERP/ERPNext guides | `/erp-development`, `/erpnext-development` |
+| Consultation and privacy | `/lets-talk`, `/privacy`; native ERPNext appointment booking when explicitly enabled |
+| Staff authentication | Native `/login?redirect-to=/desk`; no custom authentication implementation |
 
-The canonical ERP Developers brand asset is the **exact original image uploaded by the customer**, preserved byte-for-byte at `erpdevelopers/public/images/erpdevelopers-selected-logo.png` (RGBA PNG, 2048 × 682, transparent background, SHA-256 `250df1886e13229aa0e260949f66cb91a627b220a03c36b5c1d4ede1ad06d95d`). No regenerated artwork or reconstructed wordmark is used.
+Footer text links are exactly **Let's Talk**, **Team Login**, and **Back to top**.
+The shared header keeps the native language selector's space reserved from first
+paint. Training opens a local modal only; no app-owned external YouTube button.
+YouTube's own branding, authentication and embedding restrictions remain applicable.
 
-`erpdevelopers/public/images/erpdevelopers-selected-favicon.png` is an icon-only crop of the same approved image, supplied for favicon use. All active website, native login branding, and site-specific Website Settings point to these assets. The old unrelated Neural Intelligence SVG concept was removed.
+## Publish content
 
-## Frappe native logo replacement (2026-11-14)
+Website Manager/System Manager maintains the editorial DocTypes. Records are not
+public merely because they exist. Events need publication, regional relevance and
+source verification. Publications require both **Approved for public sharing** and
+**Published**; Team Advice also needs a public author name. A complete Arabic
+version is used as a unit; partial publication translations fall back to English.
 
-Frappe v16 reads the original ERP Developers PNG from the installed site's `Website Settings.app_logo` for login and Desk, with `Navbar Settings.app_logo` as a fallback. To replace the remaining default Frappe logo **without editing core**, `configure_website` now updates both site-specific Single DocTypes, including `Website Settings.brand_html` and `banner_image`, and the ERP Developers app declares `app_logo_url` pointing to the same exact approved PNG.
+Read [Events](docs/EVENT_DIRECTORY.md), [image uploads](docs/EVENT_URLS_AND_IMAGES.md),
+and [Projects and Team Advice](docs/PROJECTS_AND_TEAM_ADVICE.md). Content edits do
+not require a build or migration. Public image uploads are accessible from upload,
+even on drafts; unpublishing does not revoke the file URL. Never upload confidential
+client material in public image fields. Private files are not silently made public.
 
-**Only run on `erp-developers.com`**. After deploying a pinned commit, `bench --site erp-developers.com execute erpdevelopers.site_setup.configure_website` is idempotent, applies both settings in one commit and rejects other sites before database reads. A targeted shared-Bench web service reload is necessary after adding the new app hook. `scripts/verify_frontend.sh` checks both recorded logo settings, server-rendered native navbar image and actual image bytes. A real Desk browser refresh is still required to verify the visual result.
+## Security and module boundaries
 
-## ERPNext application icon + public SEO (pending deployment)
+Frappe owns authentication, sessions, password recovery, MFA and record permissions.
+Guests receive curated, bounded public projections, not generic editorial DocType
+read permissions. Private playlists use authenticated permission-filtered reads.
+Project stories do not read ERPNext Project/Task/Customer/Employee/User records.
 
-This change fixes a different branding surface from `Website Settings.app_logo`. On
-Frappe 16.56, the **ERPNext** entry on the Apps screen reads its icon from
-`bootinfo.app_data[].app_logo_url` (the older Desktop Icons screen uses
-`bootinfo.desktop_icons[].logo_url`). The site-scoped
-`erpdevelopers.desk_branding.brand_erpnext_on_boot` hook replaces **only**
-ERPNext's display-icon URL with the approved compact shield
-`erpdevelopers-selected-favicon.png`. It preserves ERPNext's application name,
-routes, permission checks and navigation. Nothing is written to ERPNext source,
-its installed-app definition, another Bench site or the database. The full
-selected PNG remains the website/login brand; no duplicate tiles are created.
+Native meeting booking remains behind `erpdev_meeting_booking_enabled`; availability,
+email verification, capacity and CRM/calendar creation remain ERPNext's responsibility.
+Legacy consultation intake is separate and disabled unless `erpdev_consultation_open`
+is enabled. This refactor does not enable either flag or change privacy settings.
+No unapproved provider feed, job scraping, scheduler or AI transfer is added.
 
-The public homepage now uses Frappe's native MetaTags renderer for unique
-search/OpenGraph/Twitter metadata, with a canonical HTTPS homepage URL, an
-Organization + WebSite JSON-LD graph, and the existing approved PNG as the
-social image. Site setup seeds a conservative `robots.txt` with a sitemap URL
-**only if that setting is empty**; existing administrator-defined crawl rules
-are never replaced. Planned LMS, career, marketplace and AI modules are not
-presented as active services in structured data. Native Frappe
-`/sitemap.xml` is retained. Search-console verification and actual indexing
-still require site ownership and post-deploy checks.
+The approved full PNG is unchanged, with SHA-256
+`250df1886e13229aa0e260949f66cb91a627b220a03c36b5c1d4ede1ad06d95d`.
+An Arabic logo is still awaiting name approval. Do not substitute branding silently.
 
-Deploy only to the existing `erp-developers.com` site through the guarded,
-pinned existing-site updater in [the host guide](docs/ERPTEST_LIGHTNODE.md).
-The app hook requires a coordinated **web-only** worker restart; no shared
-Bench upgrade. After deployment, authenticate as a permitted ERPNext System
-User and verify the ERPNext tile and dock use the compact shield, including
-legacy Desktop Icons mode if enabled, while other sites retain their own icons.
+See [Architecture](docs/ARCHITECTURE.md), [refactor audit](docs/REFACTOR_AUDIT.md),
+and the [production release procedure](docs/PRODUCTION_RELEASE.md).
 
-## Live meeting booking + new visitor experience (2026-11-14)
+## Validation
 
-The website now uses a simpler, unnumbered editorial design: a welcoming
-hero, three active destinations (Training, Insights, Book a Meeting),
-compact future-community cards and one thoughtful AI roadmap section.
-The former numbered slide-like roadmap is no longer rendered.
-
-**Let's Talk now books real ERPNext appointment slots** rather than only
-collecting an unconfirmed date preference. The visitor chooses a live slot,
-adds a topic/contact details, then verifies the appointment by email.
-ERPNext's own Appointment controller completes agent assignment, CRM
-Lead/Customer matching and Event creation after verification. No duplicate
-calendar or CRM engine was added. Online booking is explicitly disabled
-until the site's native Appointment Booking Settings, email account,
-privacy policy and `erpdev_meeting_booking_enabled` are configured.
-
-Follow the [meeting booking prerequisites and secure rollout guide](docs/PUBLIC_HUB.md)
-before enabling guest bookings. Publishing the GitHub code is not proof
-of a working production calendar or email flow.
-
-## Public hub — Training, Insights, Let's Talk (release candidate)
-
-**Routes:** `/training`, `/insights`, `/lets-talk`, `/privacy`. The homepage uses shared bilingual navigation and footer and now labels the authorized staff action **Team Login**. Static FAQ quick-guide content remains on-device only; it is **not AI**. No LinkedIn OAuth or job feed has been enabled.
-
-**ERPNext-backed content:** Website Managers and System Managers maintain **ERP Developers Playlist** and **ERP Developers Resource** records, publishing curated YouTube collections, authored Frappe Web Pages and attributed external sources. Content is explicitly unpublished by default; guest users see only approved fields, without DocType read permission. **New public bookings use native ERPNext Appointments**. Historic **ERP Developers Consultation** records and their staff-only CRM actions remain available but are no longer the public booking path. Email confirmation activates native Lead/Customer and Event handling.
-
-**Critical setup:** Guest consultation requests are disabled until `erpdev_consultation_open=1` is deliberately configured after privacy review, ownership, spam/consent and retention controls. The public website explains that submitting preferred availability is *not* an actual booking. Avoid adding third-party booking widgets that bypass this security boundary.
-
-See [Public Hub documentation](docs/PUBLIC_HUB.md) for permissions, editorial workflow, curriculum ideas, controlled activation, LinkedIn feasibility, AI integration gates and real-site UAT. Deployment of this source has **not** been confirmed; follow the pinned, backup-first existing-site procedure and validate the actual backend/browser before enabling intake.
-
-## Desk sign-in and deployment recovery (2026-11-14)
-
-The two staff sign-in links on the public homepage now use a **single** URL from `branding.DESK_SIGNIN_URL`: `/login?redirect-to=/desk`. Frappe v16's native `login.js` prioritizes the sanitized `redirect-to` query when sign-in succeeds; without it, Frappe navigates to the server-provided `home_page`, which on this public site is the branded homepage. The staff link is visibly labeled **Team Login / دخول فريق العمل**; it is for authorized **System Users** only. Future website-member login/portal routes must remain separate; this release does not introduce a member portal or change auth permissions.
-
-The previous deployment was interrupted **after Git fast-forward and 27 passing source tests, before migration/website setup/build/cache clear**, because the updater still called `node --check` on the deleted `login_chrome.js`. The updater no longer does that and instead asserts the obsolete JS and DOM test are absent. Re-run the **pinned existing-site** updater on the already-clean `version-16` checkout; it backs up again, runs tests before migration and finishes website config/build/cache. Restart the shared Gunicorn **web-only** service separately, then run `scripts/verify_frontend.sh`, which confirms the first-paint CSS and selected logo plus both Desk sign-in links.
-
-## Original-design restoration and bilingual login (2026-11-14)
-
-The original human-collaboration/orbit hero composition has been restored with **less whitespace**, the original customer-approved shield icon extracted from the same PNG, and no alternate/generated logo. Home includes six planned modules, focused vision, AI and roadmap, with compact desktop/mobile/RTL spacing.
-
-**English + Arabic** site content is translated through `erpdevelopers/translations/ar.csv`; Frappe's native `#language-switcher` appears in the custom homepage header and uses the framework's own locale cookie. For any language without supplied product-copy translations, website copy falls back to English. The literal approved logo and its tagline are not redrawn or reworded.
-
-**No login-page JavaScript or DOM swapping remains.** The previous JavaScript waited until page load, then inserted a second header and split-panel story, producing a standard-form-to-new-form flash. The current design is applied **by a render-blocking, fingerprinted CSS stylesheet in Frappe's HTML head**. Frappe's original server-rendered navbar, language selector and login form stay in place from the first paint; a CSS-only split-panel illustration supplies the visual design (English/Arabic copy through the page language).
-
-The exact original approved PNG is configured **server-side** in `Website Settings.app_logo`, `brand_html` and `banner_image`, while the icon crop remains the favicon. No other logo or generated illustration replaces it. `login_chrome.js` and its obsolete DOM test were removed. Native Frappe login/signup/recovery/2FA, session logic and language switching remain untouched.
-
-`scripts/verify_frontend.sh` now checks Origin CSS bytes, exact logo/favicons, six rendered modules, English/Arabic server responses, the native login's language picker and public asset routes. This is distinct from visual browser UAT.
-
-## Refactored website architecture
-
-- `erpdevelopers/branding.py`: one pure-Python source of truth for identity, site targeting, uploaded PNG and favicon, and a content-hashed homepage CSS URL.
-- `erpdevelopers/www/erp_developers_home.py`: route controller supplies branded assets and SEO context. Frappe v16 maps `erp-developers-home.html` to the underscore-named Python controller.
-- `erpdevelopers/content.py`: immutable, typed content lists for 3 brand principles, 6 planned ecosystem capabilities, 4 AI steps and 4 roadmap milestones; no repeated card markup.
-- `erpdevelopers/www/erp-developers-home.html`: Jinja page with one explicit stylesheet link in its supported `head_include` block, loop-driven sections and no duplicate Frappe navbar/footer.
-- `public/css/brand.css`: homepage-only rules and scoped variables. `public/css/login.css`: independent styles restricted to the native `/login` page.
-- No login DOM script exists: Frappe's original `/login` template is styled from the first paint by a content-hashed `public/css/login.css` loaded in `web_include_css`; this prevents a late form/header replacement.
-- `site_setup.py`: explicit administrator command for exactly `erp-developers.com`, idempotent and site-scoped. No after-install mutation or public API.
-- `scripts/update_erptest_lightnode.sh`: guarded backup, optional pinned `EXPECTED_SHA`, source validation **before** target-site migration, then assets build and cache clearing.
-- `scripts/verify_frontend.sh`: read-only direct-origin/public checks for rendered CSS fingerprint, actual stylesheet bytes, exact selected logo and favicon.
-
-See [architecture and trust boundaries](docs/ARCHITECTURE.md) for design invariants and release gates.
-
-## Security and scope
-
-- No guest-readable DocTypes. The one guest POST consultation API is opt-in, rate-limited, validated and creates only a private request; it is disabled by default.
-- No direct LinkedIn scraping or unapproved third-party job APIs.
-- No active AI inference, LinkedIn connection or third-party transfer. Consultation data is processed only if the site administrator explicitly enables intake and approves privacy/retention.
-- Use Frappe's server-side permission checks for future authenticated routes.
-- Community, LMS, and job connections must be introduced as independently tested modules.
-
-## Test from a Mac via an SSH tunnel
-
-On the Rasheed host run the isolated bench's development server bound to loopback. On the Mac:
+From the repository root in an environment with the project's declared runtime,
+Node.js, Babel and Pillow available:
 
 ```bash
-ssh -N -L 8000:127.0.0.1:8000 YOUR_USER@RASHEED_HOST
+bash scripts/check_source.sh
 ```
 
-Then run:
+This single runner is used by both static CI and the pre-migration updater. It
+checks Python, all shell/JavaScript files, unit/contract regressions, the playlist
+DOM harness, and Arabic gettext compilation. It does not contact a site or database.
+The browser workflows cover Chromium/Firefox and EN/AR desktop/mobile. The isolated
+MariaDB job tests native pinned Frappe schema functions, not a full Bench install.
+Production/refactor branches run the same checks as integration branches.
 
-```bash
-curl -I -H 'Host: erpdev.localhost' http://127.0.0.1:8000/
-```
+## Deploy or promote
 
-When the Frappe server uses hostname-based site selection, set an entry `127.0.0.1 erpdev.localhost` in the Mac's `/etc/hosts` and visit `http://erpdev.localhost:8000`.
+Use the existing complete [deployment runner](scripts/deploy_erptest_lightnode.sh),
+staged outside the mutable checkout, with an exact reviewed `EXPECTED_SHA`.
+`RELEASE_BRANCH` defaults to `version-16` for compatibility. A first switch from
+`version-16` to `production-v16` additionally requires `ALLOW_BRANCH_SWITCH=1`.
+Subsequent production updates use `RELEASE_BRANCH=production-v16` without switching.
+Never run an installer against an existing site or bypass a failed migration.
 
-Do not bind the development server to a publicly accessible interface. No production traffic or data should be involved.
+The runner backs up database/files, validates the target, refuses divergent history,
+runs source checks before migration, builds and clears caches, then restarts only
+the documented shared web process and verifies origin/public routes and Arabic copy.
+The restart affects other sites sharing that process. Creating a GitHub branch does
+not switch the server, run a migration, configure protection, or prove recovery readiness.
+See the production procedure for commands and the remaining acceptance checklist.
+Historical host troubleshooting remains in [ERPTEST_LIGHTNODE.md](docs/ERPTEST_LIGHTNODE.md).
 
-## Governing Master Plan (source of truth)
+## Roadmap - not implemented by this refactor
 
-The full roadmap, security/architecture gates, issue board and live status are maintained on the `main` branch to avoid duplicating plans across versioned code branches:
+[The canonical plan on main](https://github.com/VoyaERP/erpdevelopers/blob/main/docs/MASTER_PLAN.md)
+and [execution status](https://github.com/VoyaERP/erpdevelopers/blob/main/docs/STATUS.md)
+remain the sources of truth. The new ideas are explicitly **Deferred / do not execute**:
 
-- [Master Implementation Plan](https://github.com/VoyaERP/erpdevelopers/blob/main/docs/MASTER_PLAN.md)
-- [Current Status](https://github.com/VoyaERP/erpdevelopers/blob/main/docs/STATUS.md)
-- [Rasheed/MacVMs Safe Audit and Mac UAT](https://github.com/VoyaERP/erpdevelopers/blob/main/docs/LOCAL_RASHEED.md)
-- [GitHub delivery issues](https://github.com/VoyaERP/erpdevelopers/issues)
+- Entities such as `bedya`, `bdanexus` and `voyatours`; exact names, ownership and relationships need confirmation.
+- Represent our own development work as projects.
+- Later link to native ERPNext Project and use Task for assignments, rather than duplicate those engines.
+- A permission-scoped portal for project owners and assignees.
 
-Only mark release work complete after real v16 test-site evidence, security checks and UAT; an app commit by itself is not deployment proof.
+No entity records, integration fields, task automation, new portal roles or portal
+endpoints have been created. The existing public Projects showcase remains separate.
+[Deferred scope and open decisions](https://github.com/VoyaERP/erpdevelopers/blob/main/docs/DEFERRED_IDEAS.md).
 
-## MacVMs in-place install (guarded)
+## New isolated development sites
 
-Use [scripts/install_local_v16.sh](scripts/install_local_v16.sh) **only on MacVMs** after increasing disk free space to **at least 8 GiB** and verifying an off-VM backup. It refuses to write if the existing v15 Frappe branch is unexpected, target Bench/site already exists, or disk/memory requirements are not met. It uses Node 24 in its own subshell, allocates a distinct Bench, checks port conflicts, then creates only a **new v16 site**. On the documented 2026-11-13 machine state (**3.6 GiB free**) the script intentionally **stops before initialization**. The shared MariaDB server is 12.3.2 whereas Frappe's published v16 baseline is 11.8; a successful dev experiment is not production validation. Do not run this script as root, bypass guards or execute it on the v15 Bench.
-
-    # Clone the small repo once, then run the reviewed script:
-    git clone --branch version-16 --single-branch https://github.com/VoyaERP/erpdevelopers.git ~/erpdevelopers-source
-    cd ~/erpdevelopers-source
-    bash scripts/install_local_v16.sh
-
-The canonical roadmap and environment state stay on `main` in `docs/MASTER_PLAN.md`, `docs/STATUS.md`, and `docs/LOCAL_RASHEED.md`.
-
-## ERP Developers public website on erptest-lightnode (Frappe 16)
-
-The current homepage route is **erp-developers-home** and the native Frappe 16 **/login** receives only a website header/footer, intersecting image-backed technology background, and scoped CSS; there is **no replacement authentication handler or form**. The styling follows Green Box's verified native-login approach while using the ERP Developers navy/blue/teal brand.
-
-**Deployed test target:** erp-developers.com on erptest-lightnode; Frappe v16 app 0.1.0 installation and HTTP 200 confirmed on 2026-11-14. Full browser UAT and production acceptance are still outstanding.
-
-**Server installation and update:** See [erptest-lightnode deployment guide](docs/ERPTEST_LIGHTNODE.md). Scripts: [new-site installer](scripts/install_erptest_lightnode.sh) and [target-site updater](scripts/update_erptest_lightnode.sh). No shared Bench restart/Nginx rewrites are automated.
-
-The exact user-selected PNG is now used across the homepage, login and site branding. The native Frappe authentication handlers remain untouched.
-
-### Existing-site updates (do not create the site again)
-
-The app is already installed on `erp-developers.com` in the shared Frappe 16 Bench at `/data/frappe/frappe-bench`. The site and ERPNext database must not be recreated or overwritten.
-
-Use the reviewed, **pinned** commit with the guarded updater; the current deployment commands and frontend checks are maintained in [docs/ERPTEST_LIGHTNODE.md](docs/ERPTEST_LIGHTNODE.md). Update the web-only Gunicorn service separately when Python/hooks change (brief shared Bench HTTP impact). Static CI is not a substitute for browser or authentication UAT.
-
+Follow [DEPLOYMENT.md](docs/DEPLOYMENT.md) and the host-specific guides. Never reuse
+live site names or run `bench new-site`/reinstall for an update. The older MacVMs
+installer is environment-specific and not a production deployment command.

@@ -1,74 +1,80 @@
-# ERP Developers — Frappe 16 architecture and refactor contracts
+# ERP Developers architecture - current Frappe 16 application
 
-## Product and compatibility boundary
+## Layer boundaries
 
-The `version-16` branch is a **website-only MVP**, not a deployed community/LMS/careers/marketplace/AI platform. It runs as an installed Frappe 16 app within an existing shared Bench; ERPNext remains an independently managed app. No new DocType, API endpoint, guest-writable record, background job, permission override or login endpoint is introduced by the website refactor.
+| Layer | Responsibility |
+| --- | --- |
+| Native Frappe/ERPNext | Authentication, permission engine, File storage, ORM, migrations, Appointment/CRM/calendar behavior |
+| Pure domain rules | `catalog_rules`, `intake_rules`, `meeting_rules`, `event_rules`, `publication_rules` |
+| Shared editorial mechanics | `catalog_support.schema_status/page_number`, `taxonomy.TOPICS` |
+| Shared public-media boundary | `public_media`: path validation, public File projection, permission and local image-byte checks |
+| Domain projections | `catalog`, `events_catalog`, `publications`; fixed DocTypes/fields and mandatory publication filters |
+| Event gallery | `event_media`; parent-scoped gallery, bounded rows, uses shared image checks |
+| HTTP controllers | Thin `www/*.py` context providers and unchanged booking/legacy intake APIs |
+| Presentation | Shared page/nav/footer templates; scoped CSS; native language picker; click-initiated player |
+| Operations | Shared source check runner; pinned updater; complete deployment/readiness/HTTP verifier |
 
-## Responsibilities (single-purpose modules)
+Publications no longer import event-specific media internals. Existing import names
+are aliases to the shared functions, not duplicated implementations. Their pure
+normalization can load without a Frappe runtime. Consultation topic choices remain
+separate from the public editorial taxonomy because they describe different concepts.
 
-| File | Responsibility |
-|---|---|
-| `erpdevelopers/branding.py` | Canonical approved logo/favicons, exactly one allowed site, homepage route, pure settings mapping and content-hashed CSS URL |
-| `erpdevelopers/content.py` | Immutable, typed public site values, planned capabilities, AI steps and roadmap content |
-| `erpdevelopers/translations/ar.csv` | Arabic equivalents of homepage strings; Frappe's built-in locale resolver and language picker are authoritative |
-| `erpdevelopers/site_setup.py` | Explicit, idempotent CLI-only changes to the approved site's Website Settings; never an install hook |
-| `erpdevelopers/www/erp_developers_home.py` | Route controller, SEO context and safe asset URLs supplied to Jinja |
-| `erpdevelopers/www/erp-developers-home.html` | Public semantic page and one linked stylesheet through Frappe's supported head block |
-| `erpdevelopers/public/css/brand.css` | Scoped homepage style variables, layout and responsive rules |
-| `erpdevelopers/public/css/login.css` | First-paint CSS-only styling for the Frappe native login, header and language picker; no DOM mutations |
-| `scripts/update_erptest_lightnode.sh` | Safe backup, pinned source update, pre-migration tests and target-site operations |
-| `scripts/verify_frontend.sh` | Non-mutating HTTP+asset consistency smoke tests, direct-origin and public |
+## Authorization and data separation
 
-## Original visual direction and Frappe multilingual behavior
+Public projection is deliberately different from granting Guest permission to read
+a DocType. Public queries have constant DocTypes, allowlisted fields, mandatory
+publish/review/audience filters and bounded pagination. Internal notes are not
+returned. Private playlists still require authenticated `get_list` permission checks.
 
-The approved original hero uses the open background and orbit illustration, with a compact two-column composition instead of excessive whitespace. The orbit center displays the **icon crop from the customer's approved PNG**, never a placeholder or a replacement wordmark. The same unmodified full PNG stays in header, footer and login.
+The current Project publication is a public story. It is NOT an ERPNext Project,
+a Task list or a client portal. The future entity/project/task/owner/assignee ideas
+are documented only, with no schema, endpoint or permission expansion in this release.
 
-The homepage header contains the native Frappe `#language-switcher` markup. Frappe's `frappe.website.show_language_picker()` populates the select and persists `preferred_language` for Guest users; server-side `{{ _("...") }}` and `{{ _(item.title) }}` use `translations/ar.csv`. Logged-in users' language is governed by their Frappe user preferences. Supported custom site-copy localizations for this release: **English and Arabic**. Browser UAT must confirm RTL and keyboard navigation.
+Frappe retains native login, password reset, email links, MFA and session controls.
+Meeting APIs remain opt-in and site-gated; ERPNext owns slot capacity and verification.
+Legacy consultation intake/CRM handoff remains distinct. No automatic feature enabling,
+remote importer, credentials or custom authentication is added.
 
-Frappe v16 `www/login.html` already emits a native navbar (including `#language-switcher`) and the native form. The earlier DOM enhancement inserted a *second* navbar and story after load, causing a visible first-paint flash and unreliable logo. That JavaScript hook and file have now been removed. Frappe's original navbar and login form are laid out **immediately by CSS** from `web_include_css`. CSS pseudo-elements provide the decorative, bilingual story beside the unchanged `<main>` without modifying form structure, sign-in/recovery/signup views or server-side authentication.
+`schema_status` detects absent tables/columns without suppressing unrelated database
+errors. A temporarily empty directory during incomplete migration is not a declaration
+that deployment succeeded. Existing URL Small Text storage and 1500-character server
+validation are retained; native schema upgrade regressions remain in CI.
 
-## Login destination and user-type boundaries
+## Images, links and localization
 
-The site intentionally sets `Website Settings.home_page = erp-developers-home` for the **public** community homepage. Frappe v16's native login handler uses the `redirect-to` query when supplied, otherwise `data.home_page`. The two current site links labeled `Desk sign in` use `branding.DESK_SIGNIN_URL = "/login?redirect-to=/desk"` and bind it through the homepage controller. This is a deliberate **System User** entry point: Frappe continues to enforce native Desk permissions. Do not rewrite `frappe.auth`, global `get_default_path`, `Website Settings.home_page` or a website-member user's default route just to redirect staff. A future community-member area will require its own authorized entry/navigation.
+Public images use native File records and local bytes. They are bounded to supported
+formats, 5 MB and 24 megapixels. Remote fetches, arbitrary paths, SVG, private files,
+traversal and silent privacy changes are rejected. Rendering rechecks current public
+File references; upload/save verifies content and read permission. Public uploads are
+public even on drafts and remain reachable after unpublishing unless removed separately.
 
-The guarded updater has no dependency on the removed `login_chrome.js` and asserts the obsolete script and DOM test are absent. Its current source checks must succeed **before** `bench migrate`; if any step stops, treat the site as partially updated, inspect before resuming, and never run a site installer or reset DB.
+URL validation normalizes event links but does not resolve DNS or verify redirects.
+It must not be reused as a complete SSRF defense for future server-side importers.
 
-## Styling and caching
+EN/AR UI uses Frappe CSV/gettext. Public copy is escaped; Project/Advice body text is
+plain text with preserved paragraphs. A publication uses a complete Arabic variant
+or an explicit English fallback. Tajawal remains externally delivered as previously
+configured; isolated tests do not establish real font/network availability.
 
-Frappe's `www/erp-developers-home.html` controller is `www/erp_developers_home.py`: Frappe v16 converts hyphens to underscores when resolving the Python file. The controller binds `brand_logo_url` and `homepage_css_url`; Jinja escapes both. The CSS URL contains a 16-hex-character SHA-256 prefix computed **from the actual `brand.css` bytes**, cached for one process. On deploy, new Gunicorn workers must be loaded so their cache uses the new stylesheet hash. The independently served CSS must match the source file byte-for-byte. Homepage CSS is not inserted into global `web_include_css`; only the **content-hashed native-login stylesheet** is added to the website head before any HTML form rendering.
+## Stable UI and branding
 
-CSS custom properties are scoped under `.ed-site`, not `:root`, to avoid modifying Frappe Desk or unrelated website styles. Native login styles are gated only by Frappe's server-rendered `body[data-path="login"]` (or `/login`) selector; no client-applied enhancement class is necessary. Accessibility: semantic headings, focus outlines and focus-only skip link. Visual acceptance still requires real browsers and EN/AR/RTL inspection.
+One shared server-rendered header/footer; no injected second menu or login form.
+The native picker retains its reserved geometry; mobile links scroll in one row.
+Footer text links remain only Let's Talk, Team Login and local Back to top.
+Playlist CSS overrides are consolidated in place without adding another stylesheet
+or player script. The approved logo bytes are unchanged. Arabic-logo approval remains open.
 
-## Site-specific Frappe Desk logo
+Assets use content fingerprints. Python workers must load the new code to update
+cached fingerprints; origin/public byte checks are separate from visual UAT.
 
-On Frappe v16.56.0 the native login gets `context.logo` from `frappe.core.doctype.navbar_settings.navbar_settings.get_app_logo()`, and the Desk boot JSON sets `app_logo_url` from the same function. Frappe resolves `Website Settings.app_logo` first, then `Navbar Settings.app_logo`, and only then the `app_logo_url` hook.
+## Deployment and evidence
 
-The explicit site configuration at `erpdevelopers.site_setup.configure_website` now updates **both site-local Single DocTypes** in one transaction:
-- `Website Settings.app_logo`, `brand_html`, `banner_image`, `favicon` — native site navbar, login/logo and website icon.
-- `Navbar Settings.app_logo` — native Desk logo fallback using the exact same approved full PNG.
+`version-16` is integration; `production-v16` is the reviewed release branch; `main`
+contains canonical governance. Promotion is pinned and explicit. Source checks are
+shared by CI and the updater. No forced reset, downgrade, database deletion, core
+modification or service-wide restart is introduced.
 
-The ERP Developers app's `hooks.py` also publishes `app_logo_url = LOGO_URL` for its own app identity/icon. No Frappe core files, global bench settings, login flows or other site records are changed. On a shared Bench the site-specific setting is applied **only** when `frappe.local.site == "erp-developers.com"`, checked before any database access.
-
-The source tests assert wrong-site refusal, single commit on two changed DocTypes, idempotence and the exact PNG URL. The read-only smoke verifies both Single DocTypes before checking the rendered navbar image and CSS. Note: Frappe's built-in `frappe` system app tile remains Frappe's own product identity; this project customizes **ERP Developers branding**, not the framework source code.
-
-## Branding fidelity
-
-**Never redraw, retrace, generate or substitute a logo.** The user-approved original at `erpdevelopers/public/images/erpdevelopers-selected-logo.png` is byte-identical to the uploaded PNG (SHA-256 `250df1886e13229aa0e260949f66cb91a627b220a03c36b5c1d4ede1ad06d95d`). The icon-only favicon is cropped from the same source. All homepage image references are supplied by the Python brand module. Frappe's own navbar uses the site-specific `Website Settings.brand_html` and `banner_image` values built from the same canonical `LOGO_URL`; `app_logo` also points to that file. No JavaScript changes or replaces the logo at runtime. No hidden user uploads or remote fonts are embedded.
-
-## Security invariants
-
-1. `site_setup.configure_website` checks `frappe.local.site` *before reading or mutating* any database state, does not use a whitelisted RPC endpoint, and saves/commits only when values differ.
-2. Login remains Frappe-owned (password reset, session cookies, 2FA, social auth, throttling and permissions). **No custom login JavaScript executes**, and no form, login endpoint or template is overridden.
-3. No secrets, backups, private keys or site configuration files belong in Git. No unauthorized job scraping or external AI API calls.
-4. Deployment works on `erp-developers.com` **only**. Remote URL, branch, source SHA, app status, backup and fast-forward are guarded; source tests run before migration.
-5. Restarting shared Gunicorn is a separately reviewed operator action. The app script does not restart Redis, Nginx, workers or other Bench services.
-
-## Validation and rollback
-
-CI checks Python 3.14 syntax, Bash syntax and behavior tests for branding, the CSS-first login contract and site setup. Production claims require a real test site, public URL and browser UAT. The smoke test also checks that six data-driven ecosystem cards render (not merely that an HTTP 200 page is returned). After an approved update, run `scripts/verify_frontend.sh` to check CSS URL, Origin bytes, correct logo and public 200 GETs, then test interactive login and multiple viewport widths.
-
-On failure, retain the target site's `backup --with-files` archives and the previous recorded commit. **Do not automatically hard-reset or drop databases.** Diagnose migration/source/runtime state first; roll back the Git checkout only via a reviewed plan that accounts for schema changes. The HTTP smoke script is read-only.
-
-## Future extension approach
-
-Developer Hub, community, LMS, recruitment and marketplace must use separate feature modules with explicit permissions, data contracts, migration/tests, and audit and privacy design. Maintain one shared identity surface rather than duplicating native Frappe authentication.
+All original runtime module/endpoint paths and DocType schemas are preserved in this
+refactor. Full Bench integration, actual publishing/upload/auth flows, backup restore,
+mail delivery, access review, performance and operational sign-off remain release gates.
+See [PRODUCTION_RELEASE.md](PRODUCTION_RELEASE.md) and [REFACTOR_AUDIT.md](REFACTOR_AUDIT.md).
