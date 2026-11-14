@@ -10,12 +10,8 @@ from frappe.rate_limiter import rate_limit
 from frappe.utils import cint, strip_html, validate_email_address
 
 from erpdevelopers.branding import EXPECTED_SITE
+from erpdevelopers.consultation_flags import booking_open
 from erpdevelopers.intake_rules import TOPICS, WINDOWS, clean_text, validate_date, validate_timezone
-
-
-def booking_open():
-    return (frappe.local.site == EXPECTED_SITE
-            and cint(frappe.conf.get("erpdev_consultation_open", 0)) == 1)
 
 
 @frappe.whitelist(allow_guest=True, methods=["POST"])
