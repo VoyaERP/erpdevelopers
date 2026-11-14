@@ -104,3 +104,17 @@ def public_resources():
             item["external"] = True
         result.append(item)
     return result
+
+def public_catalog_topics(rows):
+    """Get distinct topics from published catalog dictionaries.
+
+    `public_playlists` and `public_resources` intentionally convert Frappe
+    rows to plain dicts before returning them; controllers must use key access
+    rather than Python attribute access. Ignore malformed/blank topics while
+    preserving the published-only row filter and stable case-insensitive sort.
+    """
+    return sorted(
+        {row["topic"].strip() for row in rows
+         if isinstance(row.get("topic"), str) and row["topic"].strip()},
+        key=str.casefold,
+    )

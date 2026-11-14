@@ -86,6 +86,58 @@ class TestPublicCatalogRendering(unittest.TestCase):
         self.assertEqual(fake.queries[0][1]["limit_page_length"], 60)
 
 
+class TestPublicCatalogTopicContext(unittest.TestCase):
+    """Published content must never turn a valid catalog into HTTP 500."""
+
+    def test_topics_from_plain_dicts_with_missing_or_blank_topics(self):
+        data = [
+            {"topic": "Solution Architecture"},
+            {"topic": "Frappe & ERPNext"},
+            {"topic": "Frappe & ERPNext"},
+            {"topic": None},
+            {"topic": "  "},
+        ]
+        self.assertEqual(
+            catalog.public_catalog_topics(data),
+            ["Frappe & ERPNext", "Solution Architecture"],
+        )
+        self.assertEqual(catalog.public_catalog_topics([]), [])
+
+    def test_training_context_handles_real_published_dicts(self):
+        from erpdevelopers.www import training
+
+        ctx = SimpleNamespace()
+        rows = [
+            {"topic": "Frappe & ERPNext", "title": "Basics",
+             "description": "Reviewed playlist", "level": "Beginner",
+             "language": "English", "watch_url": "https://www.youtube.com/playlist?list=PLexample"},
+            {"topic": "Cloud & DevOps", "title": "Cloud",
+             "description": "Reviewed", "level": "Intermediate",
+             "language": "Arabic", "watch_url": "https://www.youtube.com/playlist?list=PLother"},
+        ]
+        with patch.object(training, "public_playlists", return_value=rows), patch.object(
+            training, "set_public_context", side_effect=lambda context, **_kwargs: None
+        ):
+            training.get_context(ctx)
+        self.assertEqual(ctx.playlists, rows)
+        self.assertEqual(ctx.topics, ["Cloud & DevOps", "Frappe & ERPNext"])
+
+    def test_insights_context_handles_real_published_dicts(self):
+        from erpdevelopers.www import insights
+
+        ctx = SimpleNamespace()
+        rows = [
+            {"topic": "Cybersecurity", "source_kind": "External Source"},
+            {"topic": "AI & Data", "source_kind": "Original Article"},
+        ]
+        with patch.object(insights, "public_resources", return_value=rows), patch.object(
+            insights, "set_public_context", side_effect=lambda context, **_kwargs: None
+        ):
+            insights.get_context(ctx)
+        self.assertEqual(ctx.resources, rows)
+        self.assertEqual(ctx.topics, ["AI & Data", "Cybersecurity"])
+
+
 class TestBookingPageContext(unittest.TestCase):
     def test_public_get_does_not_import_native_post_handler(self):
         source = __import__("pathlib").Path(lets_talk.__file__).read_text()
