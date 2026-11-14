@@ -13,7 +13,9 @@ EXTENSIONS = {".jpg": "JPEG", ".jpeg": "JPEG", ".png": "PNG", ".webp": "WEBP", "
 
 def image_path(value):
     """Return one decoded /files filename, never an external/private/arbitrary path."""
-    if not isinstance(value, str) or not value or len(value) > 1200:
+    # urlsplit strips some raw control characters; reject them before parsing.
+    if (not isinstance(value, str) or not value or len(value) > 1200 or
+        value != value.strip() or "\\" in value or any(ord(c) < 32 or ord(c) == 127 for c in value)):
         raise ValueError("Upload a public JPG, PNG, WebP or GIF using Attach Image.")
     try:
         parts = urlsplit(value)
