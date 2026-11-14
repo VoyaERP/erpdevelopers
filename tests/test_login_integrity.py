@@ -26,6 +26,11 @@ class TestNativeLogin(unittest.TestCase):
                           "document.documentElement.lang =", "wrapper.insertBefore("):
             self.assertNotIn(forbidden, js)
 
+    def test_dom_simulation_is_run_by_ci(self):
+        workflow = (ROOT / ".github/workflows/v16-static-validation.yml").read_text(encoding="utf-8")
+        self.assertIn("node --test tests/login_chrome_dom.test.cjs", workflow)
+        self.assertTrue((ROOT / "tests/login_chrome_dom.test.cjs").is_file())
+
     def test_login_uses_one_header_and_native_auth_view(self):
         js = (APP / "public/js/login_chrome.js").read_text(encoding="utf-8")
         css = (APP / "public/css/login.css").read_text(encoding="utf-8")
