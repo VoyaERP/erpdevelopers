@@ -12,17 +12,20 @@
     const title = dialog.querySelector("#ed-playlist-dialog-title");
     const external = dialog.querySelector("[data-player-external]");
     const close = dialog.querySelector("[data-player-close]");
-    if (!frame || !title || !external || !close) return;
+    const status = dialog.querySelector("[data-player-status]");
+    if (!frame || !title || !external || !close || !status) return;
 
     const idPattern = /^[A-Za-z0-9_-]{12,64}$/;
     let lastFocus = null;
 
     const stopPlayback = () => {
       frame.removeAttribute("src");
+      status.hidden = false;
       if (lastFocus && lastFocus.isConnected) lastFocus.focus();
       lastFocus = null;
     };
     dialog.addEventListener("close", stopPlayback);
+    frame.addEventListener("load", () => { status.hidden = true; });
     close.addEventListener("click", () => dialog.close());
     dialog.addEventListener("click", event => {
       if (event.target === dialog) dialog.close();
@@ -52,6 +55,7 @@
         lastFocus = link;
         title.textContent = link.dataset.playlistTitle || "Video playlist";
         external.href = watch.toString();
+        status.hidden = false;
         frame.src = embed.toString();
         close.focus();
       });
