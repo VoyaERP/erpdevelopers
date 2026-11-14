@@ -5,7 +5,7 @@
 (() => {
   "use strict";
 
-  const ICON = "/assets/erpdevelopers/images/erp-developers-logo.svg";
+  const ICON = "/assets/erpdevelopers/images/erpdevelopers-selected-logo.png";
   const copy = {
     en: {
       home: "Home", vision: "Vision", ecosystem: "Ecosystem",

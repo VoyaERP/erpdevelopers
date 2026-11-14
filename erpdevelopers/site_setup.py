@@ -8,8 +8,8 @@ import frappe
 
 EXPECTED_SITE = "erp-developers.com"
 HOME_ROUTE = "erp-developers-home"
-ICON = "/assets/erpdevelopers/images/erp-mark.svg"
-BRAND_LOGO = "/assets/erpdevelopers/images/erp-developers-logo.svg"
+ICON = "/assets/erpdevelopers/images/erpdevelopers-selected-favicon.png"
+BRAND_LOGO = "/assets/erpdevelopers/images/erpdevelopers-selected-logo.png"
 
 
 def configure_website():

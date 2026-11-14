@@ -25,9 +25,11 @@ bench --site erpdev.localhost list-apps
 
 Run the isolated development bench with `bench start` and visit the site. Set the Host header to `erpdev.localhost` when accessing through a port or SSH tunnel. For a dedicated site, use `bench use erpdev.localhost` only on the isolated bench.
 
-## Branding
+## Branding — exact selected PNG
 
-The approved brand is concept **01 — Neural Intelligence**. Its exact original `erp_developers_01_neural_intelligence.svg` was recovered without redrawing and committed as `erpdevelopers/public/images/erp-developers-neural-intelligence.svg` (SHA-256 `9ff7a4b8409a3bbf1f5cf438e5d73fc3d3fd28f564576c720c572d55f6d93293`). The site uses a viewport-trimmed copy of the **same original SVG artwork** at `erp-developers-logo.svg` (header/login/footer and Website Settings app logo); the favicon uses the exact mark artwork extracted from that SVG at `erp-mark.svg`. No brand shapes, wording or colors were redesigned.
+The canonical ERP Developers brand asset is the **exact original image uploaded by the customer**, preserved byte-for-byte at `erpdevelopers/public/images/erpdevelopers-selected-logo.png` (RGBA PNG, 2048 × 682, transparent background, SHA-256 `250df1886e13229aa0e260949f66cb91a627b220a03c36b5c1d4ede1ad06d95d`). No regenerated artwork or reconstructed wordmark is used.
+
+`erpdevelopers/public/images/erpdevelopers-selected-favicon.png` is an icon-only crop of the same approved image, supplied for favicon use. All active website, native login branding, and site-specific Website Settings point to these assets. The old unrelated Neural Intelligence SVG concept was removed.
 
 ## Security and scope
 
@@ -85,7 +87,7 @@ The current homepage route is **erp-developers-home** and the native Frappe 16 *
 
 **Server installation and update:** See [erptest-lightnode deployment guide](docs/ERPTEST_LIGHTNODE.md). Scripts: [new-site installer](scripts/install_erptest_lightnode.sh) and [target-site updater](scripts/update_erptest_lightnode.sh). No shared Bench restart/Nginx rewrites are automated.
 
-The previously approved Neural Intelligence logo is included in its original vector form and is used throughout homepage, login, and site branding. Layout spacing has been tightened, including a compact hero, balanced modules and shorter login panel. Core Frappe authentication remains untouched.
+The exact user-selected PNG is now used across the homepage, login and site branding. The native Frappe authentication handlers remain untouched.
 
 ### Public HTTPS deployment for erptest-lightnode
 
