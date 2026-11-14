@@ -1,0 +1,104 @@
+{% extends "templates/includes/erpdevelopers_page_base.html" %}
+{% block ed_content %}
+<section class="ed-page-hero" aria-labelledby="ed-talk-title">
+  <div class="ed-shell ed-page-hero-inner">
+    <div>
+      <p class="ed-kicker">{{ _("LET'S TALK") }}</p>
+      <h1 id="ed-talk-title">{{ _("Start with the right conversation.") }}</h1>
+      <p>{{ _("Tell us what you are planning—ERP implementation, architecture, integration, learning or a partnership—and suggest a convenient date.") }}</p>
+      <div class="ed-actions">
+        <a class="ed-btn ed-btn-secondary" href="/insights">{{ _("Explore our advice") }}</a>
+      </div>
+    </div>
+    <div class="ed-page-hero-aside">
+      <span>{{ _("HOW IT WORKS") }}</span>
+      <strong>{{ _("Request → Review → Confirm") }}</strong>
+      <p>{{ _("Your preferred time is a request, not a reservation. An ERP Developers representative confirms availability before a meeting is booked.") }}</p>
+    </div>
+  </div>
+</section>
+<section class="ed-section ed-page-section" aria-labelledby="ed-talk-form-title">
+  <div class="ed-shell ed-form-layout">
+    <div>
+      <p class="ed-kicker">{{ _("CONTACT AN EXPERT") }}</p>
+      <h2 id="ed-talk-form-title">{{ _("Request an appointment") }}</h2>
+      <p class="ed-form-intro">{{ _("Share a short brief so we can direct the conversation to the right specialist.") }}</p>
+      <div class="ed-process">
+        <p><b>01</b> {{ _("Send a request") }}</p>
+        <p><b>02</b> {{ _("Our team reviews the details") }}</p>
+        <p><b>03</b> {{ _("A meeting time is confirmed separately") }}</p>
+      </div>
+    </div>
+    <div class="ed-form-card">
+      {% if booking_enabled %}
+      <form id="ed-consultation-form">
+        <div class="ed-form-grid">
+          <div class="ed-field">
+            <label for="ed-contact-name">{{ _("Your name") }} *</label>
+            <input id="ed-contact-name" name="contact_name" maxlength="120" autocomplete="name" required>
+          </div>
+          <div class="ed-field">
+            <label for="ed-email">{{ _("Work email") }} *</label>
+            <input id="ed-email" name="email" type="email" maxlength="200" autocomplete="email" required>
+          </div>
+          <div class="ed-field">
+            <label for="ed-company">{{ _("Company (optional)") }}</label>
+            <input id="ed-company" name="company" maxlength="140" autocomplete="organization">
+          </div>
+          <div class="ed-field">
+            <label for="ed-topic">{{ _("What would you like to discuss?") }} *</label>
+            <select id="ed-topic" name="topic" required>
+              <option value="">{{ _("Choose a topic") }}</option>
+              {% for topic in topic_options %}
+              <option value="{{ topic | e }}">{{ _(topic) | e }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="ed-field">
+            <label for="ed-preferred-date">{{ _("Preferred date") }} *</label>
+            <input id="ed-preferred-date" type="date" name="preferred_date" required>
+          </div>
+          <div class="ed-field">
+            <label for="ed-time-window">{{ _("Preferred time window") }} *</label>
+            <select id="ed-time-window" name="preferred_window" required>
+              {% for period in time_windows %}
+              <option value="{{ period | e }}">{{ _(period) | e }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="ed-field ed-field-full">
+            <label for="ed-timezone">{{ _("Your time zone (IANA name)") }} *</label>
+            <input id="ed-timezone" name="time_zone" maxlength="64" autocomplete="off"
+                   placeholder="Africa/Cairo" value="UTC" required>
+          </div>
+          <div class="ed-field ed-field-full">
+            <label for="ed-message">{{ _("What do you want to achieve?") }} *</label>
+            <textarea id="ed-message" name="message" rows="5" maxlength="1800" required></textarea>
+          </div>
+          <div class="ed-honeypot" aria-hidden="true">
+            <label for="ed-website">{{ _("Website") }}</label>
+            <input id="ed-website" name="website" tabindex="-1" autocomplete="off">
+          </div>
+        </div>
+        <label class="ed-consent">
+          <input name="contact_consent" type="checkbox" value="1" required>
+          <span>{{ _("I agree to be contacted about this request and understand that a meeting is not yet confirmed.") }}
+            <a href="/privacy">{{ _("Read the privacy notice") }}</a>.</span>
+        </label>
+        <p id="ed-form-feedback" class="ed-form-feedback" role="status" aria-live="polite"></p>
+        <button type="submit" class="ed-btn ed-btn-primary" id="ed-submit-request">
+          {{ _("Send appointment request") }}
+        </button>
+      </form>
+      <script defer src="/assets/erpdevelopers/js/consultation.js"></script>
+      {% else %}
+      <div class="ed-empty ed-closed-booking" role="status">
+        <strong>{{ _("Appointment requests are being prepared.") }}</strong>
+        <p>{{ _("Online submissions will open after our privacy notice and intake process are approved. The company will announce availability here.") }}</p>
+        <a href="/insights" class="ed-btn ed-btn-secondary">{{ _("Browse insights in the meantime") }}</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "templates/includes/erpdevelopers_page_base.html" %}
+{% block ed_content %}
+<section class="ed-page-hero" aria-labelledby="ed-insights-title">
+  <div class="ed-shell ed-page-hero-inner">
+    <div>
+      <p class="ed-kicker">{{ _("PRACTICAL KNOWLEDGE") }}</p>
+      <h1 id="ed-insights-title">{{ _("Advice with context, not noise.") }}</h1>
+      <p>{{ _("Explore practical guidance and carefully attributed sources on ERP, software development, architecture, data and digital transformation.") }}</p>
+      <div class="ed-actions">
+        <a href="#insights" class="ed-btn ed-btn-primary">{{ _("Explore insights") }}</a>
+        <a href="/lets-talk" class="ed-btn ed-btn-secondary">{{ _("Ask about a solution") }}</a>
+      </div>
+    </div>
+    <div class="ed-page-hero-aside">
+      <span>{{ _("EDITORIAL PRINCIPLE") }}</span>
+      <strong>{{ _("Source → Review → Advice") }}</strong>
+      <p>{{ _("Our notes explain why a resource matters. External articles remain with their original publishers, and AI does not auto-publish advice.") }}</p>
+    </div>
+  </div>
+</section>
+<section class="ed-section ed-page-section" id="insights" aria-labelledby="ed-resource-heading">
+  <div class="ed-shell">
+    <div class="ed-section-head">
+      <div>
+        <p class="ed-kicker">{{ _("RESOURCE LIBRARY") }}</p>
+        <h2 id="ed-resource-heading">{{ _("Insights and trusted resources") }}</h2>
+      </div>
+      <p>{{ _("Original articles use Frappe Web Pages. External resources open at the publisher's site with clear attribution.") }}</p>
+    </div>
+    <div class="ed-filter-row">
+      <label for="ed-resource-topic">{{ _("Filter by topic") }}</label>
+      <select id="ed-resource-topic" class="ed-filter" data-catalog-filter="#ed-insight-list"
+              data-count-target="#ed-resource-count">
+        <option value="">{{ _("All topics") }}</option>
+        {% for topic in topics %}
+        <option value="{{ topic | e }}">{{ _(topic) | e }}</option>
+        {% endfor %}
+      </select>
+      <span class="ed-catalog-count"><b id="ed-resource-count">{{ resources | length }}</b> {{ _("resources") }}</span>
+    </div>
+    {% if resources %}
+    <div class="ed-resource-grid" id="ed-insight-list">
+      {% for item in resources %}
+      <article class="ed-resource-card" data-catalog-topic="{{ item.topic | e }}">
+        <div class="ed-card-meta">
+          <span>{{ _(item.topic) | e }}</span>
+          <span>{{ _(item.source_kind) | e }}</span>
+        </div>
+        <h3>{% if boot.lang == "ar" and item.title_ar %}{{ item.title_ar | e }}{% else %}{{ item.title | e }}{% endif %}</h3>
+        <p>{{ item.summary | e }}</p>
+        <div class="ed-editor-note">
+          <strong>{{ _("Why it matters") }}</strong>
+          <p>{{ item.editorial_note | e }}</p>
+        </div>
+        <div class="ed-card-bottom">
+          <span>{% if item.external %}{{ item.source_name | e }}{% else %}ERP Developers{% endif %}</span>
+          <a href="{{ item.href | e }}" {% if item.external %}target="_blank" rel="noopener noreferrer nofollow"{% endif %}>
+            {{ _("Read source") }} <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="ed-empty">
+      <strong>{{ _("Insights are being reviewed.") }}</strong>
+      <p>{{ _("We will share practical articles and sourced reading after editorial approval.") }}</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+<section class="ed-section">
+  <div class="ed-shell ed-path-callout">
+    <div>
+      <p class="ed-kicker">{{ _("TURN INSIGHT INTO SKILL") }}</p>
+      <h2>{{ _("Learn the concepts behind the recommendations.") }}</h2>
+    </div>
+    <a class="ed-btn ed-btn-primary" href="/training">{{ _("See training playlists") }}</a>
+  </div>
+</section>
+<script defer src="{{ catalog_js_url | e }}"></script>
+{% endblock %}
