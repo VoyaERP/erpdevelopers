@@ -39,7 +39,8 @@ def external_https_url(url: str) -> str:
         host = p.hostname or ""
         if (p.scheme != "https" or not host or p.username or p.password
             or p.port not in (None, 443) or host.endswith((".local", ".internal"))
-            or host in {"localhost", "erp-developers.com"}):
+            or host in {"localhost", "erp-developers.com"} or "." not in host
+            or host.startswith(".") or host.endswith(".")):
             raise ValueError()
         try:
             ipaddress.ip_address(host)

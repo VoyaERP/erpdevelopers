@@ -218,3 +218,6 @@
 "Flexible","مرن"
 "Morning","صباحاً"
 "Afternoon","بعد الظهر"
+"Request received. Our team will confirm availability before a meeting is booked.","استلمنا طلبك. سيتواصل الفريق لتأكيد الموعد المتاح قبل تثبيت الاجتماع."
+"Unable to send your request. Please review the details and retry.","تعذّر إرسال الطلب. يرجى مراجعة البيانات والمحاولة مجدداً."
+"The connection is unavailable. Please retry later.","الاتصال غير متاح حالياً. يرجى المحاولة لاحقاً."
