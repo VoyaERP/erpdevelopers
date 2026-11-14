@@ -11,60 +11,67 @@
 {% block page_container %}
 <main class="ed-site" id="top">
   {% include "templates/includes/erpdevelopers_nav.html" %}
-
   <div id="content">
     <section class="ed-hero" aria-labelledby="ed-heading">
       <div class="ed-shell ed-hero-inner">
         <div class="ed-hero-copy">
-          <p class="ed-eyebrow"><span class="ed-pulse" aria-hidden="true"></span> {{ _("Human collaboration. Intelligent technology.") }}</p>
-          <h1 id="ed-heading">{{ _("Technology grows stronger") }} <em>{{ _("together.") }}</em></h1>
-          <p class="ed-hero-lead">{{ _("ERP Developers brings people, expertise and intelligent systems into one connected technology ecosystem — not limited to a single ERP, vendor or platform.") }}</p>
+          <p class="ed-eyebrow"><span class="ed-pulse" aria-hidden="true"></span>{{ _("PEOPLE. IDEAS. POSSIBILITIES.") }}</p>
+          <h1 id="ed-heading">{{ _("Better technology starts with") }} <em>{{ _("better connections.") }}</em></h1>
+          <p class="ed-hero-lead">{{ _("A space for developers, architects, and curious minds to learn, exchange ideas, and turn real challenges into meaningful progress. Beyond any single ERP or platform.") }}</p>
           <div class="ed-actions">
-            <a class="ed-btn ed-btn-primary" href="#ecosystem">{{ _("Explore our ecosystem") }} <span aria-hidden="true">↗</span></a>
-            <a class="ed-btn ed-btn-secondary" href="/lets-talk">{{ _("Let's Talk") }}</a>
+            <a class="ed-btn ed-btn-primary" href="#discover">{{ _("Explore what's here") }} <span aria-hidden="true">↗</span></a>
+            <a class="ed-btn ed-btn-secondary" href="/lets-talk">{{ _("Book a meeting") }} <span aria-hidden="true">↗</span></a>
           </div>
           <div class="ed-principles" aria-label="{{ _('Brand values') }}">
             {% for value in values_items %}
-            <span><b>{{ value.index | e }}</b> {{ value.title | e }}</span>
+            <span>{{ _(value.title) | e }}</span>
             {% endfor %}
           </div>
         </div>
-
-        {# Restore the original orbit motif, using only the approved customer icon. #}
         <div class="ed-art" aria-hidden="true">
           <div class="ed-art-grid"></div>
           <div class="ed-orbit ed-orbit-one"></div>
           <div class="ed-orbit ed-orbit-two"></div>
-          <span class="ed-orb ed-orb-one"></span>
-          <span class="ed-orb ed-orb-two"></span>
           <div class="ed-art-core">
             <img src="{{ brand_icon_url | e }}" width="130" height="130" alt="">
           </div>
-          <span class="ed-art-badge">AI</span>
-          <div class="ed-art-caption">{{ _("Connect knowledge") }} <span>→</span> {{ _("Create progress") }}</div>
+          <div class="ed-art-float ed-art-float-a"><span class="ed-art-spark">✧</span>{{ _("Share what works") }}</div>
+          <div class="ed-art-float ed-art-float-b"><span class="ed-art-spark">✧</span>{{ _("Learn together") }}</div>
+          <div class="ed-art-float ed-art-float-c"><span class="ed-art-spark">✧</span>{{ _("Build what's next") }}</div>
         </div>
       </div>
     </section>
 
-    <section class="ed-section ed-active-journeys" aria-labelledby="ed-explore-heading">
+    <section class="ed-section ed-active-journeys" id="discover" aria-labelledby="ed-explore-heading">
       <div class="ed-shell">
-        <p class="ed-kicker">{{ _("EXPLORE TODAY") }}</p>
-        <h2 id="ed-explore-heading">{{ _("Learn, discover and connect.") }}</h2>
+        <div class="ed-section-head ed-section-head-intimate">
+          <div>
+            <p class="ed-kicker">{{ _("START SOMEWHERE INTERESTING") }}</p>
+            <h2 id="ed-explore-heading">{{ _("Find your next spark.") }}</h2>
+          </div>
+          <p>{{ _("Whether you're learning something new or solving a tough problem, here's a place to begin.") }}</p>
+        </div>
         <div class="ed-link-grid">
-          <a class="ed-link-card" href="/training">
-            <small>{{ _("LEARN") }}</small><strong>{{ _("Training Playlists") }}</strong>
-            <p>{{ _("Curated public YouTube collections for practical technology learning.") }}</p>
-            <span>{{ _("Browse training") }}</span>
+          <a class="ed-link-card ed-link-feature" href="/training">
+            <span class="ed-card-topline">{{ _("EXPLORE & LEARN") }}</span>
+            <div class="ed-card-graphic" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div>
+              <h3>{{ _("Good ideas are worth sharing.") }}</h3>
+              <p>{{ _("Discover curated technology playlists and practical learning resources.") }}</p>
+            </div>
+            <span class="ed-card-cta">{{ _("Go to Training") }} <span aria-hidden="true">↗</span></span>
           </a>
-          <a class="ed-link-card" href="/insights">
-            <small>{{ _("DISCOVER") }}</small><strong>{{ _("Practical Insights") }}</strong>
-            <p>{{ _("Read original advice and editor-reviewed external sources.") }}</p>
-            <span>{{ _("Explore insights") }}</span>
+          <a class="ed-link-card ed-link-insights" href="/insights">
+            <span class="ed-card-topline">{{ _("PERSPECTIVES") }}</span>
+            <h3>{{ _("Curiosity looks good on you.") }}</h3>
+            <p>{{ _("Explore useful insights, trusted sources, and ideas worth thinking about.") }}</p>
+            <span class="ed-card-cta">{{ _("Explore Insights") }} <span aria-hidden="true">↗</span></span>
           </a>
-          <a class="ed-link-card" href="/lets-talk">
-            <small>{{ _("CONNECT") }}</small><strong>{{ _("Let's Talk") }}</strong>
-            <p>{{ _("Start a consultation request; our team confirms availability.") }}</p>
-            <span>{{ _("Request a conversation") }}</span>
+          <a class="ed-link-card ed-link-connect" href="/lets-talk">
+            <span class="ed-card-topline">{{ _("LET'S CONNECT") }}</span>
+            <h3>{{ _("Have something in mind?") }}</h3>
+            <p>{{ _("An ERP challenge, a bold idea, or a question? Let's make time to talk.") }}</p>
+            <span class="ed-card-cta">{{ _("Book a Meeting") }} <span aria-hidden="true">↗</span></span>
           </a>
         </div>
       </div>
@@ -73,23 +80,26 @@
     <section id="vision" class="ed-section ed-vision" aria-labelledby="ed-vision-heading">
       <div class="ed-shell ed-intro">
         <div>
-          <p class="ed-kicker">{{ _("OUR MISSION") }}</p>
-          <h2 id="ed-vision-heading">{{ _("More than software.") }}<br><span>{{ _("An ecosystem for progress.") }}</span></h2>
+          <p class="ed-kicker">{{ _("BUILT AROUND PEOPLE") }}</p>
+          <h2 id="ed-vision-heading">{{ _("Technology is better") }} <span>{{ _("when we build it together.") }}</span></h2>
         </div>
-        <p>{{ _("We connect developers, architects, organizations and learners around useful technology, responsible AI and measurable business outcomes.") }}</p>
+        <div class="ed-intro-copy">
+          <p>{{ _("We're bringing different minds into one conversation: engineers, decision-makers, learners and business teams. The goal is practical knowledge and better outcomes, not another vendor-centric portal.") }}</p>
+          <a href="/lets-talk" class="ed-text-link">{{ _("Tell us what you're working on") }} <span aria-hidden="true">↗</span></a>
+        </div>
       </div>
     </section>
 
     <section id="ecosystem" class="ed-section ed-ecosystem" aria-labelledby="ed-ecosystem-heading">
       <div class="ed-shell">
         <div class="ed-section-head">
-          <div><p class="ed-kicker">{{ _("THE ECOSYSTEM") }}</p><h2 id="ed-ecosystem-heading">{{ _("One platform. Many possibilities.") }}</h2></div>
-          <p>{{ _("Designed as modular destinations that can grow independently, with shared identity and security foundations.") }}</p>
+          <div><p class="ed-kicker">{{ _("WHERE WE'RE HEADED") }}</p><h2 id="ed-ecosystem-heading">{{ _("One community. Many ways to grow.") }}</h2></div>
+          <p>{{ _("Our planned community spaces will evolve alongside the people who use them.") }}</p>
         </div>
         <div class="ed-grid">
           {% for item in ecosystem_items %}
           <article class="ed-tile">
-            <div class="ed-tile-index">{{ item.index | e }} <i aria-hidden="true"></i></div>
+            <span class="ed-tile-accent" aria-hidden="true"></span>
             <h3>{{ _(item.title) | e }}</h3>
             <p>{{ _(item.description) | e }}</p>
             <span class="ed-tile-status">{{ _("Planned module") }}</span>
@@ -102,49 +112,31 @@
     <section id="ai" class="ed-section ed-ai" aria-labelledby="ed-ai-heading">
       <div class="ed-shell ed-ai-panel">
         <div class="ed-ai-copy">
-          <p class="ed-kicker">{{ _("INTELLIGENCE WITH PURPOSE") }}</p>
-          <h2 id="ed-ai-heading">{{ _("AI should improve decisions, not replace judgment.") }}</h2>
-          <p>{{ _("We envision secure, human-reviewed assistants that accelerate discovery, knowledge sharing and solution delivery. AI capabilities are on the roadmap and are not active on this preview site.") }}</p>
-          <a class="ed-ai-link" href="#roadmap">{{ _("See the roadmap") }} <span aria-hidden="true">↗</span></a>
+          <p class="ed-kicker">{{ _("HUMAN FIRST. INTELLIGENCE NEXT.") }}</p>
+          <h2 id="ed-ai-heading">{{ _("The best technology leaves room for") }} <em>{{ _("human judgment.") }}</em></h2>
+          <p>{{ _("We're exploring responsible AI guidance built around trustworthy sources, clear permissions, and people who stay in control. AI advisory features are planned, not active today.") }}</p>
+          <a class="ed-ai-link" href="/insights">{{ _("Explore human-reviewed insights") }} <span aria-hidden="true">↗</span></a>
         </div>
-        <div class="ed-ai-flow" aria-hidden="true">
-          {% for step in ai_flow_items %}
-          <div><span>{{ step.index | e }}</span><strong>{{ _(step.title) | e }}</strong><small>{{ _(step.description) | e }}</small></div>
-          {% endfor %}
-        </div>
-      </div>
-    </section>
-
-    <section class="ed-section ed-future-section" aria-labelledby="ed-connect-title">
-      <div class="ed-shell">
-        <p class="ed-kicker">{{ _("FUTURE CONNECTIONS") }}</p>
-        <h2 id="ed-connect-title">{{ _("Prepared for intelligent integrations.") }}</h2>
-        <div class="ed-future-integrations">
-          <div><span>{{ _("PLANNED") }}</span><strong>{{ _("LinkedIn connections") }}</strong>
-            <p>{{ _("Professional sign-in and approved partner integrations will require OAuth consent and provider authorization. No LinkedIn sync is active.") }}</p>
-          </div>
-          <div><span>{{ _("FAQ PREVIEW") }}</span><strong>{{ _("AI-powered advisory") }}</strong>
-            <p>{{ _("The quick guide answers fixed FAQs locally. Future AI must cite approved sources and respect each user's permissions.") }}</p>
-          </div>
+        <div class="ed-ai-visual" aria-hidden="true">
+          <div class="ed-ai-visual-orb"></div>
+          <div class="ed-ai-visual-core">{{ _("Human insight") }}</div>
+          <span class="ed-ai-visual-chip ed-ai-visual-chip-a">{{ _("Trusted sources") }}</span>
+          <span class="ed-ai-visual-chip ed-ai-visual-chip-b">{{ _("Thoughtful decisions") }}</span>
         </div>
       </div>
     </section>
 
-    <section id="roadmap" class="ed-section ed-roadmap" aria-labelledby="ed-roadmap-heading">
-      <div class="ed-shell">
-        <div class="ed-roadmap-title">
-          <div><p class="ed-kicker">{{ _("WHAT COMES NEXT") }}</p><h2 id="ed-roadmap-heading">{{ _("Build trust first. Expand with intent.") }}</h2></div>
-          <p>{{ _("Our foundation starts with a secure public experience; new capabilities will follow through independent delivery and testing.") }}</p>
+    <section class="ed-section ed-invite" aria-labelledby="ed-invite-heading">
+      <div class="ed-shell ed-invite-inner">
+        <div>
+          <p class="ed-kicker">{{ _("A GOOD PLACE TO BEGIN") }}</p>
+          <h2 id="ed-invite-heading">{{ _("Something on your mind?") }} <span>{{ _("Let's talk about it.") }}</span></h2>
+          <p>{{ _("You bring the challenge. We'll bring curiosity, experience and a fresh perspective.") }}</p>
         </div>
-        <div class="ed-steps">
-          {% for step in roadmap_items %}
-          <div><span>{{ step.index | e }}</span><strong>{{ _(step.title) | e }}</strong><small>{{ _(step.description) | e }}</small></div>
-          {% endfor %}
-        </div>
+        <a href="/lets-talk" class="ed-btn ed-btn-primary">{{ _("Book a meeting") }} <span aria-hidden="true">↗</span></a>
       </div>
     </section>
   </div>
-
   {% include "templates/includes/erpdevelopers_footer.html" %}
   {% include "templates/includes/erpdevelopers_assistant.html" %}
 </main>
