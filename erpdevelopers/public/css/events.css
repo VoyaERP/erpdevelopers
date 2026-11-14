@@ -21,5 +21,15 @@
 .ed-site .ed-event-source{margin-top:10px;font-size:12px;color:#356f97;text-decoration:underline}
 .ed-site .ed-events-pagination{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:20px;margin-top:28px;font-size:13px;color:#526d84}
 .ed-site .ed-events :is(select,summary,a,button):focus-visible{outline:3px solid #08a89f;outline-offset:3px}
+/* Posters remain fully visible rather than being cropped; stable image dimensions limit layout shifts. */
+.ed-site .ed-event-cover{margin:0 0 18px;overflow:hidden;border:1px solid #deebf3;border-radius:12px;background:#f2f7fb}
+.ed-site .ed-event-cover img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain}
+.ed-site .ed-event-cover figcaption,.ed-site .ed-event-gallery figcaption{padding:9px 12px;color:#4d6780;font-size:12px;line-height:1.7;overflow-wrap:anywhere;background:#fff}
+.ed-site .ed-event-gallery{margin:0 0 18px;padding:11px 12px;background:#f5faff;border:1px solid #deebf3;border-radius:10px}
+.ed-site .ed-event-gallery summary{cursor:pointer;color:#1269ab;font-size:13px;font-weight:700}
+.ed-site .ed-event-gallery summary span{font-weight:500}
+.ed-site .ed-event-gallery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.ed-site .ed-event-gallery figure{margin:0;min-width:0;overflow:hidden;border:1px solid #deebf3;border-radius:8px;background:#fff}
+.ed-site .ed-event-gallery img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:contain;background:#eef4f8}
 @media(max-width:1100px){.ed-site .ed-events-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:540px){.ed-site .ed-events-filters{grid-template-columns:1fr;padding:17px}.ed-site .ed-event-filter-actions>span{margin-inline-start:0}.ed-site .ed-event-facts>div{grid-template-columns:1fr;gap:0}}
+@media(max-width:540px){.ed-site .ed-events-filters{grid-template-columns:1fr;padding:17px}.ed-site .ed-event-filter-actions>span{margin-inline-start:0}.ed-site .ed-event-facts>div{grid-template-columns:1fr;gap:0}.ed-site .ed-event-gallery-grid{grid-template-columns:1fr}}

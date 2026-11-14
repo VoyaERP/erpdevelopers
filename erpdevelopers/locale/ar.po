@@ -272,3 +272,129 @@ msgstr "لا يمكن أن يكون تاريخ التحقق من المصدر ف
 
 msgid "Verify the source and enter its verification date before publishing."
 msgstr "تحقق من المصدر وأدخل تاريخ التحقق قبل النشر."
+
+msgid "Event photos"
+msgstr "صور الفعالية"
+
+msgid "Cover image"
+msgstr "صورة الغلاف"
+
+msgid "Cover caption"
+msgstr "وصف صورة الغلاف"
+
+msgid "Arabic cover caption"
+msgstr "وصف صورة الغلاف بالعربية"
+
+msgid "Photo gallery"
+msgstr "معرض الصور"
+
+msgid "Gallery images"
+msgstr "صور المعرض"
+
+msgid "Event image"
+msgstr "صورة الفعالية"
+
+msgid "Image caption"
+msgstr "وصف الصورة"
+
+msgid "Arabic image caption"
+msgstr "وصف الصورة بالعربية"
+
+msgid "Upload only images you may publish. Public image files are accessible even before the event is published."
+msgstr "ارفع فقط الصور المسموح لك بنشرها. تكون ملفات الصور العامة متاحة حتى قبل نشر الفعالية."
+
+msgid "Public from upload, including on draft events. JPG, PNG, WebP or GIF; maximum 5 MB."
+msgstr "تكون الصورة عامة منذ رفعها، حتى في الفعاليات المسودة. الصيغ: JPG أو PNG أو WebP أو GIF، بحد أقصى 5 ميجابايت."
+
+msgid "Add up to 8 photos. Row order controls display order. Without a cover, the first photo becomes the cover."
+msgstr "أضف حتى 8 صور. يحدد ترتيب الصفوف ترتيب العرض. عند عدم تحديد غلاف، تُستخدم الصورة الأولى كغلاف."
+
+msgid "Paste a public website domain or URL. Saved as HTTPS. Public ERP Developers pages are allowed; private and administrative addresses are not."
+msgstr "الصق اسم نطاق أو رابط موقع عام. يُحفظ الرابط بصيغة HTTPS. تُقبل صفحات ERP Developers العامة، ولا تُقبل العناوين الخاصة أو الإدارية."
+
+msgid "Optional public source link. Leave empty when it is the same as the official event page."
+msgstr "رابط عام اختياري للمصدر. اتركه فارغاً إذا كان هو نفسه الرابط الرسمي للفعالية."
+
+msgid "{0}: {1}"
+msgstr "{0}: {1}"
+
+msgid "Enter a public website URL."
+msgstr "أدخل رابط موقع عام."
+
+msgid "Enter a valid website URL without control characters or backslashes."
+msgstr "أدخل رابط موقع صحيحاً دون محارف تحكم أو شرطات مائلة عكسية."
+
+msgid "The website hostname or port is invalid."
+msgstr "اسم مضيف الموقع أو المنفذ غير صحيح."
+
+msgid "Use HTTPS or paste the public website domain."
+msgstr "استخدم HTTPS أو الصق اسم نطاق الموقع العام."
+
+msgid "Website URLs cannot contain a username or password."
+msgstr "لا يجوز أن يحتوي رابط الموقع على اسم مستخدم أو كلمة مرور."
+
+msgid "Use the standard HTTPS website port."
+msgstr "استخدم منفذ HTTPS القياسي للموقع."
+
+msgid "The website hostname is invalid."
+msgstr "اسم مضيف الموقع غير صحيح."
+
+msgid "Use a public domain name, not an IP address."
+msgstr "استخدم اسم نطاق عام، وليس عنوان IP."
+
+msgid "Enter a valid public domain, for example www.example.com."
+msgstr "أدخل اسم نطاق عام صحيحاً، مثل www.example.com."
+
+msgid "Local and private-network hostnames are not allowed."
+msgstr "أسماء المضيفين المحلية والخاصة بالشبكات الداخلية غير مسموح بها."
+
+msgid "Use an external website for this resource."
+msgstr "استخدم موقعاً خارجياً لهذا المورد."
+
+msgid "Use a public page, not a private or administrative route."
+msgstr "استخدم صفحة عامة، وليس مساراً خاصاً أو إدارياً."
+
+msgid "The URL contains an invalid percent-encoded character."
+msgstr "يحتوي الرابط على محرف غير صحيح بترميز النسبة المئوية."
+
+msgid "The website URL is too long."
+msgstr "رابط الموقع أطول من الحد المسموح."
+
+msgid "Upload a public JPG, PNG, WebP or GIF using Attach Image."
+msgstr "ارفع صورة عامة بصيغة JPG أو PNG أو WebP أو GIF باستخدام إرفاق صورة."
+
+msgid "The event image path is invalid."
+msgstr "مسار صورة الفعالية غير صحيح."
+
+msgid "Event images must be public uploads under /files/, not private files or external URLs."
+msgstr "يجب أن تكون صور الفعالية ملفات عامة مرفوعة ضمن /files/، وليست ملفات خاصة أو روابط خارجية."
+
+msgid "Image captions must be plain text of at most 240 characters."
+msgstr "يجب أن يكون وصف الصورة نصاً عادياً لا يتجاوز 240 محرفاً."
+
+msgid "Choose a public image upload; private files are never made public automatically."
+msgstr "اختر صورة مرفوعة كملف عام؛ لا تُحوّل الملفات الخاصة إلى عامة تلقائياً."
+
+msgid "The uploaded image file is missing or outside the public files folder."
+msgstr "ملف الصورة المرفوعة غير موجود أو يقع خارج مجلد الملفات العامة."
+
+msgid "Each event image must be no larger than 5 MB."
+msgstr "يجب ألا يتجاوز حجم كل صورة للفعالية 5 ميجابايت."
+
+msgid "The file contents do not match a supported image format."
+msgstr "محتوى الملف لا يطابق إحدى صيغ الصور المدعومة."
+
+msgid "Resize the event image to no more than 24 megapixels."
+msgstr "قلّل أبعاد صورة الفعالية لتكون بدقة لا تتجاوز 24 ميجابكسل."
+
+msgid "The uploaded file is not a valid supported image."
+msgstr "الملف المرفوع ليس صورة صحيحة بصيغة مدعومة."
+
+msgid "Add no more than 8 gallery images per event."
+msgstr "أضف بحد أقصى 8 صور في معرض كل فعالية."
+
+msgid "The event gallery contains the same image more than once."
+msgstr "يحتوي معرض الفعالية على الصورة نفسها أكثر من مرة."
+
+msgid "Choose an existing public image up to 5 MB; private or missing files cannot be displayed."
+msgstr "اختر صورة عامة موجودة بحجم لا يتجاوز 5 ميجابايت؛ لا يمكن عرض الملفات الخاصة أو غير الموجودة."

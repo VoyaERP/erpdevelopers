@@ -37,6 +37,7 @@
     <div class="ed-resource-grid">
       {% for item in event_rows %}
       <article class="ed-resource-card ed-event-card">
+        {% include "templates/includes/erpdevelopers_event_media.html" %}
         <div class="ed-card-meta"><span>{{ _(item.topic) | e }}</span><span>{{ _(item.event_format) | e }}</span><span class="ed-event-status" data-status="{{ item.event_status | e }}">{{ _(item.event_status) | e }}</span></div>
         <p class="ed-event-date"><time datetime="{{ item.start_date | e }}">{{ item.start_date_label | e }}</time>{% if item.end_date != item.start_date %} — <time datetime="{{ item.end_date | e }}">{{ item.end_date_label | e }}</time>{% endif %}</p>
         <h3>{% if boot.lang.startswith('ar') and item.title_ar %}{{ item.title_ar | e }}{% else %}{{ item.title | e }}{% endif %}</h3>

@@ -3,7 +3,7 @@ from datetime import date, datetime, time, timedelta, timezone
 from hashlib import sha256
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from erpdevelopers.catalog_rules import external_https_url
+from erpdevelopers.catalog_rules import event_https_url
 
 TOPICS = (
     "ERP & Business Applications", "Solution Architecture", "Developer Practices",
@@ -53,11 +53,7 @@ def _utc(local, zone):
 
 
 def normalize_event(data):
-    """Validate an editorial record and derive UTC query fields from local dates.
-
-    Separate Date/Time fields avoid interpreting venue time as the user's or
-    server's timezone. Date-only end dates are inclusive; UTC end is exclusive.
-    """
+    """Venue Date/Time inputs produce UTC boundaries; date-only end is inclusive."""
     result = {
         "title": _text(data.get("title"), 140, True),
         "title_ar": _text(data.get("title_ar"), 140),
@@ -98,9 +94,9 @@ def normalize_event(data):
         raise ValueError("The event end must be after its start.")
     result.update(time_zone=key, start_date=start.isoformat(), end_date=end.isoformat(),
                   date_only=int(date_only), start_utc=beginning, end_utc=finish)
-    result["event_url"] = external_https_url(data.get("event_url"))
+    result["event_url"] = event_https_url(data.get("event_url"), fieldname="event_url")
     source_url = _text(data.get("source_url"), 1500)
-    result["source_url"] = external_https_url(source_url) if source_url else None
+    result["source_url"] = event_https_url(source_url, fieldname="source_url") if source_url else None
     provider = _text(data.get("source_provider") or "Manual", 80, True)
     external_id = _text(data.get("source_event_id"), 200)
     result.update(source_provider=provider, source_event_id=external_id or None)
