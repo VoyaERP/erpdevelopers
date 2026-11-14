@@ -158,7 +158,10 @@ class TestNativeLogin(unittest.TestCase):
         self.assertFalse((APP / "www/login.py").exists())
     def test_site_setup_is_explicit_and_site_scoped(self):
         setup = (APP / "site_setup.py").read_text(encoding="utf-8")
-        self.assertIn("from erpdevelopers.branding import EXPECTED_SITE", setup)
+        self.assertIn("from erpdevelopers.branding import (", setup)
+        self.assertIn("    EXPECTED_SITE,", setup)
+        self.assertIn('frappe.get_single("Navbar Settings")', setup)
+        self.assertIn("desk_navbar_settings_values()", setup)
         self.assertIn("frappe.local.site != EXPECTED_SITE", setup)
         self.assertNotIn("@frappe.whitelist", setup)
 
