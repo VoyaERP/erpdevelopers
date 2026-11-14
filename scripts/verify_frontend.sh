@@ -31,6 +31,22 @@
     echo "STOP: CSS served by origin differs from deployed file"; exit 3;
   }
 
+  echo "=== SEO: canonical homepage, Frappe meta, structured data and sitemap ==="
+  grep -Fq 'rel="canonical" href="https://erp-developers.com/"' "$TMP/home.html" || {
+    echo "STOP: canonical homepage URL missing"; exit 3;
+  }
+  grep -Fq 'property="og:type" content="website"' "$TMP/home.html" || {
+    echo "STOP: OpenGraph website metadata missing"; exit 3;
+  }
+  grep -Fq '"@type":"Organization"' "$TMP/home.html" || {
+    echo "STOP: Organization JSON-LD missing"; exit 3;
+  }
+  curl -kfsSL --connect-timeout 5 --max-time 20 \
+    --resolve "$SITE:443:127.0.0.1" "https://$SITE/sitemap.xml" -o "$TMP/sitemap.xml"
+  grep -Fq '<urlset' "$TMP/sitemap.xml" || {
+    echo "STOP: Frappe sitemap XML is missing"; exit 3;
+  }
+
   echo "=== Confirm data-driven homepage content rendered ==="
   CARD_COUNT="$(grep -o 'class="ed-tile"' "$TMP/home.html" | wc -l | tr -d '[:space:]')"
   test "$CARD_COUNT" = "6" || {

@@ -1,14 +1,14 @@
 """Page controller for /erp-developers-home (hyphens are scrubbed by Frappe)."""
 
-from erpdevelopers.branding import APP_NAME, DESK_SIGNIN_URL, FAVICON_URL, LOGO_URL, TAGLINE, homepage_stylesheet_url
+from erpdevelopers.branding import DESK_SIGNIN_URL, FAVICON_URL, LOGO_URL, homepage_stylesheet_url
 from erpdevelopers.content import AI_FLOW, ECOSYSTEM, ROADMAP, VALUES
+from erpdevelopers.seo import homepage_seo_context
 
 
 def get_context(context):
-    context.title = f"{APP_NAME} | {TAGLINE}"
-    context.description = (
-        "A community for developers, business leaders and technology innovators."
-    )
+    # Frappe MetaTags renders search, OpenGraph and Twitter tags once.
+    for field, value in homepage_seo_context().items():
+        setattr(context, field, value)
     context.no_cache = 1
     context.brand_logo_url = LOGO_URL
     context.desk_signin_url = DESK_SIGNIN_URL

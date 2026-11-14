@@ -8,6 +8,7 @@ from importlib import util
 import sys
 
 from erpdevelopers import branding
+from erpdevelopers.seo import ROBOTS_TXT
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / "erpdevelopers"
@@ -68,7 +69,7 @@ class TestBrandContract(TestCase):
         self.assertEqual(branding.DESK_SIGNIN_URL, "/login?redirect-to=/desk")
         self.assertEqual(context.brand_icon_url, branding.FAVICON_URL)
         self.assertEqual(context.homepage_css_url, branding.homepage_stylesheet_url())
-        self.assertEqual(context.title, branding.APP_NAME + " | " + branding.TAGLINE)
+        self.assertEqual(context.title, "ERP Developers | Developer Community & Technology")
         self.assertEqual(context.no_cache, 1)
 
     def test_brand_assets_have_one_authoritative_source(self):
@@ -210,9 +211,9 @@ class TestSiteScopedBranding(TestCase):
         module, calls, website, desk = self._fixture(branding.EXPECTED_SITE)
         first = module.configure_website()
         self.assertEqual(first["site"], branding.EXPECTED_SITE)
-        self.assertEqual(set(first["changed_fields"]), set(branding.website_settings_values()))
+        self.assertEqual(set(first["changed_fields"]), set(branding.website_settings_values()) | {"robots_txt"})
         self.assertEqual(first["desk_changed_fields"], ["app_logo"])
-        self.assertEqual(website, branding.website_settings_values())
+        self.assertEqual(website, {**branding.website_settings_values(), "robots_txt": ROBOTS_TXT})
         self.assertEqual(desk, branding.desk_navbar_settings_values())
         self.assertEqual(calls["save"], 2)
         self.assertEqual(calls["commit"], 1)
@@ -228,13 +229,27 @@ class TestSiteScopedBranding(TestCase):
     def test_existing_website_branding_unchanged_when_only_desk_logo_is_missing(self):
         module, calls, website, desk = self._fixture(branding.EXPECTED_SITE)
         website.update(branding.website_settings_values())
+        website["robots_txt"] = ROBOTS_TXT
         result = module.configure_website()
         self.assertEqual(result["changed_fields"], [])
         self.assertEqual(result["desk_changed_fields"], ["app_logo"])
         self.assertEqual(calls["save"], 1)
         self.assertEqual(calls["commit"], 1)
-        self.assertEqual(website, branding.website_settings_values())
+        self.assertEqual(website, {**branding.website_settings_values(), "robots_txt": ROBOTS_TXT})
         self.assertEqual(desk, branding.desk_navbar_settings_values())
+
+
+    def test_existing_custom_robots_policy_is_preserved(self):
+        module, calls, website, desk = self._fixture(branding.EXPECTED_SITE)
+        website.update(branding.website_settings_values())
+        website["robots_txt"] = "User-agent: *\\nDisallow: /\\n"
+        desk.update(branding.desk_navbar_settings_values())
+        result = module.configure_website()
+        self.assertEqual(result["changed_fields"], [])
+        self.assertEqual(result["desk_changed_fields"], [])
+        self.assertEqual(website["robots_txt"], "User-agent: *\\nDisallow: /\\n")
+        self.assertEqual(calls["save"], 0)
+        self.assertEqual(calls["commit"], 0)
 
     def test_settings_mapping_is_not_shared_mutable_state(self):
         first = branding.website_settings_values()

@@ -12,6 +12,7 @@ from erpdevelopers.branding import (
     desk_navbar_settings_values,
     website_settings_values,
 )
+from erpdevelopers.seo import ROBOTS_TXT
 
 
 def _apply_values(document, values):
@@ -40,7 +41,13 @@ def configure_website():
     website = frappe.get_single("Website Settings")
     desk_navbar = frappe.get_single("Navbar Settings")
 
-    changed_website = _apply_values(website, website_settings_values())
+    website_values = website_settings_values()
+    # Preserve any administrator-managed robots.txt policy; populate only
+    # when blank. The rule is crawl guidance, not an authorization control.
+    if not (website.get("robots_txt") or "").strip():
+        website_values["robots_txt"] = ROBOTS_TXT
+
+    changed_website = _apply_values(website, website_values)
     changed_desk = _apply_values(desk_navbar, desk_navbar_settings_values())
 
     if changed_website or changed_desk:

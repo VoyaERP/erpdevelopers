@@ -37,6 +37,36 @@ Frappe v16 reads the original ERP Developers PNG from the installed site's `Webs
 
 **Only run on `erp-developers.com`**. After deploying a pinned commit, `bench --site erp-developers.com execute erpdevelopers.site_setup.configure_website` is idempotent, applies both settings in one commit and rejects other sites before database reads. A targeted shared-Bench web service reload is necessary after adding the new app hook. `scripts/verify_frontend.sh` checks both recorded logo settings, server-rendered native navbar image and actual image bytes. A real Desk browser refresh is still required to verify the visual result.
 
+## ERPNext application icon + public SEO (pending deployment)
+
+This change fixes a different branding surface from `Website Settings.app_logo`. On
+Frappe 16.56, the **ERPNext** entry on the Apps screen reads its icon from
+`bootinfo.app_data[].app_logo_url` (the older Desktop Icons screen uses
+`bootinfo.desktop_icons[].logo_url`). The site-scoped
+`erpdevelopers.desk_branding.brand_erpnext_on_boot` hook replaces **only**
+ERPNext's display-icon URL with the approved compact shield
+`erpdevelopers-selected-favicon.png`. It preserves ERPNext's application name,
+routes, permission checks and navigation. Nothing is written to ERPNext source,
+its installed-app definition, another Bench site or the database. The full
+selected PNG remains the website/login brand; no duplicate tiles are created.
+
+The public homepage now uses Frappe's native MetaTags renderer for unique
+search/OpenGraph/Twitter metadata, with a canonical HTTPS homepage URL, an
+Organization + WebSite JSON-LD graph, and the existing approved PNG as the
+social image. Site setup seeds a conservative `robots.txt` with a sitemap URL
+**only if that setting is empty**; existing administrator-defined crawl rules
+are never replaced. Planned LMS, career, marketplace and AI modules are not
+presented as active services in structured data. Native Frappe
+`/sitemap.xml` is retained. Search-console verification and actual indexing
+still require site ownership and post-deploy checks.
+
+Deploy only to the existing `erp-developers.com` site through the guarded,
+pinned existing-site updater in [the host guide](docs/ERPTEST_LIGHTNODE.md).
+The app hook requires a coordinated **web-only** worker restart; no shared
+Bench upgrade. After deployment, authenticate as a permitted ERPNext System
+User and verify the ERPNext tile and dock use the compact shield, including
+legacy Desktop Icons mode if enabled, while other sites retain their own icons.
+
 ## Desk sign-in and deployment recovery (2026-11-14)
 
 The two staff sign-in links on the public homepage now use a **single** URL from `branding.DESK_SIGNIN_URL`: `/login?redirect-to=/desk`. Frappe v16's native `login.js` prioritizes the sanitized `redirect-to` query when sign-in succeeds; without it, Frappe navigates to the server-provided `home_page`, which on this public site is the branded homepage. The link is visibly labeled **Desk sign in / دخول لوحة التحكم**; it is for authorized **System Users** only. Future website-member login/portal routes must remain separate; this release does not introduce a member portal or change auth permissions.
