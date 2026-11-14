@@ -1,33 +1,55 @@
-"""Explicit, idempotent branding for the existing ERP Developers site only.
+"""Explicit, idempotent, site-scoped website and Desk logo configuration.
 
-This file is intentionally not an after-install hook or a whitelisted API.
-Run via bench --site erp-developers.com execute erpdevelopers.site_setup.configure_website.
+CLI-only: bench --site erp-developers.com execute erpdevelopers.site_setup.configure_website
+No installation hooks, login overrides, global Desk CSS or public write APIs.
 """
 
 import frappe
 
-from erpdevelopers.branding import EXPECTED_SITE, HOME_ROUTE, website_settings_values
+from erpdevelopers.branding import (
+    EXPECTED_SITE,
+    HOME_ROUTE,
+    desk_navbar_settings_values,
+    website_settings_values,
+)
 
 
-def configure_website():
-    """Synchronize approved branding without changing any other Frappe site."""
-    if frappe.local.site != EXPECTED_SITE:
-        raise RuntimeError("Refusing to change Website Settings on an unexpected site.")
-
-    settings = frappe.get_single("Website Settings")
+def _apply_values(document, values):
+    """Set only changed Single DocType fields; return the names changed."""
     changed = []
-    for fieldname, value in website_settings_values().items():
-        if settings.get(fieldname) != value:
-            settings.set(fieldname, value)
+    for fieldname, value in values.items():
+        if document.get(fieldname) != value:
+            document.set(fieldname, value)
             changed.append(fieldname)
 
     if changed:
-        settings.save(ignore_permissions=True)
+        document.save(ignore_permissions=True)
+    return changed
+
+
+def configure_website():
+    """Apply approved branding to the one authorized Frappe site only.
+
+    The public website/login uses Website Settings. Frappe's Desk navbar
+    also supports Navbar Settings.app_logo, so configure both consistently.
+    One transaction, no duplicate logo copies or changes to Frappe core.
+    """
+    if frappe.local.site != EXPECTED_SITE:
+        raise RuntimeError("Refusing to change Website Settings on an unexpected site.")
+
+    website = frappe.get_single("Website Settings")
+    desk_navbar = frappe.get_single("Navbar Settings")
+
+    changed_website = _apply_values(website, website_settings_values())
+    changed_desk = _apply_values(desk_navbar, desk_navbar_settings_values())
+
+    if changed_website or changed_desk:
         frappe.db.commit()
         frappe.clear_cache()
 
     return {
         "site": EXPECTED_SITE,
-        "changed_fields": changed,
+        "changed_fields": changed_website,
+        "desk_changed_fields": changed_desk,
         "home_page": HOME_ROUTE,
     }

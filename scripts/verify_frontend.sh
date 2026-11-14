@@ -69,6 +69,17 @@
     "https://$SITE$SIGNIN_HREF" -o "$TMP/login-desk.html"
   grep -Fq 'id="page-login"' "$TMP/login-desk.html"
 
+  echo "=== Confirm public/login and Desk use the same approved PNG ==="
+  for SETTINGS in "Website Settings" "Navbar Settings"; do
+    ACTUAL_LOGO="$(cd "$BENCH" && bench --site "$SITE" execute \
+      frappe.db.get_single_value --args "[\"$SETTINGS\",\"app_logo\"]")"
+    if [ "$ACTUAL_LOGO" != "$LOGO" ]; then
+      echo "STOP: $SETTINGS.app_logo is $ACTUAL_LOGO, not the approved PNG"
+      exit 3
+    fi
+    echo "PASS: $SETTINGS.app_logo"
+  done
+
   echo "=== First-paint login CSS and approved navbar logo ==="
   grep -Fq "$LOGIN_CSS" "$TMP/login.html" || {
     echo "STOP: fingerprinted login CSS not linked"; exit 3;

@@ -64,3 +64,13 @@ def website_settings_values():
         "title_prefix": APP_NAME,
         "show_language_picker": 1,
     }
+
+
+def desk_navbar_settings_values():
+    """Use the original uploaded PNG for the Frappe Desk navbar, too.
+
+    Navbar Settings is a site-specific Single DocType. The Frappe v16 boot
+    path obtains app_logo_url from Website Settings or Navbar Settings,
+    then falls back to app_logo_url hooks.
+    """
+    return {"app_logo": LOGO_URL}

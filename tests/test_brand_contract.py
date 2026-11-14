@@ -151,26 +151,35 @@ class TestBrandContract(TestCase):
 class TestSiteScopedBranding(TestCase):
     def _fixture(self, site):
         calls = {"get_single": 0, "save": 0, "commit": 0, "clear_cache": 0}
-        values = {}
+        website_fields = {}
+        desk_fields = {}
 
         class Settings:
+            def __init__(self, fields):
+                self.fields = fields
+
             def get(self, key):
-                return values.get(key)
+                return self.fields.get(key)
 
             def set(self, key, value):
-                values[key] = value
+                self.fields[key] = value
 
             def save(self, ignore_permissions=False):
-                self_is_correct = ignore_permissions is True
-                if not self_is_correct:
-                    raise AssertionError("Expected explicit administrator-only setup")
+                if ignore_permissions is not True:
+                    raise AssertionError("Expected explicit admin-only site setup")
                 calls["save"] += 1
+
+        def get_single(doctype):
+            calls["get_single"] += 1
+            if doctype == "Website Settings":
+                return Settings(website_fields)
+            if doctype == "Navbar Settings":
+                return Settings(desk_fields)
+            raise AssertionError("Unexpected single doctype read: " + doctype)
 
         frappe = ModuleType("frappe")
         frappe.local = SimpleNamespace(site=site)
-        frappe.get_single = lambda doctype: (
-            calls.__setitem__("get_single", calls["get_single"] + 1) or Settings()
-        ) if doctype == "Website Settings" else None
+        frappe.get_single = get_single
         frappe.db = SimpleNamespace(
             commit=lambda: calls.__setitem__("commit", calls["commit"] + 1)
         )
@@ -178,38 +187,61 @@ class TestSiteScopedBranding(TestCase):
             "clear_cache", calls["clear_cache"] + 1
         )
 
-        # The real site_setup imports frappe; simulate it without a bench/DB.
+        # Run the real configuration implementation with a simulated database.
         spec = util.spec_from_file_location(
             "erpdevelopers_site_setup_under_test", APP / "site_setup.py"
         )
         module = util.module_from_spec(spec)
         with mock.patch.dict(sys.modules, {"frappe": frappe}):
             spec.loader.exec_module(module)
-        return module, calls, values
+        return module, calls, website_fields, desk_fields
 
     def test_rejects_other_site_before_reading_or_writing_db(self):
-        module, calls, values = self._fixture("other-site.example")
+        module, calls, website, desk = self._fixture("other-site.example")
         with self.assertRaisesRegex(RuntimeError, "unexpected site"):
             module.configure_website()
-        self.assertEqual(calls, {"get_single": 0, "save": 0, "commit": 0, "clear_cache": 0})
-        self.assertEqual(values, {})
+        self.assertEqual(
+            calls, {"get_single": 0, "save": 0, "commit": 0, "clear_cache": 0}
+        )
+        self.assertEqual(website, {})
+        self.assertEqual(desk, {})
 
-    def test_updates_only_changed_settings_and_is_idempotent(self):
-        module, calls, values = self._fixture(branding.EXPECTED_SITE)
+    def test_updates_both_branding_surfaces_in_one_transaction(self):
+        module, calls, website, desk = self._fixture(branding.EXPECTED_SITE)
         first = module.configure_website()
         self.assertEqual(first["site"], branding.EXPECTED_SITE)
         self.assertEqual(set(first["changed_fields"]), set(branding.website_settings_values()))
-        self.assertEqual(values, branding.website_settings_values())
-        self.assertEqual(calls["save"], 1)
+        self.assertEqual(first["desk_changed_fields"], ["app_logo"])
+        self.assertEqual(website, branding.website_settings_values())
+        self.assertEqual(desk, branding.desk_navbar_settings_values())
+        self.assertEqual(calls["save"], 2)
         self.assertEqual(calls["commit"], 1)
+        self.assertEqual(calls["clear_cache"], 1)
 
         again = module.configure_website()
         self.assertEqual(again["changed_fields"], [])
-        self.assertEqual(calls["save"], 1)
+        self.assertEqual(again["desk_changed_fields"], [])
+        self.assertEqual(calls["save"], 2)
         self.assertEqual(calls["commit"], 1)
         self.assertEqual(calls["clear_cache"], 1)
+
+    def test_existing_website_branding_unchanged_when_only_desk_logo_is_missing(self):
+        module, calls, website, desk = self._fixture(branding.EXPECTED_SITE)
+        website.update(branding.website_settings_values())
+        result = module.configure_website()
+        self.assertEqual(result["changed_fields"], [])
+        self.assertEqual(result["desk_changed_fields"], ["app_logo"])
+        self.assertEqual(calls["save"], 1)
+        self.assertEqual(calls["commit"], 1)
+        self.assertEqual(website, branding.website_settings_values())
+        self.assertEqual(desk, branding.desk_navbar_settings_values())
 
     def test_settings_mapping_is_not_shared_mutable_state(self):
         first = branding.website_settings_values()
         first["app_logo"] = "/wrong-logo.png"
+        desk = branding.desk_navbar_settings_values()
+        desk["app_logo"] = "/wrong-desk-logo.png"
         self.assertEqual(branding.website_settings_values()["app_logo"], branding.LOGO_URL)
+        self.assertEqual(
+            branding.desk_navbar_settings_values()["app_logo"], branding.LOGO_URL
+        )

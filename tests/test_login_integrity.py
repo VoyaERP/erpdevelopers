@@ -38,6 +38,11 @@ class TestNativeLogin(unittest.TestCase):
         from erpdevelopers import branding
         settings = branding.website_settings_values()
         self.assertEqual(settings["app_logo"], branding.LOGO_URL)
+        self.assertEqual(
+            branding.desk_navbar_settings_values()["app_logo"], branding.LOGO_URL
+        )
+        hooks = (APP / "hooks.py").read_text(encoding="utf-8")
+        self.assertIn("app_logo_url = LOGO_URL", hooks)
         self.assertEqual(settings["banner_image"], branding.LOGO_URL)
         self.assertEqual(settings["favicon"], branding.FAVICON_URL)
         self.assertIn('src="' + branding.LOGO_URL + '"', settings["brand_html"])
