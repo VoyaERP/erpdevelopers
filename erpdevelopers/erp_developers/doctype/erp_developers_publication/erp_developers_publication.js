@@ -10,7 +10,7 @@ frappe.ui.form.on("ERP Developers Publication", {
     if (published && frm.doc.public_reviewed) {
       const route = frm.doc.publication_type === "Project" ? "/projects" : "/team-advice";
       frm.add_custom_button(__("View on website"), () => {
-        window.open(route + "#publication-" + encodeURIComponent(frm.doc.name), "_blank", "noopener,noreferrer");
+        window.open(route, "_blank", "noopener,noreferrer");
       });
     }
   }

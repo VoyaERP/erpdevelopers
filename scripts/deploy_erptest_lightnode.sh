@@ -41,7 +41,6 @@ export GIT_TERMINAL_PROMPT=0
 git -C "$APP" fetch "$REMOTE" version-16
 test "$(git -C "$APP" rev-parse FETCH_HEAD)" = "$EXPECTED_SHA"
 git -C "$APP" merge-base --is-ancestor HEAD "$EXPECTED_SHA"
-# Confirm the exact existing service before backup/migration; never restart all services.
 sudo supervisorctl status "$WEB"
 TMP="$(mktemp -d)"
 git -C "$APP" show "${EXPECTED_SHA}:scripts/update_erptest_lightnode.sh" > "$TMP/update.sh"
@@ -72,8 +71,27 @@ if not isinstance(value, dict) or value.get("message") != "pong":
 PY
 STAGE="frontend verification"
 BENCH="$BENCH" bash "$APP/scripts/verify_frontend.sh"
-# Check actual Arabic native login text, not just that the login route returns 200.
 curl -q -kfsS --noproxy '*' --resolve "$SITE:443:127.0.0.1" \
   --connect-timeout 3 --max-time 20 "https://$SITE/login?_lang=ar" -o "$TMP/login-ar.html"
 "$BENCH/env/bin/python" "$APP/scripts/inspect_arabic_login.py" "$TMP/login-ar.html"
+echo "=== Projects, Team Advice and the minimal footer: origin and public HTML ==="
+PUBLICATION_DIGEST="$(sha256sum "$APP/erpdevelopers/public/css/publications.css" | cut -c1-16)"
+PUBLICATION_CSS="/assets/erpdevelopers/css/publications.css?v=$PUBLICATION_DIGEST"
+for route in projects team-advice; do
+  for language in en ar; do
+    for source in origin public; do
+      CURL_EXTRA=()
+      if [ "$source" = "origin" ]; then
+        CURL_EXTRA=(-k --noproxy '*' --resolve "$SITE:443:127.0.0.1")
+      fi
+      curl -q -fsS "${CURL_EXTRA[@]}" --connect-timeout 3 --max-time 20 \
+        "https://$SITE/$route?_lang=$language" -o "$TMP/publication.html"
+      "$BENCH/env/bin/python" "$APP/scripts/inspect_publications.py" "$TMP/publication.html" \
+        --route "$route" --language "$language" --stylesheet "$PUBLICATION_CSS"
+    done
+  done
+done
+curl -q -fsS --connect-timeout 3 --max-time 20 "https://$SITE$PUBLICATION_CSS" -o "$TMP/publications.css"
+cmp -s "$APP/erpdevelopers/public/css/publications.css" "$TMP/publications.css"
 echo "PASS: deployed $EXPECTED_SHA, Frappe ready, frontend and Arabic login verified."
+echo "PASS: Projects, Team Advice, three footer links and publication asset bytes verified."

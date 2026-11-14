@@ -41,8 +41,9 @@ def normalize_publication(data):
         result[field] = value
     if not all(result[k] for k in ("title", "summary", "content")):
         raise ValueError("Enter the publication title, summary and content.")
-    if str(data.get("published") or 0) == "1":
-        if str(data.get("public_reviewed") or 0) != "1":
+    # Native Check fields may arrive as JSON booleans, integers or form strings.
+    if data.get("published") in (1, "1"):
+        if data.get("public_reviewed") not in (1, "1"):
             raise ValueError("Review the content and confirm public sharing before publishing.")
         if kind == "Team Advice" and not result["author_name"]:
             raise ValueError("Enter a public author name before publishing team advice.")
@@ -100,7 +101,6 @@ def public_publications(slug, args=None, lang="en"):
                 paths[row["name"]] = image_path(row["cover_image"])
         except ValueError:
             continue
-    # One batched File query, re-checking privacy on each uncached page render.
     files = _public_files(paths.values())
     for row in rows:
         arabic = lang.startswith("ar") and all(row.get(f"{key}_ar") for key in ("title", "summary", "content"))
@@ -140,7 +140,6 @@ def set_publication_context(context, slug):
     context.directory_language = lang
     context.can_manage_publications = (frappe.session.user != "Guest" and frappe.has_permission(DOCTYPE, "read"))
     context.manage_publications_url = "/desk/erp-developers-publication?" + urlencode({"publication_type": KINDS[slug]})
-    # Canonical language variants keep filter/page parameters out of duplicate URLs.
     context.canonical_url += "?" + urlencode({"_lang": lang})
     context.metatags["og:url"] = context.canonical_url
     def page_url(page):
