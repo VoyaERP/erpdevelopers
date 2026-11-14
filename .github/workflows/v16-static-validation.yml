@@ -15,8 +15,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.14"
+      - name: Install pure translation test dependency
+        run: python -m pip install Babel==2.17.0
       - name: Python compile
-        run: python -m compileall -q erpdevelopers tests scripts/test_training_browser.py
+        run: python -m compileall -q erpdevelopers tests scripts
       - name: Bash syntax
         run: |
           bash -n scripts/install_erptest_lightnode.sh
@@ -26,15 +28,17 @@ jobs:
           bash -n scripts/install_local_v16.sh
       - name: Contract tests
         run: python -m unittest discover -s tests -v
-      - name: Validate meeting calendar and Quick Guide JavaScript
+      - name: Validate website and Desk JavaScript
         run: |
           node --check erpdevelopers/public/js/meeting.js
           node --check erpdevelopers/public/js/assistant.js
           node --check erpdevelopers/public/js/catalog.js
           node --test tests/test_catalog_player.mjs
           node --check erpdevelopers/erp_developers/doctype/erp_developers_playlist/erp_developers_playlist.js
+          node --check erpdevelopers/erp_developers/doctype/erp_developers_event/erp_developers_event.js
+      - name: Compile native Arabic gettext catalog
+        run: pybabel compile -i erpdevelopers/locale/ar.po -o /tmp/erpdevelopers-ar.mo -l ar
   training-browser:
-    # Match the operating system supported by the pinned Playwright release.
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -45,7 +49,7 @@ jobs:
           python-version: "3.14"
       - name: Install isolated browser-test dependencies
         run: |
-          python -m pip install Jinja2==3.1.6 playwright==1.57.0
+          python -m pip install Babel==2.17.0 Jinja2==3.1.6 playwright==1.57.0
           python -m playwright install --with-deps chromium firefox
-      - name: Test actual Training template in Chromium and Firefox
+      - name: Test Training and Events in Chromium and Firefox
         run: python scripts/test_training_browser.py

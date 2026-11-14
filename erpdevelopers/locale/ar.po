@@ -1,0 +1,274 @@
+# New v16 messages. Frappe merges compiled gettext with the existing CSV catalog.
+msgid ""
+msgstr ""
+"Project-Id-Version: ERP Developers\n"
+"Language: ar\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Events"
+msgstr "الفعاليات"
+
+msgid "events"
+msgstr "فعالية"
+
+msgid "CONNECT IN THE REGION"
+msgstr "تواصل مع مجتمع التقنية في المنطقة"
+
+msgid "Technology events. Meaningful connections."
+msgstr "فعاليات تقنية. وعلاقات تصنع الفارق."
+
+msgid "Discover reviewed conferences, exhibitions, workshops and community meetups relevant to the Middle East. Across ERP platforms, development, cloud, AI and cybersecurity."
+msgstr "اكتشف مؤتمرات ومعارض وورش عمل ولقاءات مجتمعية مختارة تهم منطقة الشرق الأوسط، في أنظمة الأعمال والتطوير والحوسبة السحابية والذكاء الاصطناعي والأمن السيبراني."
+
+msgid "Explore events"
+msgstr "استكشف الفعاليات"
+
+msgid "Manage events"
+msgstr "إدارة الفعاليات"
+
+msgid "CURATED, NOT AUTOMATICALLY PUBLISHED"
+msgstr "محتوى مختار يخضع للمراجعة قبل النشر"
+
+msgid "Relevant events. Verified sources."
+msgstr "فعاليات تهمك. ومصادر موثوقة."
+
+msgid "Dates and availability can change. Confirm the latest details with the organizer before registering or travelling."
+msgstr "قد تتغير المواعيد وإمكانية الحضور. تأكد من أحدث التفاصيل لدى الجهة المنظمة قبل التسجيل أو السفر."
+
+msgid "EVENT DIRECTORY"
+msgstr "دليل الفعاليات"
+
+msgid "Find your next connection"
+msgstr "اكتشف فرصتك القادمة للتواصل"
+
+msgid "Browse by country, topic and attendance format. Event dates and times are shown in the event's local time zone."
+msgstr "تصفح الفعاليات حسب الدولة والموضوع وطريقة الحضور. تُعرض المواعيد وفق المنطقة الزمنية المحلية لكل فعالية."
+
+msgid "Event filters"
+msgstr "تصفية الفعاليات"
+
+msgid "Country"
+msgstr "الدولة"
+
+msgid "All countries"
+msgstr "جميع الدول"
+
+msgid "Topic"
+msgstr "الموضوع"
+
+msgid "Attendance format"
+msgstr "طريقة الحضور"
+
+msgid "All formats"
+msgstr "جميع طرق الحضور"
+
+msgid "Event period"
+msgstr "فترة الفعاليات"
+
+msgid "Upcoming and ongoing"
+msgstr "القادمة والجارية"
+
+msgid "Past events"
+msgstr "الفعاليات السابقة"
+
+msgid "Apply filters"
+msgstr "تطبيق التصفية"
+
+msgid "Reset filters"
+msgstr "إعادة ضبط التصفية"
+
+msgid "Location"
+msgstr "الموقع"
+
+msgid "Event time zone"
+msgstr "المنطقة الزمنية للفعالية"
+
+msgid "Event summary"
+msgstr "نبذة عن الفعالية"
+
+msgid "Source verified on"
+msgstr "تاريخ التحقق من المصدر"
+
+msgid "Official event page"
+msgstr "الصفحة الرسمية للفعالية"
+
+msgid "Event source"
+msgstr "مصدر الفعالية"
+
+msgid "Event pages"
+msgstr "صفحات الفعاليات"
+
+msgid "Previous page"
+msgstr "الصفحة السابقة"
+
+msgid "Next page"
+msgstr "الصفحة التالية"
+
+msgid "Page"
+msgstr "الصفحة"
+
+msgid "No matching events are published yet."
+msgstr "لا توجد فعاليات منشورة مطابقة حالياً."
+
+msgid "Try another filter or return later. New events appear only after editorial review."
+msgstr "جرّب خيارات تصفية أخرى أو عُد لاحقاً. لا تظهر الفعاليات الجديدة إلا بعد مراجعتها واعتماد نشرها."
+
+msgid "In person"
+msgstr "حضوري"
+
+msgid "Online"
+msgstr "عبر الإنترنت"
+
+msgid "Hybrid"
+msgstr "حضوري وعبر الإنترنت"
+
+msgid "Conference"
+msgstr "مؤتمر"
+
+msgid "Exhibition"
+msgstr "معرض"
+
+msgid "Workshop"
+msgstr "ورشة عمل"
+
+msgid "Webinar"
+msgstr "ندوة عبر الإنترنت"
+
+msgid "Meetup"
+msgstr "لقاء مجتمعي"
+
+msgid "Scheduled"
+msgstr "مجدولة"
+
+msgid "Postponed"
+msgstr "مؤجلة"
+
+msgid "Cancelled"
+msgstr "ملغاة"
+
+msgid "Enable JavaScript to use the video player."
+msgstr "فعّل JavaScript لاستخدام مشغّل الفيديو."
+
+msgid "Loading playlist…"
+msgstr "جارٍ تحميل قائمة التشغيل…"
+
+msgid "YouTube loads only when you choose to watch. Playback depends on the video's availability and embedding permissions. Close to stop playback."
+msgstr "لا يتم تحميل محتوى يوتيوب إلا عند اختيار المشاهدة. يعتمد التشغيل على إتاحة الفيديو والسماح بتضمينه. أغلق النافذة لإيقاف التشغيل."
+
+msgid "Event details"
+msgstr "تفاصيل الفعالية"
+
+msgid "Event type"
+msgstr "نوع الفعالية"
+
+msgid "Organizer"
+msgstr "الجهة المنظمة"
+
+msgid "Event status"
+msgstr "حالة الفعالية"
+
+msgid "Arabic description"
+msgstr "الوصف بالعربية"
+
+msgid "Event schedule"
+msgstr "مواعيد الفعالية"
+
+msgid "Start date"
+msgstr "تاريخ البداية"
+
+msgid "End date"
+msgstr "تاريخ النهاية"
+
+msgid "Local start time"
+msgstr "وقت البداية المحلي"
+
+msgid "Local end time"
+msgstr "وقت النهاية المحلي"
+
+msgid "Dates only"
+msgstr "التواريخ فقط"
+
+msgid "Venue and official website"
+msgstr "مكان الانعقاد والموقع الرسمي"
+
+msgid "City"
+msgstr "المدينة"
+
+msgid "Venue"
+msgstr "مكان الانعقاد"
+
+msgid "Official event URL"
+msgstr "الرابط الرسمي للفعالية"
+
+msgid "Publication"
+msgstr "النشر"
+
+msgid "Publish"
+msgstr "نشر"
+
+msgid "Unpublish"
+msgstr "إلغاء النشر"
+
+msgid "Relevant to the Middle East audience"
+msgstr "تُهم جمهور الشرق الأوسط"
+
+msgid "Source and integration reference"
+msgstr "المصدر ومرجع التكامل"
+
+msgid "Source provider"
+msgstr "مزود المصدر"
+
+msgid "External event ID"
+msgstr "معرّف الفعالية لدى المصدر"
+
+msgid "Source identity"
+msgstr "هوية المصدر"
+
+msgid "Source URL"
+msgstr "رابط المصدر"
+
+msgid "Internal notes"
+msgstr "ملاحظات داخلية"
+
+msgid "Start UTC"
+msgstr "البداية بالتوقيت العالمي"
+
+msgid "End UTC"
+msgstr "النهاية بالتوقيت العالمي"
+
+msgid "IANA zone, for example Asia/Riyadh, Asia/Dubai or Africa/Cairo."
+msgstr "منطقة زمنية وفق IANA، مثل Asia/Riyadh أو Asia/Dubai أو Africa/Cairo."
+
+msgid "Complete the required event details within the field limits."
+msgstr "أكمل بيانات الفعالية المطلوبة مع مراعاة الحد الأقصى لطول الحقول."
+
+msgid "Enter valid event dates."
+msgstr "أدخل تواريخ صحيحة للفعالية."
+
+msgid "Enter valid local start and end times."
+msgstr "أدخل وقتي بداية ونهاية صحيحين بالتوقيت المحلي."
+
+msgid "This local time does not exist because of a clock change."
+msgstr "هذا الوقت المحلي غير صالح بسبب تغيير التوقيت."
+
+msgid "This local time is ambiguous because of a clock change."
+msgstr "هذا الوقت المحلي يتكرر بسبب تغيير التوقيت؛ اختر وقتاً غير ملتبس."
+
+msgid "Select a valid topic, type, format and event status."
+msgstr "اختر موضوعاً ونوعاً وطريقة حضور وحالة صحيحة للفعالية."
+
+msgid "Country, city and venue are required for in-person and hybrid events."
+msgstr "يجب تحديد الدولة والمدينة ومكان الانعقاد للفعاليات الحضورية والمختلطة."
+
+msgid "Enter a valid IANA time zone, such as Asia/Riyadh or Africa/Cairo."
+msgstr "أدخل منطقة زمنية صحيحة وفق IANA، مثل Asia/Riyadh أو Africa/Cairo."
+
+msgid "The event end must be after its start."
+msgstr "يجب أن تنتهي الفعالية بعد بدايتها."
+
+msgid "The source verification date cannot be in the future."
+msgstr "لا يمكن أن يكون تاريخ التحقق من المصدر في المستقبل."
+
+msgid "Verify the source and enter its verification date before publishing."
+msgstr "تحقق من المصدر وأدخل تاريخ التحقق قبل النشر."

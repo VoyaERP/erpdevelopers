@@ -24,20 +24,14 @@
 <section class="ed-section ed-page-section" id="playlists" aria-labelledby="ed-playlist-heading">
   <div class="ed-shell">
     <div class="ed-section-head">
-      <div>
-        <p class="ed-kicker">{{ _("LEARNING LIBRARY") }}</p>
-        <h2 id="ed-playlist-heading">{{ _("Video playlists") }}</h2>
-      </div>
+      <div><p class="ed-kicker">{{ _("LEARNING LIBRARY") }}</p><h2 id="ed-playlist-heading">{{ _("Video playlists") }}</h2></div>
       <p>{{ _("Public playlists play here. Private collections require sign-in and access permission.") }}</p>
     </div>
     <div class="ed-filter-row">
       <label for="ed-topic-filter">{{ _("Filter by topic") }}</label>
-      <select id="ed-topic-filter" class="ed-filter" data-catalog-filter="#ed-playlists"
-              data-count-target="#ed-playlist-count">
+      <select id="ed-topic-filter" class="ed-filter" data-catalog-filter="#ed-playlists" data-count-target="#ed-playlist-count">
         <option value="">{{ _("All topics") }}</option>
-        {% for topic in topics %}
-        <option value="{{ topic | e }}">{{ _(topic) | e }}</option>
-        {% endfor %}
+        {% for topic in topics %}<option value="{{ topic | e }}">{{ _(topic) | e }}</option>{% endfor %}
       </select>
       <span class="ed-catalog-count"><b id="ed-playlist-count">{{ playlists | length }}</b> {{ _("playlists") }}</span>
     </div>
@@ -45,11 +39,7 @@
     <div class="ed-resource-grid" id="ed-playlists">
       {% for item in playlists %}
       <article class="ed-resource-card" data-catalog-topic="{{ item.topic | e }}">
-        <div class="ed-card-meta">
-          <span>{{ _(item.topic) | e }}</span>
-          <span>{{ _(item.level) | e }}</span>
-          {% if item.visibility == "Private" %}<span class="ed-private-tag">{{ _("Members only") }}</span>{% endif %}
-        </div>
+        <div class="ed-card-meta"><span>{{ _(item.topic) | e }}</span><span>{{ _(item.level) | e }}</span>{% if item.visibility == "Private" %}<span class="ed-private-tag">{{ _("Members only") }}</span>{% endif %}</div>
         <h3>{% if boot.lang == "ar" and item.title_ar %}{{ item.title_ar | e }}{% else %}{{ item.title | e }}{% endif %}</h3>
         <p>{{ item.description | e }}</p>
         <div class="ed-card-bottom">
@@ -59,69 +49,33 @@
                     aria-haspopup="dialog" aria-controls="ed-playlist-dialog"
                     data-playlist-id="{{ item.playlist_id | e }}"
                     data-playlist-title="{% if boot.lang == 'ar' and item.title_ar %}{{ item.title_ar | e }}{% else %}{{ item.title | e }}{% endif %}">
-              <span class="ed-playlist-play-icon" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" focusable="false"><path d="M8 5.8a1 1 0 0 1 1.51-.86l9.1 6.2a1.05 1.05 0 0 1 0 1.72l-9.1 6.2A1 1 0 0 1 8 18.2Z"></path></svg>
-              </span>
+              <span class="ed-playlist-play-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" focusable="false"><path d="M8 5.8a1 1 0 0 1 1.51-.86l9.1 6.2a1.05 1.05 0 0 1 0 1.72l-9.1 6.2A1 1 0 0 1 8 18.2Z"></path></svg></span>
               <span>{{ _("Watch here") }}</span>
             </button>
-            <a href="{{ item.watch_url | e }}" target="_blank" rel="noopener noreferrer">
-              {{ _("Open on YouTube") }} <span aria-hidden="true">↗</span>
-            </a>
           </div>
         </div>
       </article>
       {% endfor %}
     </div>
+    <noscript><p class="ed-small-note">{{ _("Enable JavaScript to use the video player.") }}</p></noscript>
     {% else %}
-    <div class="ed-empty">
-      <strong>{{ _("The playlist library is being curated.") }}</strong>
-      <p>{{ _("We will publish collections after checking their relevance, accuracy and source rights.") }}</p>
-    </div>
+    <div class="ed-empty"><strong>{{ _("The playlist library is being curated.") }}</strong><p>{{ _("We will publish collections after checking their relevance, accuracy and source rights.") }}</p></div>
     {% endif %}
-    {% if not is_authenticated %}
-    <p class="ed-private-intro">{{ _("Have access to a private learning collection?") }} <a href="/login?redirect-to=/training">{{ _("Sign in to view your playlists") }}</a></p>
-    {% endif %}
+    {% if not is_authenticated %}<p class="ed-private-intro">{{ _("Have access to a private learning collection?") }} <a href="/login?redirect-to=/training">{{ _("Sign in to view your playlists") }}</a></p>{% endif %}
   </div>
 </section>
-<dialog id="ed-playlist-dialog" class="ed-playlist-dialog"
-        aria-labelledby="ed-playlist-dialog-title" aria-describedby="ed-playlist-privacy">
-  <div class="ed-playlist-dialog-header">
-    <div>
-      <span class="ed-booking-overline">{{ _("VIDEO LIBRARY") }}</span>
-      <h2 id="ed-playlist-dialog-title">{{ _("Watch playlist") }}</h2>
-    </div>
-    <button type="button" class="ed-playlist-close" data-player-close
-            aria-label="{{ _('Close video player') }}">×</button>
-  </div>
+<dialog id="ed-playlist-dialog" class="ed-playlist-dialog" aria-labelledby="ed-playlist-dialog-title" aria-describedby="ed-playlist-privacy">
+  <div class="ed-playlist-dialog-header"><div><span class="ed-booking-overline">{{ _("VIDEO LIBRARY") }}</span><h2 id="ed-playlist-dialog-title">{{ _("Watch playlist") }}</h2></div><button type="button" class="ed-playlist-close" data-player-close aria-label="{{ _('Close video player') }}">×</button></div>
   <div class="ed-playlist-player">
-    <iframe data-player-frame title="{{ _('YouTube playlist player') | e }}"
-            loading="eager" referrerpolicy="strict-origin-when-cross-origin"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    <iframe data-player-frame title="{{ _('YouTube playlist player') | e }}" loading="eager" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
   </div>
-  <div class="ed-playlist-dialog-foot">
-    <div>
-      <p data-player-status role="status" hidden>{{ _("Loading playlist… If unavailable, use Open on YouTube below.") }}</p>
-      <p id="ed-playlist-privacy">{{ _("YouTube loads only when you choose to watch. Some videos cannot be embedded; use Open on YouTube if needed. Close to stop playback.") }}</p>
-    </div>
-    <a data-player-external href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">
-      {{ _("Open on YouTube") }} <span aria-hidden="true">↗</span>
-    </a>
-  </div>
+  <div class="ed-playlist-dialog-foot"><div>
+    <p data-player-status role="status" hidden>{{ _("Loading playlist…") }}</p>
+    <p id="ed-playlist-privacy">{{ _("YouTube loads only when you choose to watch. Playback depends on the video's availability and embedding permissions. Close to stop playback.") }}</p>
+  </div></div>
 </dialog>
-<section class="ed-section ed-learning-paths">
-  <div class="ed-shell">
-    <div class="ed-section-head">
-      <div>
-        <p class="ed-kicker">{{ _("LEARN YOUR WAY") }}</p>
-        <h2>{{ _("Watch something. Try something. Share something.") }}</h2>
-      </div>
-      <p>{{ _("Follow your curiosity and connect practical ideas to real work. More structured learning experiences are being planned.") }}</p>
-    </div>
-    <div class="ed-learning-lanes">
-      <div><strong>{{ _("Discover") }}</strong><p>{{ _("Find a topic worth exploring.") }}</p></div>
-      <div><strong>{{ _("Practice") }}</strong><p>{{ _("Apply what you've learned at work.") }}</p></div>
-      <div><strong>{{ _("Connect") }}</strong><p>{{ _("Share questions and insights with others.") }}</p></div>
-    </div>
-  </div>
-</section>
+<section class="ed-section ed-learning-paths"><div class="ed-shell">
+  <div class="ed-section-head"><div><p class="ed-kicker">{{ _("LEARN YOUR WAY") }}</p><h2>{{ _("Watch something. Try something. Share something.") }}</h2></div><p>{{ _("Follow your curiosity and connect practical ideas to real work. More structured learning experiences are being planned.") }}</p></div>
+  <div class="ed-learning-lanes"><div><strong>{{ _("Discover") }}</strong><p>{{ _("Find a topic worth exploring.") }}</p></div><div><strong>{{ _("Practice") }}</strong><p>{{ _("Apply what you've learned at work.") }}</p></div><div><strong>{{ _("Connect") }}</strong><p>{{ _("Share questions and insights with others.") }}</p></div></div>
+</div></section>
 {% endblock %}

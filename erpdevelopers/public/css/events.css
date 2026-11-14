@@ -1,0 +1,25 @@
+/* Regional directory; scoped to the public Events section, never Desk. */
+.ed-site .ed-events-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;padding:22px;margin-block:0 26px;background:#f5faff;border:1px solid #dce9f5;border-radius:17px}
+.ed-site .ed-event-filter{display:flex;flex-direction:column;gap:7px;min-width:0}
+.ed-site .ed-event-filter label{font-size:13px;font-weight:700;color:#37516d}
+.ed-site .ed-event-filter select{width:100%;min-height:44px;padding:9px 11px;border:1px solid #cbdde9;border-radius:9px;background:#fff;color:#183857;font-family:inherit;font-size:13px}
+.ed-site .ed-event-filter-actions{display:flex;align-items:center;flex-wrap:wrap;gap:17px;grid-column:1/-1}
+.ed-site .ed-event-filter-actions>span{margin-inline-start:auto;color:#526f87;font-size:13px}
+.ed-site .ed-event-card{border-top:3px solid #168b9e;gap:0}
+.ed-site .ed-event-card .ed-event-date{margin-block:20px 0;color:#0d6c85;font-size:14px;font-weight:700;line-height:1.7}
+.ed-site .ed-event-card h3{margin-top:10px}
+.ed-site .ed-event-organizer{font-size:13px;color:#60748c}
+.ed-site .ed-event-facts{display:grid;gap:11px;margin-block:10px 17px;font-size:13px;line-height:1.7}
+.ed-site .ed-event-facts>div{display:grid;grid-template-columns:90px minmax(0,1fr);gap:10px}
+.ed-site .ed-event-facts dt{color:#5e748b;font-weight:500}
+.ed-site .ed-event-facts dd{margin:0;color:#203e5c;overflow-wrap:anywhere}
+.ed-site .ed-event-summary{margin-bottom:14px;border-top:1px solid #e1ecf3;padding-top:12px;font-size:13px;line-height:1.8}
+.ed-site .ed-event-summary summary{cursor:pointer;color:#1269ab;font-weight:700}
+.ed-site .ed-event-summary p{white-space:pre-line;color:#526d84;margin:10px 0 0;overflow-wrap:anywhere}
+.ed-site .ed-event-status[data-status="Cancelled"]{background:#fff0ef;color:#9c342d}
+.ed-site .ed-event-status[data-status="Postponed"]{background:#fff6df;color:#856006}
+.ed-site .ed-event-source{margin-top:10px;font-size:12px;color:#356f97;text-decoration:underline}
+.ed-site .ed-events-pagination{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:20px;margin-top:28px;font-size:13px;color:#526d84}
+.ed-site .ed-events :is(select,summary,a,button):focus-visible{outline:3px solid #08a89f;outline-offset:3px}
+@media(max-width:1100px){.ed-site .ed-events-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){.ed-site .ed-events-filters{grid-template-columns:1fr;padding:17px}.ed-site .ed-event-filter-actions>span{margin-inline-start:0}.ed-site .ed-event-facts>div{grid-template-columns:1fr;gap:0}}

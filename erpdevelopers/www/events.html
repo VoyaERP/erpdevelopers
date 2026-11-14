@@ -1,0 +1,67 @@
+{% extends "templates/includes/erpdevelopers_page_base.html" %}
+{% block ed_head %}<link rel="stylesheet" href="{{ events_css_url | e }}">{% endblock %}
+{% block ed_content %}
+<section class="ed-page-hero" aria-labelledby="ed-events-title">
+  <div class="ed-shell ed-page-hero-inner">
+    <div>
+      <p class="ed-kicker">{{ _("CONNECT IN THE REGION") }}</p>
+      <h1 id="ed-events-title">{{ _("Technology events. Meaningful connections.") }}</h1>
+      <p>{{ _("Discover reviewed conferences, exhibitions, workshops and community meetups relevant to the Middle East. Across ERP platforms, development, cloud, AI and cybersecurity.") }}</p>
+      <div class="ed-actions">
+        <a class="ed-btn ed-btn-primary" href="#event-directory">{{ _("Explore events") }}</a>
+        {% if can_manage_events %}<a class="ed-btn ed-btn-secondary" href="/desk/erp-developers-event">{{ _("Manage events") }}</a>{% endif %}
+      </div>
+    </div>
+    <div class="ed-page-hero-aside">
+      <span>{{ _("CURATED, NOT AUTOMATICALLY PUBLISHED") }}</span>
+      <strong>{{ _("Relevant events. Verified sources.") }}</strong>
+      <p>{{ _("Dates and availability can change. Confirm the latest details with the organizer before registering or travelling.") }}</p>
+    </div>
+  </div>
+</section>
+<section class="ed-section ed-page-section ed-events" id="event-directory" aria-labelledby="ed-events-heading">
+  <div class="ed-shell">
+    <div class="ed-section-head">
+      <div><p class="ed-kicker">{{ _("EVENT DIRECTORY") }}</p><h2 id="ed-events-heading">{{ _("Find your next connection") }}</h2></div>
+      <p>{{ _("Browse by country, topic and attendance format. Event dates and times are shown in the event's local time zone.") }}</p>
+    </div>
+    <form class="ed-events-filters" method="get" action="/events" aria-label="{{ _('Event filters') }}">
+      <input type="hidden" name="_lang" value="{{ boot.lang | e }}">
+      <div class="ed-event-filter"><label for="ed-event-country">{{ _("Country") }}</label><select id="ed-event-country" name="country"><option value="">{{ _("All countries") }}</option>{% for country in countries %}<option value="{{ country | e }}" {% if selected.country == country %}selected{% endif %}>{{ _(country) | e }}</option>{% endfor %}</select></div>
+      <div class="ed-event-filter"><label for="ed-event-topic">{{ _("Topic") }}</label><select id="ed-event-topic" name="topic"><option value="">{{ _("All topics") }}</option>{% for topic in topics %}<option value="{{ topic | e }}" {% if selected.topic == topic %}selected{% endif %}>{{ _(topic) | e }}</option>{% endfor %}</select></div>
+      <div class="ed-event-filter"><label for="ed-event-format">{{ _("Attendance format") }}</label><select id="ed-event-format" name="event_format"><option value="">{{ _("All formats") }}</option>{% for mode in formats %}<option value="{{ mode | e }}" {% if selected.event_format == mode %}selected{% endif %}>{{ _(mode) | e }}</option>{% endfor %}</select></div>
+      <div class="ed-event-filter"><label for="ed-event-period">{{ _("Event period") }}</label><select id="ed-event-period" name="period"><option value="upcoming" {% if selected.period == 'upcoming' %}selected{% endif %}>{{ _("Upcoming and ongoing") }}</option><option value="past" {% if selected.period == 'past' %}selected{% endif %}>{{ _("Past events") }}</option></select></div>
+      <div class="ed-event-filter-actions"><button type="submit" class="ed-btn ed-btn-primary">{{ _("Apply filters") }}</button><a class="ed-text-link" href="/events?_lang={{ boot.lang | e }}">{{ _("Reset filters") }}</a><span>{{ total }} {{ _("events") }}</span></div>
+    </form>
+    {% if event_rows %}
+    <div class="ed-resource-grid">
+      {% for item in event_rows %}
+      <article class="ed-resource-card ed-event-card">
+        <div class="ed-card-meta"><span>{{ _(item.topic) | e }}</span><span>{{ _(item.event_format) | e }}</span><span class="ed-event-status" data-status="{{ item.event_status | e }}">{{ _(item.event_status) | e }}</span></div>
+        <p class="ed-event-date"><time datetime="{{ item.start_date | e }}">{{ item.start_date_label | e }}</time>{% if item.end_date != item.start_date %} — <time datetime="{{ item.end_date | e }}">{{ item.end_date_label | e }}</time>{% endif %}</p>
+        <h3>{% if boot.lang.startswith('ar') and item.title_ar %}{{ item.title_ar | e }}{% else %}{{ item.title | e }}{% endif %}</h3>
+        <p class="ed-event-organizer">{{ item.organizer | e }} · {{ _(item.event_type) | e }}</p>
+        <dl class="ed-event-facts">
+          <div><dt>{{ _("Location") }}</dt><dd>{% if item.event_format == 'Online' %}{{ _("Online") }}{% else %}{{ item.city | e }}{% if item.country %}, {{ _(item.country) | e }}{% endif %}<br>{{ item.venue | e }}{% endif %}</dd></div>
+          <div><dt>{{ _("Event time zone") }}</dt><dd>{% if not item.date_only %}<bdi>{{ item.start_time_label | e }} – {{ item.end_time_label | e }}</bdi> · {% endif %}<bdi>{{ item.time_zone | e }}</bdi></dd></div>
+        </dl>
+        <details class="ed-event-summary"><summary>{{ _("Event summary") }}</summary><p>{% if boot.lang.startswith('ar') and item.description_ar %}{{ item.description_ar | e }}{% else %}{{ item.description | e }}{% endif %}</p></details>
+        <div class="ed-card-bottom">
+          <span>{{ _("Source verified on") }} {{ item.verified_on_label | e }}</span>
+          <a href="{{ item.event_url | e }}" target="_blank" rel="noopener noreferrer">{{ _("Official event page") }} <span aria-hidden="true">↗</span></a>
+        </div>
+        {% if item.source_url and item.source_url != item.event_url %}<a class="ed-event-source" href="{{ item.source_url | e }}" target="_blank" rel="noopener noreferrer">{{ _("Event source") }}</a>{% endif %}
+      </article>
+      {% endfor %}
+    </div>
+    <nav class="ed-events-pagination" aria-label="{{ _('Event pages') }}">
+      {% if previous_url %}<a class="ed-btn ed-btn-secondary" href="{{ previous_url | e }}">{{ _("Previous page") }}</a>{% endif %}
+      <span>{{ _("Page") }} {{ selected.page }} / {{ pages }}</span>
+      {% if next_url %}<a class="ed-btn ed-btn-secondary" href="{{ next_url | e }}">{{ _("Next page") }}</a>{% endif %}
+    </nav>
+    {% else %}
+    <div class="ed-empty"><strong>{{ _("No matching events are published yet.") }}</strong><p>{{ _("Try another filter or return later. New events appear only after editorial review.") }}</p></div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

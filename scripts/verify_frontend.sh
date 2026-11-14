@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Read-only frontend check. Direct-origin TLS bypass applies ONLY to localhost tests.
+# Read-only checks. Insecure TLS is limited to explicit localhost origin testing.
 (
   set -Eeuo pipefail
   trap 'echo "FRONTEND CHECK FAILED at line $LINENO" >&2' ERR
@@ -7,219 +7,125 @@
   BENCH="${BENCH:-/data/frappe/frappe-bench}"
   APP="$BENCH/apps/erpdevelopers"
   test -f "$BENCH/sites/$SITE/site_config.json"
-  test -f "$APP/erpdevelopers/public/css/brand.css"
-
   TMP="$(mktemp -d)"
   trap 'rm -rf "$TMP"' EXIT
+
+  origin() {
+    curl -kfsSL --connect-timeout 5 --max-time 20 \
+      --resolve "$SITE:443:127.0.0.1" "https://$SITE$2" -o "$TMP/$1"
+  }
   DIGEST="$(sha256sum "$APP/erpdevelopers/public/css/brand.css" | cut -c1-16)"
   CSS="/assets/erpdevelopers/css/brand.css?v=$DIGEST"
-  LOGO="/assets/erpdevelopers/images/erpdevelopers-selected-logo.png"
-  FAVICON="/assets/erpdevelopers/images/erpdevelopers-selected-favicon.png"
   LOGIN_DIGEST="$(sha256sum "$APP/erpdevelopers/public/css/login.css" | cut -c1-16)"
   LOGIN_CSS="/assets/erpdevelopers/css/login.css?v=$LOGIN_DIGEST"
   ARABIC_DIGEST="$(sha256sum "$APP/erpdevelopers/public/css/arabic_typography.css" | cut -c1-16)"
   ARABIC_CSS="/assets/erpdevelopers/css/arabic_typography.css?v=$ARABIC_DIGEST"
-
-  echo "=== Origin homepage: stylesheet URL and real CSS bytes ==="
-  curl -kfsSL --connect-timeout 5 --max-time 20 \
-    --resolve "$SITE:443:127.0.0.1" "https://$SITE/" -o "$TMP/home.html"
-  grep -Fq "href=\"$CSS\"" "$TMP/home.html" || {
-    echo "STOP: homepage missing $CSS; check page context, caches, web worker restart"; exit 3;
-  }
-  curl -kfsSL --connect-timeout 5 --max-time 20 \
-    --resolve "$SITE:443:127.0.0.1" "https://$SITE$CSS" -o "$TMP/brand.css"
-  grep -Fq '.ed-hero-inner' "$TMP/brand.css"
-  cmp -s "$APP/erpdevelopers/public/css/brand.css" "$TMP/brand.css" || {
-    echo "STOP: CSS served by origin differs from deployed file"; exit 3;
-  }
-
-  echo "=== SEO: canonical homepage, Frappe meta, structured data and sitemap ==="
-  grep -Fq 'rel="canonical" href="https://erp-developers.com/"' "$TMP/home.html" || {
-    echo "STOP: canonical homepage URL missing"; exit 3;
-  }
-  grep -Fq 'property="og:type" content="website"' "$TMP/home.html" || {
-    echo "STOP: OpenGraph website metadata missing"; exit 3;
-  }
-  grep -Fq '"@type":"Organization"' "$TMP/home.html" || {
-    echo "STOP: Organization JSON-LD missing"; exit 3;
-  }
-  curl -kfsSL --connect-timeout 5 --max-time 20 \
-    --resolve "$SITE:443:127.0.0.1" "https://$SITE/sitemap.xml" -o "$TMP/sitemap.xml"
-  grep -Fq '<urlset' "$TMP/sitemap.xml" || {
-    echo "STOP: Frappe sitemap XML is missing"; exit 3;
-  }
-
-  echo "=== Confirm data-driven homepage content rendered ==="
-  CARD_COUNT="$(grep -o 'class="ed-tile"' "$TMP/home.html" | wc -l | tr -d '[:space:]')"
-  test "$CARD_COUNT" = "6" || {
-    echo "STOP: expected six ecosystem cards but rendered $CARD_COUNT"; exit 3;
-  }
-  echo "=== Verify English and Arabic using Frappe's native _lang request ==="
-  curl -kfsSL --connect-timeout 5 --max-time 20 \
-    --resolve "$SITE:443:127.0.0.1" \
-    "https://$SITE/erp-developers-home?_lang=en" -o "$TMP/home-en.html"
-  grep -Fq 'Developer Hub' "$TMP/home-en.html"
-  grep -Fq 'Learning Academy' "$TMP/home-en.html"
-  curl -kfsSL --connect-timeout 5 --max-time 20 \
-    --resolve "$SITE:443:127.0.0.1" \
-    "https://$SITE/erp-developers-home?_lang=ar" -o "$TMP/home-ar.html"
-  grep -Fq 'بوابة المطورين' "$TMP/home-ar.html" || {
-    echo "STOP: missing Arabic homepage translation"; exit 3;
-  }
-  grep -Fq 'أكاديمية التعلم' "$TMP/home-ar.html"
-
-  echo "=== Public Hub: Team Login, training, insights, consultation and privacy ==="
-  grep -Fq "Team Login" "$TMP/home-en.html" || {
-    echo "STOP: Team Login label not rendered"; exit 3;
-  }
-  for entry in "training:ed-training-title" "insights:ed-insights-title" \
-               "lets-talk:ed-meet-title" "privacy:ed-privacy-title"; do
-    route="${entry%%:*}"
-    marker="${entry#*:}"
-    curl -kfsSL --connect-timeout 5 --max-time 20 \
-      --resolve "$SITE:443:127.0.0.1" \
-      "https://$SITE/$route?_lang=en" -o "$TMP/$route.html"
-    grep -Fq "id=\"$marker\"" "$TMP/$route.html" || {
-      echo "STOP: public hub page $route did not render correctly"; exit 3;
-    }
-    grep -Fq 'href="/training"' "$TMP/$route.html" || {
-      echo "STOP: shared hub navigation missing from $route"; exit 3;
-    }
-  done
-  grep -Fq 'id="book-meeting"' "$TMP/lets-talk.html" || {
-    echo "STOP: meeting scheduler container missing"; exit 3;
-  }
-  grep -Fq 'id="ed-meeting-form"' "$TMP/lets-talk.html" || {
-    echo "STOP: the public booking form must be visible even while calendar is unconfigured"; exit 3;
-  }
-  grep -Fq 'id="ed-meeting-slots"' "$TMP/lets-talk.html" || {
-    echo "STOP: the real booking calendar area is missing"; exit 3;
-  }
-  grep -Fq "Your meeting is confirmed after you verify it." "$TMP/lets-talk.html" || {
-    echo "STOP: booking email verification disclaimer missing"; exit 3;
-  }
-  if grep -Fq 'data-booking-ready="0"' "$TMP/lets-talk.html"; then
-    grep -Fq 'ed-meet-offline-notice' "$TMP/lets-talk.html" || {
-      echo "STOP: offline booking must show a clear unavailable notice"; exit 3;
-    }
-    grep -Fq '<fieldset class="ed-meet-fields" disabled' "$TMP/lets-talk.html" || {
-      echo "STOP: offline booking form must be disabled"; exit 3;
-    }
-  else
-    grep -Fq 'data-booking-ready="1"' "$TMP/lets-talk.html" || {
-      echo "STOP: expected explicit server-side booking readiness"; exit 3;
-    }
-  fi
-  echo "=== Verify native booking assets and page without leaking appointment data ==="
-  MEETING_DIGEST="$(sha256sum "$APP/erpdevelopers/public/css/meeting.css" | cut -c1-16)"
-  MEETING_CSS="/assets/erpdevelopers/css/meeting.css?v=$MEETING_DIGEST"
-  grep -Fq "href=\"$MEETING_CSS\"" "$TMP/lets-talk.html" || {
-    echo "STOP: meeting CSS fingerprint missing"; exit 3;
-  }
-  curl -kfsSL --connect-timeout 5 --max-time 20 \
-    --resolve "$SITE:443:127.0.0.1" "https://$SITE$MEETING_CSS" -o "$TMP/meeting.css"
-  cmp -s "$APP/erpdevelopers/public/css/meeting.css" "$TMP/meeting.css" || {
-    echo "STOP: meeting CSS differs from installed file"; exit 3;
-  }
   PORTAL_DIGEST="$(sha256sum "$APP/erpdevelopers/public/css/portal.css" | cut -c1-16)"
   PORTAL_CSS="/assets/erpdevelopers/css/portal.css?v=$PORTAL_DIGEST"
-  grep -Fq "href=\"$PORTAL_CSS\"" "$TMP/training.html" || {
-    echo "STOP: public hub CSS fingerprint missing"; exit 3;
-  }
-  echo "=== Verify catalog JavaScript matches page fingerprint and served bytes ==="
+  MEETING_DIGEST="$(sha256sum "$APP/erpdevelopers/public/css/meeting.css" | cut -c1-16)"
+  MEETING_CSS="/assets/erpdevelopers/css/meeting.css?v=$MEETING_DIGEST"
+  EVENTS_DIGEST="$(sha256sum "$APP/erpdevelopers/public/css/events.css" | cut -c1-16)"
+  EVENTS_CSS="/assets/erpdevelopers/css/events.css?v=$EVENTS_DIGEST"
   CATALOG_DIGEST="$(sha256sum "$APP/erpdevelopers/public/js/catalog.js" | cut -c1-16)"
   CATALOG_JS="/assets/erpdevelopers/js/catalog.js?v=$CATALOG_DIGEST"
-  grep -Fq "src=\"$CATALOG_JS\"" "$TMP/training.html" || {
-    echo "STOP: Training page does not reference current catalog.js"; exit 3;
-  }
-  curl -kfsSL --connect-timeout 5 --max-time 20 \
-    --resolve "$SITE:443:127.0.0.1" "https://$SITE$CATALOG_JS" -o "$TMP/catalog.js"
-  cmp -s "$APP/erpdevelopers/public/js/catalog.js" "$TMP/catalog.js" || {
-    echo "STOP: current catalog.js is not served by origin"; exit 3;
-  }
-  echo "=== Training: in-page button, deferred script and click-to-load frame ==="
+  LOGO="/assets/erpdevelopers/images/erpdevelopers-selected-logo.png"
+  FAVICON="/assets/erpdevelopers/images/erpdevelopers-selected-favicon.png"
+
+  echo "=== Origin homepage: CSS and SEO ==="
+  origin home.html /
+  grep -Fq "href=\"$CSS\"" "$TMP/home.html" || { echo "STOP: stale homepage CSS reference"; exit 3; }
+  origin brand.css "$CSS"
+  cmp -s "$APP/erpdevelopers/public/css/brand.css" "$TMP/brand.css" || { echo "STOP: stale brand CSS bytes"; exit 3; }
+  grep -Fq 'rel="canonical" href="https://erp-developers.com/"' "$TMP/home.html" || { echo "STOP: missing canonical homepage URL"; exit 3; }
+  "$BENCH/env/bin/python" "$APP/scripts/inspect_home_metadata.py" "$TMP/home.html"
+  grep -Fq '"@type":"Organization"' "$TMP/home.html" || { echo "STOP: missing Organization JSON-LD"; exit 3; }
+  origin sitemap.xml /sitemap.xml
+  grep -Fq '<urlset' "$TMP/sitemap.xml"
+  CARD_COUNT="$(grep -o 'class="ed-tile"' "$TMP/home.html" | wc -l | tr -d '[:space:]')"
+  test "$CARD_COUNT" = "6"
+
+  echo "=== Native EN/AR language rendering ==="
+  origin home-en.html '/erp-developers-home?_lang=en'
+  origin home-ar.html '/erp-developers-home?_lang=ar'
+  grep -Fq 'Developer Hub' "$TMP/home-en.html"
+  grep -Fq 'Learning Academy' "$TMP/home-en.html"
+  grep -Fq 'Team Login' "$TMP/home-en.html"
+  grep -Fq 'بوابة المطورين' "$TMP/home-ar.html"
+  grep -Fq 'أكاديمية التعلم' "$TMP/home-ar.html"
+
+  echo "=== Public Hub routes, including Events ==="
+  for entry in 'training:ed-training-title' 'events:ed-events-title' 'insights:ed-insights-title' 'lets-talk:ed-meet-title' 'privacy:ed-privacy-title'; do
+    route="${entry%%:*}"
+    marker="${entry#*:}"
+    origin "$route.html" "/$route?_lang=en"
+    grep -Fq "id=\"$marker\"" "$TMP/$route.html" || { echo "STOP: route did not render: $route"; exit 3; }
+    grep -Fq 'href="/training"' "$TMP/$route.html"
+    grep -Fq 'href="/events"' "$TMP/$route.html"
+  done
+  origin events-ar.html '/events?_lang=ar'
+  grep -Fq 'دليل الفعاليات' "$TMP/events-ar.html" || { echo "STOP: compiled Arabic event translations missing"; exit 3; }
+  grep -Fq "href=\"$EVENTS_CSS\"" "$TMP/events.html"
+  origin events.css "$EVENTS_CSS"
+  cmp -s "$APP/erpdevelopers/public/css/events.css" "$TMP/events.css"
+
+  echo "=== Meeting readiness and assets ==="
+  for marker in book-meeting ed-meeting-form ed-meeting-slots; do
+    grep -Fq "id=\"$marker\"" "$TMP/lets-talk.html"
+  done
+  grep -Fq 'Your meeting is confirmed after you verify it.' "$TMP/lets-talk.html"
+  if grep -Fq 'data-booking-ready="0"' "$TMP/lets-talk.html"; then
+    grep -Fq 'ed-meet-offline-notice' "$TMP/lets-talk.html"
+    grep -Fq '<fieldset class="ed-meet-fields" disabled' "$TMP/lets-talk.html"
+  else
+    grep -Fq 'data-booking-ready="1"' "$TMP/lets-talk.html"
+  fi
+  grep -Fq "href=\"$MEETING_CSS\"" "$TMP/lets-talk.html"
+  origin meeting.css "$MEETING_CSS"
+  cmp -s "$APP/erpdevelopers/public/css/meeting.css" "$TMP/meeting.css"
+
+  echo "=== Training script delivery and in-page-only controls ==="
+  grep -Fq "href=\"$PORTAL_CSS\"" "$TMP/training.html"
+  grep -Fq "src=\"$CATALOG_JS\"" "$TMP/training.html" || { echo "STOP: stale catalog script reference"; exit 3; }
+  origin catalog.js "$CATALOG_JS"
+  cmp -s "$APP/erpdevelopers/public/js/catalog.js" "$TMP/catalog.js"
   "$BENCH/env/bin/python" "$APP/scripts/inspect_training_player.py" "$TMP/training.html"
-  curl -kfsSL --connect-timeout 5 --max-time 20 \
-    --resolve "$SITE:443:127.0.0.1" "https://$SITE$PORTAL_CSS" -o "$TMP/portal.css"
-  cmp -s "$APP/erpdevelopers/public/css/portal.css" "$TMP/portal.css" || {
-    echo "STOP: public hub CSS bytes differ from the installed app"; exit 3;
-  }
-  echo "=== Confirm native Frappe login and language picker render ==="
-  curl -kfsSL --connect-timeout 5 --max-time 20 \
-    --resolve "$SITE:443:127.0.0.1" \
-    "https://$SITE/login?_lang=en" -o "$TMP/login.html"
+  origin portal.css "$PORTAL_CSS"
+  cmp -s "$APP/erpdevelopers/public/css/portal.css" "$TMP/portal.css"
+
+  echo "=== Native login, Arabic typography and Desk sign-in ==="
+  origin login.html '/login?_lang=en'
   grep -Fq 'id="page-login"' "$TMP/login.html"
   grep -Fq 'for-login' "$TMP/login.html"
   grep -Fq 'id="language-switcher"' "$TMP/login.html"
-
-  echo "=== Greenbox Arabic typography: stylesheet reference and actual bytes ==="
-  for rendered in home-ar training login; do
-    grep -Fq "href=\"$ARABIC_CSS\"" "$TMP/$rendered.html" || {
-      echo "STOP: $rendered missing Arabic typography stylesheet; check web reload"; exit 3;
-    }
+  for rendered in home-ar training events login; do
+    grep -Fq "href=\"$ARABIC_CSS\"" "$TMP/$rendered.html" || { echo "STOP: missing Arabic CSS; reload web workers"; exit 3; }
   done
-  curl -kfsSL --connect-timeout 5 --max-time 20 \
-    --resolve "$SITE:443:127.0.0.1" "https://$SITE$ARABIC_CSS" -o "$TMP/arabic.css"
-  cmp -s "$APP/erpdevelopers/public/css/arabic_typography.css" "$TMP/arabic.css" || {
-    echo "STOP: Arabic typography CSS differs from deployed file"; exit 3;
-  }
+  origin arabic.css "$ARABIC_CSS"
+  cmp -s "$APP/erpdevelopers/public/css/arabic_typography.css" "$TMP/arabic.css"
   grep -Fq 'family=Tajawal' "$TMP/arabic.css"
-
-  echo "=== Verify explicit Desk sign-in intent in public homepage ==="
   SIGNIN_HREF="/login?redirect-to=/desk"
   SIGNIN_COUNT="$(grep -oF 'href="'$SIGNIN_HREF'"' "$TMP/home.html" | wc -l | tr -d '[:space:]')"
-  test "$SIGNIN_COUNT" = "2" || {
-    echo "STOP: Desk sign-in links must explicitly request /desk"; exit 3;
-  }
-  curl -kfsSL --connect-timeout 5 --max-time 20 \
-    --resolve "$SITE:443:127.0.0.1" \
-    "https://$SITE$SIGNIN_HREF" -o "$TMP/login-desk.html"
+  test "$SIGNIN_COUNT" = "2"
+  origin login-desk.html "$SIGNIN_HREF"
   grep -Fq 'id="page-login"' "$TMP/login-desk.html"
-
-  echo "=== Confirm public/login and Desk use the same approved PNG ==="
-  for SETTINGS in "Website Settings" "Navbar Settings"; do
-    ACTUAL_LOGO="$(cd "$BENCH" && bench --site "$SITE" execute \
-      frappe.db.get_single_value --args "[\"$SETTINGS\",\"app_logo\"]")"
-    if [ "$ACTUAL_LOGO" != "$LOGO" ]; then
-      echo "STOP: $SETTINGS.app_logo is $ACTUAL_LOGO, not the approved PNG"
-      exit 3
-    fi
-    echo "PASS: $SETTINGS.app_logo"
+  for SETTINGS in 'Website Settings' 'Navbar Settings'; do
+    ACTUAL_LOGO="$(cd "$BENCH" && bench --site "$SITE" execute frappe.db.get_single_value --args "[\"$SETTINGS\",\"app_logo\"]")"
+    test "$ACTUAL_LOGO" = "$LOGO" || { echo "STOP: stored logo mismatch for $SETTINGS"; exit 3; }
   done
-
-  echo "=== First-paint login CSS and approved navbar logo ==="
-  grep -Fq "$LOGIN_CSS" "$TMP/login.html" || {
-    echo "STOP: fingerprinted login CSS not linked"; exit 3;
-  }
-  # Parse the actual <a class="navbar-brand"> image structurally.
-  # Exact "<img src=..." grep incorrectly rejects valid attributes/quotes.
-  "$BENCH/env/bin/python" "$APP/scripts/inspect_login_brand.py" "$TMP/login.html" \
-    --site "$SITE"
-  if grep -Fq 'login_chrome.js' "$TMP/login.html"; then
-    echo "STOP: stale script still reinserts the login layout"; exit 3;
-  fi
-  curl -kfsSL --connect-timeout 5 --max-time 20 \
-    --resolve "$SITE:443:127.0.0.1" \
-    "https://$SITE$LOGIN_CSS" -o "$TMP/login.css"
-  cmp -s "$APP/erpdevelopers/public/css/login.css" "$TMP/login.css" || {
-    echo "STOP: native login CSS does not match deployed file"; exit 3;
-  }
-
-  echo "=== Origin selected logo and favicon ==="
-  curl -kfsSL --connect-timeout 5 --max-time 20 \
-    --resolve "$SITE:443:127.0.0.1" "https://$SITE$LOGO" -o "$TMP/logo.png"
-  curl -kfsSL --connect-timeout 5 --max-time 20 \
-    --resolve "$SITE:443:127.0.0.1" "https://$SITE$FAVICON" -o "$TMP/favicon.png"
+  grep -Fq "$LOGIN_CSS" "$TMP/login.html"
+  "$BENCH/env/bin/python" "$APP/scripts/inspect_login_brand.py" "$TMP/login.html" --site "$SITE"
+  if grep -Fq 'login_chrome.js' "$TMP/login.html"; then echo "STOP: stale login injection script"; exit 3; fi
+  origin login.css "$LOGIN_CSS"
+  cmp -s "$APP/erpdevelopers/public/css/login.css" "$TMP/login.css"
+  origin logo.png "$LOGO"
+  origin favicon.png "$FAVICON"
   cmp -s "$APP/erpdevelopers/public/images/erpdevelopers-selected-logo.png" "$TMP/logo.png"
   cmp -s "$APP/erpdevelopers/public/images/erpdevelopers-selected-favicon.png" "$TMP/favicon.png"
 
   echo "=== Public Cloudflare HTTPS GET checks ==="
-  for route in / /training /insights /lets-talk /privacy /login /api/method/ping "$CSS" "$LOGIN_CSS" "$PORTAL_CSS" "$MEETING_CSS" "$ARABIC_CSS" "$CATALOG_JS" "$LOGO" "$FAVICON"; do
-    status="$(curl -fsSL --connect-timeout 5 --max-time 20 \
-      -o /dev/null -w '%{http_code}' "https://$SITE$route")" || {
-        echo "STOP: public route failed: $route"; exit 4;
-      }
+  for route in / /training /events /insights /lets-talk /privacy /login /api/method/ping "$CSS" "$LOGIN_CSS" "$ARABIC_CSS" "$PORTAL_CSS" "$MEETING_CSS" "$EVENTS_CSS" "$CATALOG_JS" "$LOGO" "$FAVICON"; do
+    status="$(curl -fsSL --connect-timeout 5 --max-time 20 -o /dev/null -w '%{http_code}' "https://$SITE$route")" || { echo "STOP: public route failed: $route"; exit 4; }
     echo "$status $route"
   done
-  echo "PASS: EN/AR, native login, in-page player markup, Tajawal CSS, approved PNG and public routes"
+  echo "PASS: public routes, Events, EN/AR, metadata, native login, in-page player and asset bytes"
 )
