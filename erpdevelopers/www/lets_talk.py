@@ -9,8 +9,8 @@ sitemap = 1
 
 def get_context(context):
     set_public_context(
-        context, slug="lets-talk", title="Book a Meeting",
-        description="Book an ERP Developers conversation on enterprise systems, solution architecture, development, training and partnerships using available ERPNext appointment times.",
+        context, slug="lets-talk", title="Let's Talk",
+        description="Talk with ERP Developers about enterprise systems, solution architecture, integrations, training and partnerships. Choose an available meeting time with ERPNext.",
     )
     context.booking_enabled = booking_ready()
     context.topic_options = TOPICS
