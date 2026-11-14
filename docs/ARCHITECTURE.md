@@ -39,6 +39,18 @@ Frappe's `www/erp-developers-home.html` controller is `www/erp_developers_home.p
 
 CSS custom properties are scoped under `.ed-site`, not `:root`, to avoid modifying Frappe Desk or unrelated website styles. Native login styles are gated only by Frappe's server-rendered `body[data-path="login"]` (or `/login`) selector; no client-applied enhancement class is necessary. Accessibility: semantic headings, focus outlines and focus-only skip link. Visual acceptance still requires real browsers and EN/AR/RTL inspection.
 
+## Site-specific Frappe Desk logo
+
+On Frappe v16.56.0 the native login gets `context.logo` from `frappe.core.doctype.navbar_settings.navbar_settings.get_app_logo()`, and the Desk boot JSON sets `app_logo_url` from the same function. Frappe resolves `Website Settings.app_logo` first, then `Navbar Settings.app_logo`, and only then the `app_logo_url` hook.
+
+The explicit site configuration at `erpdevelopers.site_setup.configure_website` now updates **both site-local Single DocTypes** in one transaction:
+- `Website Settings.app_logo`, `brand_html`, `banner_image`, `favicon` — native site navbar, login/logo and website icon.
+- `Navbar Settings.app_logo` — native Desk logo fallback using the exact same approved full PNG.
+
+The ERP Developers app's `hooks.py` also publishes `app_logo_url = LOGO_URL` for its own app identity/icon. No Frappe core files, global bench settings, login flows or other site records are changed. On a shared Bench the site-specific setting is applied **only** when `frappe.local.site == "erp-developers.com"`, checked before any database access.
+
+The source tests assert wrong-site refusal, single commit on two changed DocTypes, idempotence and the exact PNG URL. The read-only smoke verifies both Single DocTypes before checking the rendered navbar image and CSS. Note: Frappe's built-in `frappe` system app tile remains Frappe's own product identity; this project customizes **ERP Developers branding**, not the framework source code.
+
 ## Branding fidelity
 
 **Never redraw, retrace, generate or substitute a logo.** The user-approved original at `erpdevelopers/public/images/erpdevelopers-selected-logo.png` is byte-identical to the uploaded PNG (SHA-256 `250df1886e13229aa0e260949f66cb91a627b220a03c36b5c1d4ede1ad06d95d`). The icon-only favicon is cropped from the same source. All homepage image references are supplied by the Python brand module. Frappe's own navbar uses the site-specific `Website Settings.brand_html` and `banner_image` values built from the same canonical `LOGO_URL`; `app_logo` also points to that file. No JavaScript changes or replaces the logo at runtime. No hidden user uploads or remote fonts are embedded.

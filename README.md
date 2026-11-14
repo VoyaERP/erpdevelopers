@@ -31,6 +31,12 @@ The canonical ERP Developers brand asset is the **exact original image uploaded 
 
 `erpdevelopers/public/images/erpdevelopers-selected-favicon.png` is an icon-only crop of the same approved image, supplied for favicon use. All active website, native login branding, and site-specific Website Settings point to these assets. The old unrelated Neural Intelligence SVG concept was removed.
 
+## Frappe native logo replacement (2026-11-14)
+
+Frappe v16 reads the original ERP Developers PNG from the installed site's `Website Settings.app_logo` for login and Desk, with `Navbar Settings.app_logo` as a fallback. To replace the remaining default Frappe logo **without editing core**, `configure_website` now updates both site-specific Single DocTypes, including `Website Settings.brand_html` and `banner_image`, and the ERP Developers app declares `app_logo_url` pointing to the same exact approved PNG.
+
+**Only run on `erp-developers.com`**. After deploying a pinned commit, `bench --site erp-developers.com execute erpdevelopers.site_setup.configure_website` is idempotent, applies both settings in one commit and rejects other sites before database reads. A targeted shared-Bench web service reload is necessary after adding the new app hook. `scripts/verify_frontend.sh` checks both recorded logo settings, server-rendered native navbar image and actual image bytes. A real Desk browser refresh is still required to verify the visual result.
+
 ## Desk sign-in and deployment recovery (2026-11-14)
 
 The two staff sign-in links on the public homepage now use a **single** URL from `branding.DESK_SIGNIN_URL`: `/login?redirect-to=/desk`. Frappe v16's native `login.js` prioritizes the sanitized `redirect-to` query when sign-in succeeds; without it, Frappe navigates to the server-provided `home_page`, which on this public site is the branded homepage. The link is visibly labeled **Desk sign in / دخول لوحة التحكم**; it is for authorized **System Users** only. Future website-member login/portal routes must remain separate; this release does not introduce a member portal or change auth permissions.
