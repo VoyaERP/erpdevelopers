@@ -698,3 +698,12 @@ msgstr "ناقش النصيحة في سياق احتياجاتك"
 
 msgid "Talk with us about your goals, constraints and next steps."
 msgstr "تحدث معنا عن أهدافك ومتطلباتك وخطواتك القادمة."
+
+msgid "Engage."
+msgstr "نتواصل."
+
+msgid "Reason."
+msgstr "نفكّر."
+
+msgid "Progress."
+msgstr "نتقدّم."

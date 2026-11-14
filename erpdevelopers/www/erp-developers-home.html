@@ -23,11 +23,6 @@
             <a class="ed-btn ed-btn-primary" href="#discover">{{ _("Explore what's here") }} <span aria-hidden="true">↗</span></a>
             <a class="ed-btn ed-btn-secondary" href="/lets-talk#meeting-start">{{ _("Let's Talk") }} <span aria-hidden="true">↗</span></a>
           </div>
-          <div class="ed-principles" aria-label="{{ _('Brand values') }}">
-            {% for value in values_items %}
-            <span>{{ _(value.title) | e }}</span>
-            {% endfor %}
-          </div>
         </div>
         <div class="ed-art" aria-hidden="true">
           <div class="ed-art-grid"></div>
@@ -85,9 +80,11 @@
         <div>
           <p class="ed-kicker">{{ _("BUILT AROUND PEOPLE") }}</p>
           <h2 id="ed-vision-heading">{{ _("Technology is better") }} <span>{{ _("when we build it together.") }}</span></h2>
-          <div class="ed-principles" aria-label="{{ _('Brand values') }}">
+          <p class="ed-vision-signature" data-brand-slogan aria-label="{{ _('Brand values') }}"
+             lang="{{ 'ar' if boot.lang.startswith('ar') else 'en' }}"
+             dir="{{ 'rtl' if boot.lang.startswith('ar') else 'ltr' }}">
             {% for value in values_items %}<span>{{ _(value.title) | e }}</span>{% endfor %}
-          </div>
+          </p>
         </div>
         <div class="ed-intro-copy">
           <p>{{ _("We're bringing different minds into one conversation: engineers, decision-makers, learners and business teams. The goal is practical knowledge and better outcomes, not another vendor-centric portal.") }}</p>

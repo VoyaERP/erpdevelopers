@@ -163,9 +163,8 @@ def main():
                                     afterRow:after.gridRowStart,mainColumn:main.gridColumnStart,mainRow:main.gridRowStart,
                                     position:after.position,content:after.content};
                                 }''')
-                                assert geometry["position"] == "relative"
-                                assert geometry["beforeColumn"] == geometry["afterColumn"] == "1"
-                                assert geometry["afterRow"] == "1"
+                                assert geometry["content"] in ("none", "normal", '""'), "Login must not repeat the slogan"
+                                assert geometry["beforeColumn"] == "1"
                                 if width > 720:
                                     assert geometry["mainColumn"] == "2"
                                 else:

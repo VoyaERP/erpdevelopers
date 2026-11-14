@@ -73,7 +73,7 @@ def main():
                 browser = engine.launch(headless=True)
                 try:
                     for lang in ("en", "ar"):
-                        for width in (1440, 390):
+                        for width in (1440, 768, 390, 320):
                             context = browser.new_context(viewport={"width": width, "height": 900})
                             fixture.routes(context, [])
                             context.add_cookies([dict(name="preferred_language", value=lang, url=origin)])
@@ -85,6 +85,19 @@ def main():
                             expect(page).to_have_url(f"{origin}/#vision")
                             vision = page.locator("#vision")
                             expect(vision).to_be_visible()
+                            signature = vision.locator("[data-brand-slogan]")
+                            expect(page.locator("[data-brand-slogan]")).to_have_count(1)
+                            expect(page.locator(".ed-principles")).to_have_count(0)
+                            expect(signature).to_be_visible()
+                            expected_words = [fixture.ARABIC.get(word, word) if lang == "ar" else word
+                                              for word in ("Engage.", "Reason.", "Progress.")]
+                            expect(signature.locator("span")).to_have_text(expected_words)
+                            assert signature.get_attribute("dir") == ("rtl" if lang == "ar" else "ltr")
+                            assert signature.locator("a,button").count() == 0
+                            assert signature.bounding_box()["y"] >= page.locator("#ed-vision-heading").bounding_box()["y"] + page.locator("#ed-vision-heading").bounding_box()["height"]
+                            words = signature.locator("span").evaluate_all("els=>els.map(e=>({y:e.getBoundingClientRect().y,bg:getComputedStyle(e).backgroundColor,border:getComputedStyle(e).borderTopWidth}))")
+                            assert max(w["y"] for w in words) - min(w["y"] for w in words) < 1, "Slogan wraps at normal mobile size"
+                            assert all(w["bg"] == "rgba(0, 0, 0, 0)" and w["border"] == "0px" for w in words), "No pill decoration"
                             page.wait_for_function("document.querySelector('.ed-vision-image').complete && document.querySelector('.ed-vision-image').naturalWidth > 0")
                             size = vision.bounding_box()
                             offset = vision.evaluate("e => parseFloat(getComputedStyle(e).getPropertyValue('--ed-header-anchor-offset'))")

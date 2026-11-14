@@ -11,7 +11,10 @@ html[lang^="ar"] .ed-vision-immersive::before{background:linear-gradient(270deg,
 .ed-vision-immersive .ed-intro-copy{padding:clamp(22px,3.5vw,40px);background:rgba(5,23,47,.82);border:1px solid #4e8ba0;border-radius:22px;max-width:550px}
 .ed-vision-immersive .ed-intro-copy p{color:#edf6ff;font-size:clamp(16px,1.5vw,19px);line-height:1.9;margin:0 0 24px}
 .ed-vision-immersive .ed-text-link{color:#9cf3e9!important;line-height:1.8;display:inline-flex;gap:12px;align-items:center;flex-wrap:wrap}
-.ed-vision-immersive .ed-principles span{color:#fff;border-color:#5e9bac;background:rgba(5,23,47,.8)}
+/* One quiet brand signature, anchored to the Vision heading rather than pills. */
+.ed-vision-immersive .ed-vision-signature{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;width:fit-content;max-width:100%;margin:24px 0 0;padding-block-start:16px;border-block-start:1px solid #426477;color:#bce9e4;font-size:clamp(16px,1.4vw,19px);font-weight:600;line-height:1.7;letter-spacing:0}
+.ed-vision-signature span{white-space:nowrap}
+.ed-vision-signature[lang="ar"]{font-family:"Tajawal",Arial,sans-serif}
 .ed-guide-discovery{background:#f5faff}
 .ed-guide-discovery .ed-resource-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .ed-guide-discovery .ed-resource-card{color:var(--ed-navy);transition:border-color .18s}

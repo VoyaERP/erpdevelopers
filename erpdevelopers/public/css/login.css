@@ -50,9 +50,8 @@
 }
 :is(body[data-path="login"],body[data-path="/login"]) > footer.web-footer {display:none!important}
 
-/* The grid follows the document direction; story and tagline share ONE cell.
- * Avoid absolute logical insets on a differently directed pseudo-element:
- * direction:ltr used to place the English tagline over the Arabic form.
+/* One artwork panel follows the document direction. The approved logo already
+ * carries the brand signature; do not repeat it on the authentication artwork.
  */
 :is(body[data-path="login"],body[data-path="/login"]) #page-login {
   flex:1 0 auto;width:100%;min-width:0;
@@ -68,7 +67,7 @@
 :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {
   content:"A connected space for people and technology.";
   grid-column:1;grid-row:1;display:flex;align-items:center;
-  padding:clamp(34px,4.8vw,61px) clamp(26px,4.2vw,51px) 100px;
+  padding:clamp(34px,4.8vw,61px) clamp(26px,4.2vw,51px);
   min-height:448px;color:#fff;font-weight:820;font-size:clamp(29px,3.1vw,42px);
   line-height:1.25;letter-spacing:-.038em;
   background:radial-gradient(circle at 92% 24%,#2ae5dd36 0%,transparent 32%),
@@ -77,20 +76,9 @@
     linear-gradient(135deg,#071c3c,#125c9f);
   text-wrap:balance;pointer-events:none;
 }
-:is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::after {
-  content:"Engage.   Reason.   Progress.";
-  position:relative;grid-column:1;grid-row:1;align-self:end;justify-self:stretch;
-  margin:0 clamp(26px,4.2vw,51px) 32px;z-index:1;min-width:0;
-  font-size:13px;line-height:1.7;letter-spacing:.055em;font-weight:750;
-  text-align:start;color:#8bf0e6;pointer-events:none;overflow-wrap:break-word;
-}
 html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {
   content:"مساحة تجمع الأشخاص والخبرات والتقنيات.";
   direction:rtl;text-align:start;font-family:"Tajawal",Arial,sans-serif;letter-spacing:0;
-}
-html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::after {
-  content:"نتواصل. نفكّر. نتقدّم.";
-  direction:rtl;font-family:"Tajawal",Arial,sans-serif;letter-spacing:0;
 }
 
 /* Presentation only: never override visibility of Frappe authentication states. */
@@ -151,8 +139,7 @@ html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) #page-log
 
 @media(max-width:900px) {
   :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper {grid-template-columns:minmax(0,1fr) minmax(315px,1fr)}
-  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {font-size:clamp(26px,3.6vw,33px);padding:31px 25px 100px}
-  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::after {margin-inline:25px}
+  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {font-size:clamp(26px,3.6vw,33px);padding:31px 25px}
 }
 @media(max-width:720px) {
   :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar > .container {width:calc(100% - 26px)}
@@ -161,9 +148,8 @@ html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) #page-log
     grid-template-columns:minmax(0,1fr);width:min(540px,calc(100% - 24px));min-height:0;margin:15px auto 23px;border-radius:17px;
   }
   :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {
-    min-height:169px;padding:22px 23px 65px;font-size:clamp(24px,5.4vw,28px);
+    min-height:169px;padding:22px 23px;font-size:clamp(24px,5.4vw,28px);
   }
-  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::after {margin:0 23px 20px;font-size:12px}
   :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper > main {grid-column:1;grid-row:2;padding:25px 20px 28px}
 }
 @media(max-width:390px) {

@@ -52,14 +52,11 @@ class TestArabicNativeLogin(TestCase):
                     self.assertEqual(set(re.findall(r"\{\d+\}", message.id)),
                                      set(re.findall(r"\{\d+\}", message.string or "")))
 
-    def test_tagline_shares_artwork_grid_cell_not_form_coordinates(self):
+    def test_login_has_no_repeated_slogan_and_preserves_native_forms(self):
         css = (APP / "public/css/login.css").read_text()
-        declaration = re.search(r"\.page-content-wrapper::after\s*\{([^}]+)\}", css).group(1)
-        self.assertIn("position:relative", declaration)
-        self.assertIn("grid-column:1", declaration)
-        self.assertIn("grid-row:1", declaration)
-        self.assertNotIn("position:absolute", declaration)
-        self.assertIn('content:"نتواصل. نفكّر. نتقدّم."', css)
+        self.assertNotIn(".page-content-wrapper::after", css)
+        self.assertNotIn("Engage.", css)
+        self.assertNotIn("نتواصل.", css)
         self.assertIn("padding-inline-end:44px", css)
         self.assertIn('font-family:"Tajawal",Arial,sans-serif', css)
         self.assertNotIn("Noto Sans Arabic", css)
