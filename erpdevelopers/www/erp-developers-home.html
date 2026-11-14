@@ -1,7 +1,9 @@
 {% extends "templates/web.html" %}
 {% block head_include %}
 {{ super() }}
+<link rel="canonical" href="{{ canonical_home_url | e }}">
 <link rel="stylesheet" href="{{ homepage_css_url | e }}">
+<script type="application/ld+json">{{ structured_data_json | safe }}</script>
 {% endblock %}
 {% block navbar %}{% endblock %}
 {% block footer %}{% endblock %}
