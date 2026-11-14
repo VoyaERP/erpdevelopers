@@ -92,32 +92,50 @@ existing ERPNext logic, and no names, tokens or booking IDs are returned to
 anonymous browsers. Check Guest/CRM/System Manager permissions and
 rate limits; no workflows can be approved by the guest endpoint.
 
-### Adding a YouTube playlist from Frappe Desk (v16)
+### Add public or private YouTube playlists in ERPNext Desk
 
-The site supports an editorial directory, **not YouTube syncing**.
-A user with **Website Manager** or **System Manager** can publish multiple
-independent playlist records without code changes or API keys:
+Site curators with **Website Manager** or **System Manager** can manage
+the existing **ERP Developers Playlist** DocType at
+`/app/erp-developers-playlist` without an API key.
 
-1. Sign into the system Desk at `/login?redirect-to=/desk` and search for
-   **ERP Developers Playlist**, or visit `/app/erp-developers-playlist`.
-2. Select **New**. Enter **Title** (required), optional **Arabic Title**,
-   **Topic**, **Level**, **Language**, and **Description** (required).
-   There is no need to enter a Playlist ID manually.
-3. On YouTube, open the actual playlist and copy its playlist URL,
-   beginning `https://www.youtube.com/playlist?list=`, into
-   **YouTube Playlist URL**. A single video watch URL, `youtu.be`
-   shortcut, or channel homepage is rejected.
-4. Set **Display Order** (lower values display first), check
-   **Published**, and **Save**. The validator normalizes the URL and
-   extracts the read-only **Validated Playlist ID**.
-5. Visit `/training` as a Guest to verify the published playlist card.
-   If missing, check Published, source URL, permissions and whether the
-   app's migration installed the DocType.
+1. Choose **New** and enter Title (required), optional Arabic Title,
+   Topic, Level, Language, Description (required), and a valid YouTube
+   `https://www.youtube.com/playlist?list=...` URL.
+2. **Visibility = Public** is a candidate for the public Training page,
+   but only appears to Guests if **Published** is enabled.
+3. **Visibility = Private** keeps the entry in the permission-controlled
+   Desk **only**. The backend forcibly sets `Published = 0` on save;
+   public `/training` queries also require both `published = 1` and
+   `visibility = Public` as a defense in depth. Private rows are never
+   serialized to the public HTML, including their YouTube URLs.
+4. Set Display Order, Save, and check the validated Playlist ID. Published
+   Public items appear on `/training`; choose **Watch here** to open
+   the in-page modal, or **Open on YouTube** for direct playback.
+5. The iframe uses only a server-validated playlist ID to construct a
+   `youtube-nocookie.com` embed URL, and the client verifies the ID
+   again. It starts loading **only on a click**, runs in a sandboxed
+   frame, and drops its src on close to stop playback. No automated
+   YouTube scraping or playlists are seeded.
 
-Add further playlists as separate records; do not duplicate application
-code or embed videos. Leave Published unchecked until editorial review.
-The public page displays at most 60 published playlists, ordered by
-Display Order then most recently modified.
+**Important distinction:** Frappe's Private option means **Desk-only
+metadata**; it is not a DRM or private-video-streaming service. A
+YouTube-Private playlist/video cannot be made embeddable by adding its
+link here. YouTube Unlisted playlists may play for anyone with the URL
+and are **not secure private course content**. If confidential training
+is required, use an authenticated LMS with authorized video delivery.
+YouTube embed availability depends on the owner's embed settings,
+geographic restrictions, viewer permissions, and the site's CSP
+allowlisting `https://www.youtube-nocookie.com` in `frame-src`.
+Never weaken the shared Bench or global CSP for a single app; use
+site-scoped CSP configuration if separately approved.
+
+A YouTube player may contact Google/YouTube and process visitor data
+after explicit activation; Privacy Enhanced Mode is not a guarantee
+of zero tracking. The player does not load at initial page view.
+
+The index displays at most 60 reviewed Public playlists, sorted by
+Display Order then modified time. Private unpublished rows remain
+available for editorial review from Desk.
 
 ## Training catalogue: ideas and curation
 
@@ -130,7 +148,7 @@ Recommended learning tracks, **not seeded as invented playlists**:
 - **Cloud & Cybersecurity:** Azure, identity, API security, infrastructure-as-code, observability.
 - **Data, AI & Automation:** practical analytics, responsible LLM workflows and enterprise governance.
 
-An authorized curator creates a **Playlist** record with original title, optional Arabic title, YouTube playlist URL, topic, level, language, description, sort order and Published flag. Controller parses the actual YouTube `list` identifier; only HTTPS `/playlist?list=...` links from approved YouTube hosts are allowed. Videos open on YouTube, not autoplayed in the ERP Developers site. No YouTube API key or scraping is needed for this v1 directory.
+An authorized curator creates a **Playlist** record with a validated YouTube URL, title, topic, level, language, description, Visibility, sort order and Published flag. The public page now supports click-to-load privacy-enhanced YouTube playback in a modal as well as a direct YouTube link. No player is loaded or autoplayed before visitor interaction; no YouTube API key or scraping is needed.
 
 A future sync may use the official `playlistItems.list` API to retrieve video metadata with quota controls, caching, API-key storage and editorial review. It must not treat video existence, copyright, availability, or accuracy as guaranteed.
 

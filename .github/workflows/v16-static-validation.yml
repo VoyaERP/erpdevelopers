@@ -30,3 +30,4 @@ jobs:
         run: |
           node --check erpdevelopers/public/js/meeting.js
           node --check erpdevelopers/public/js/assistant.js
+          node --check erpdevelopers/public/js/catalog.js
