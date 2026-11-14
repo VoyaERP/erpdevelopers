@@ -62,7 +62,12 @@ def book_meeting(date, time, timezone, contact):
         slot_time = validate_slot_time(time)
         payload = json.loads(contact) if isinstance(contact, str) else contact
         details = validate_meeting_contact(payload)
-        details["email"] = validate_email_address(details["email"], throw=True)
+        validated_email = validate_email_address(details["email"], throw=True)
+        # Frappe's mail validator also accepts comma-separated addresses;
+        # native appointment confirmation must have exactly one recipient.
+        if not validated_email or "," in validated_email or validated_email != details["email"]:
+            raise ValueError("Use one individual email address")
+        details["email"] = validated_email
     except (TypeError, ValueError):
         frappe.throw(_("Review the selected meeting slot and contact details."))
 
@@ -74,6 +79,7 @@ def book_meeting(date, time, timezone, contact):
 
     note = "\n".join(filter(None, (
         "ERP Developers meeting request",
+        "Contact consent: visitor requested this meeting",
         f"Topic: {details['topic']}",
         f"Company: {details['company']}" if details["company"] else "",
         f"Requirements: {details['message']}" if details["message"] else "",
