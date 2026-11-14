@@ -35,7 +35,8 @@ The canonical ERP Developers brand asset is the **exact original image uploaded 
 
 - `erpdevelopers/branding.py`: one pure-Python source of truth for identity, site targeting, uploaded PNG and favicon, and a content-hashed homepage CSS URL.
 - `erpdevelopers/www/erp_developers_home.py`: route controller supplies branded assets and SEO context. Frappe v16 maps `erp-developers-home.html` to the underscore-named Python controller.
-- `erpdevelopers/www/erp-developers-home.html`: Jinja page with one explicit stylesheet link in its supported `head_include` block and no duplicate Frappe navbar/footer.
+- `erpdevelopers/content.py`: immutable, typed content lists for 3 brand principles, 6 planned ecosystem capabilities, 4 AI steps and 4 roadmap milestones; no repeated card markup.
+- `erpdevelopers/www/erp-developers-home.html`: Jinja page with one explicit stylesheet link in its supported `head_include` block, loop-driven sections and no duplicate Frappe navbar/footer.
 - `public/css/brand.css`: homepage-only rules and scoped variables. `public/css/login.css`: independent styles restricted to the native `/login` page.
 - `public/js/login_chrome.js`: decorative login header/footer only; shares a single brand-image helper and never handles credentials.
 - `site_setup.py`: explicit administrator command for exactly `erp-developers.com`, idempotent and site-scoped. No after-install mutation or public API.

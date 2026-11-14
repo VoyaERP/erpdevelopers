@@ -29,6 +29,14 @@
     echo "STOP: CSS served by origin differs from deployed file"; exit 3;
   }
 
+  echo "=== Confirm data-driven homepage content rendered ==="
+  CARD_COUNT="$(grep -o 'class="ed-tile"' "$TMP/home.html" | wc -l | tr -d '[:space:]')"
+  test "$CARD_COUNT" = "6" || {
+    echo "STOP: expected six ecosystem cards but rendered $CARD_COUNT"; exit 3;
+  }
+  grep -Fq 'Developer Hub' "$TMP/home.html"
+  grep -Fq 'Learning Academy' "$TMP/home.html"
+
   echo "=== Origin selected logo and favicon ==="
   curl -kfsSL --connect-timeout 5 --max-time 20 \
     --resolve "$SITE:443:127.0.0.1" "https://$SITE$LOGO" -o "$TMP/logo.png"
@@ -38,7 +46,7 @@
   cmp -s "$APP/erpdevelopers/public/images/erpdevelopers-selected-favicon.png" "$TMP/favicon.png"
 
   echo "=== Public Cloudflare HTTPS GET checks ==="
-  for route in / /login /api/method/ping "$CSS" "$LOGO" "$FAVICON"; do
+  for route in / /login /api/method/ping "$CSS" "$LOGO" "$FAVICON" /assets/erpdevelopers/css/login.css /assets/erpdevelopers/js/login_chrome.js; do
     status="$(curl -fsSL --connect-timeout 5 --max-time 20 \
       -o /dev/null -w '%{http_code}' "https://$SITE$route")" || {
         echo "STOP: public route failed: $route"; exit 4;

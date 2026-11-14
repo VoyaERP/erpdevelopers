@@ -9,6 +9,7 @@ The `version-16` branch is a **website-only MVP**, not a deployed community/LMS/
 | File | Responsibility |
 |---|---|
 | `erpdevelopers/branding.py` | Canonical approved logo/favicons, exactly one allowed site, homepage route, pure settings mapping and content-hashed CSS URL |
+| `erpdevelopers/content.py` | Immutable, typed public site values, planned capabilities, AI steps and roadmap content |
 | `erpdevelopers/site_setup.py` | Explicit, idempotent CLI-only changes to the approved site's Website Settings; never an install hook |
 | `erpdevelopers/www/erp_developers_home.py` | Route controller, SEO context and safe asset URLs supplied to Jinja |
 | `erpdevelopers/www/erp-developers-home.html` | Public semantic page and one linked stylesheet through Frappe's supported head block |
@@ -26,7 +27,7 @@ CSS custom properties are scoped under `.ed-site`, not `:root`, to avoid modifyi
 
 ## Branding fidelity
 
-**Never redraw, retrace, generate or substitute a logo.** The user-approved original at `erpdevelopers/public/images/erpdevelopers-selected-logo.png` is byte-identical to the uploaded PNG (SHA-256 `250df1886e13229aa0e260949f66cb91a627b220a03c36b5c1d4ede1ad06d95d`). The icon-only favicon is cropped from the same source. All homepage image references are supplied by the Python brand module. The browser login chrome includes a fixed same-site fallback to that exact image; tests require the fallback path to match the canonical Python path. No hidden user uploads or remote fonts are embedded.
+**Never redraw, retrace, generate or substitute a logo.** The user-approved original at `erpdevelopers/public/images/erpdevelopers-selected-logo.png` is byte-identical to the uploaded PNG (SHA-256 `250df1886e13229aa0e260949f66cb91a627b220a03c36b5c1d4ede1ad06d95d`). The icon-only favicon is cropped from the same source. All homepage image references are supplied by the Python brand module. The browser login chrome uses that exact image path as its local image constant; tests require it to match the canonical Python configuration. No hidden user uploads or remote fonts are embedded.
 
 ## Security invariants
 
@@ -38,7 +39,7 @@ CSS custom properties are scoped under `.ed-site`, not `:root`, to avoid modifyi
 
 ## Validation and rollback
 
-CI checks Python 3.14 syntax, JS syntax (Node 24), Bash syntax and behavior tests for branding and site setup. Production claims require a real test site, public URL and browser UAT. After an approved update, run `scripts/verify_frontend.sh` to check CSS URL, Origin bytes, correct logo and public 200 GETs, then test interactive login and multiple viewport widths.
+CI checks Python 3.14 syntax, JS syntax (Node 24), Bash syntax and behavior tests for branding and site setup. Production claims require a real test site, public URL and browser UAT. The smoke test also checks that six data-driven ecosystem cards render (not merely that an HTTP 200 page is returned). After an approved update, run `scripts/verify_frontend.sh` to check CSS URL, Origin bytes, correct logo and public 200 GETs, then test interactive login and multiple viewport widths.
 
 On failure, retain the target site's `backup --with-files` archives and the previous recorded commit. **Do not automatically hard-reset or drop databases.** Diagnose migration/source/runtime state first; roll back the Git checkout only via a reviewed plan that accounts for schema changes. The HTTP smoke script is read-only.
 

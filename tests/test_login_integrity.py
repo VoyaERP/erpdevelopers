@@ -70,6 +70,8 @@ class TestNativeLogin(unittest.TestCase):
         self.assertIn('cmp -s "$APP/erpdevelopers/public/css/brand.css" "$TMP/brand.css"', script)
         self.assertIn("erpdevelopers-selected-logo.png", script)
         self.assertIn("erpdevelopers-selected-favicon.png", script)
+        self.assertIn('CARD_COUNT=', script)
+        self.assertIn("Learning Academy", script)
         self.assertNotIn("bench migrate", script)
 
     def test_existing_site_installer_recognizes_upstream_remote(self):
