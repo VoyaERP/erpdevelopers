@@ -53,6 +53,7 @@ def versioned_public_asset(relative_path):
         "css/portal.css", "js/catalog.js", "js/assistant.js",
         "js/consultation.js", "css/meeting.css", "js/meeting.js",
         "css/arabic_typography.css", "css/events.css", "css/discovery.css",
+        "css/publications.css",
     }
     if relative_path not in allowed:
         raise ValueError("Unexpected public asset")

@@ -1,0 +1,74 @@
+{% extends "templates/includes/erpdevelopers_page_base.html" %}
+{% block ed_head %}
+<link rel="stylesheet" href="{{ publications_css_url | e }}">
+<link rel="alternate" hreflang="en" href="https://erp-developers.com/{{ directory_slug | e }}?_lang=en">
+<link rel="alternate" hreflang="ar" href="https://erp-developers.com/{{ directory_slug | e }}?_lang=ar">
+<link rel="alternate" hreflang="x-default" href="https://erp-developers.com/{{ directory_slug | e }}?_lang=en">
+{% endblock %}
+{% block ed_content %}
+<section class="ed-page-hero" aria-labelledby="ed-publications-title">
+  <div class="ed-shell ed-page-hero-inner">
+    <div>
+      <p class="ed-kicker">{% if is_projects %}{{ _("PROJECT STORIES") }}{% else %}{{ _("FROM OUR TEAM") }}{% endif %}</p>
+      <h1 id="ed-publications-title">{{ directory_title | e }}</h1>
+      <p>{{ description | e }}</p>
+      <div class="ed-actions">
+        <a class="ed-btn ed-btn-primary" href="#publications">{{ _("Explore projects") if is_projects else _("Read team advice") }}</a>
+        {% if can_manage_publications %}<a class="ed-btn ed-btn-secondary" href="{{ manage_publications_url | e }}">{{ _("Manage publications") }}</a>{% endif %}
+      </div>
+    </div>
+    <aside class="ed-page-hero-aside">
+      <span>{{ _("REVIEWED BEFORE PUBLICATION") }}</span>
+      <strong>{{ _("Experience worth sharing.") if is_projects else _("Practical guidance. Clear context.") }}</strong>
+      <p>{{ _("Only stories approved for public sharing appear here. Internal project records remain private.") if is_projects else _("Explore the context behind each recommendation and discuss how it applies to your situation.") }}</p>
+    </aside>
+  </div>
+</section>
+<section class="ed-section ed-publications" id="publications" aria-label="{{ directory_title | e }}">
+  <div class="ed-shell">
+    <form class="ed-filter-row" method="get" action="/{{ directory_slug | e }}#publications">
+      <input type="hidden" name="_lang" value="{{ directory_language | e }}">
+      <label for="ed-publication-topic">{{ _("Filter by topic") }}</label>
+      <select class="ed-filter" id="ed-publication-topic" name="topic">
+        <option value="">{{ _("All topics") }}</option>
+        {% for topic in topics %}<option value="{{ topic | e }}" {% if directory.topic == topic %}selected{% endif %}>{{ _(topic) | e }}</option>{% endfor %}
+      </select>
+      <button class="ed-btn ed-btn-primary" type="submit">{{ _("Apply filters") }}</button>
+      <a class="ed-text-link" href="/{{ directory_slug | e }}?_lang={{ directory_language | e }}#publications">{{ _("Reset filters") }}</a>
+    </form>
+    {% if directory["items"] %}
+    <div class="ed-publication-grid">
+      {% for item in directory["items"] %}
+      <article class="ed-resource-card ed-publication-card" id="publication-{{ item.name | e }}" lang="{{ item.lang | e }}" dir="{{ 'rtl' if item.lang == 'ar' else 'ltr' }}">
+        {% if item.cover %}<figure class="ed-publication-cover"><img src="{{ item.cover.url | e }}" alt="{{ item.cover.alt | e }}" loading="lazy" decoding="async" width="720" height="405"></figure>{% endif %}
+        <div class="ed-card-meta"><span>{{ _(item.topic) | e }}</span></div>
+        <h2>{{ item.title | e }}</h2>
+        <p>{{ item.summary | e }}</p>
+        {% if item.industry or item.technologies or item.author %}
+        <dl class="ed-publication-meta">
+          {% if item.industry %}<div><dt>{{ _("Industry") }}</dt><dd><bdi>{{ item.industry | e }}</bdi></dd></div>{% endif %}
+          {% if item.technologies %}<div><dt>{{ _("Technologies") }}</dt><dd><bdi>{{ item.technologies | e }}</bdi></dd></div>{% endif %}
+          {% if item.author %}<div><dt>{{ _("Author") }}</dt><dd><bdi>{{ item.author | e }}</bdi></dd></div>{% endif %}
+        </dl>
+        {% endif %}
+        <details class="ed-publication-details">
+          <summary>{{ _("Read project story") if is_projects else _("Read advice") }}</summary>
+          <div class="ed-publication-copy">{{ item.content | e }}</div>
+        </details>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="ed-empty"><strong>{{ _("No matching project stories are published yet.") if is_projects else _("No matching team advice is published yet.") }}</strong><p>{{ _("Try another topic or return after new content has been reviewed and published.") }}</p></div>
+    {% endif %}
+    {% if previous_page_url or next_page_url %}
+    <nav class="ed-publication-pages" aria-label="{{ _('Publication pages') }}">
+      {% if previous_page_url %}<a class="ed-btn ed-btn-secondary" href="{{ previous_page_url | e }}">{{ _("Previous page") }}</a>{% endif %}
+      <span>{{ _("Page") }} {{ directory.page }}</span>
+      {% if next_page_url %}<a class="ed-btn ed-btn-secondary" href="{{ next_page_url | e }}">{{ _("Next page") }}</a>{% endif %}
+    </nav>
+    {% endif %}
+  </div>
+</section>
+<section class="ed-section ed-learning-paths"><div class="ed-shell ed-path-callout"><div><h2>{{ _("Discuss your next project") if is_projects else _("Put the advice into context") }}</h2><p>{{ _("Talk with us about your goals, constraints and next steps.") }}</p></div><a class="ed-btn ed-btn-primary" href="/lets-talk#meeting-start">{{ _("Let's Talk") }}</a></div></section>
+{% endblock %}

@@ -1,0 +1,21 @@
+/* Shared Projects / Team Advice cards. No header or global theme overrides. */
+.ed-publications{scroll-margin-top:var(--ed-header-anchor-offset)}
+.ed-publication-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+.ed-publication-card{padding:26px;align-self:start;scroll-margin-top:var(--ed-header-anchor-offset)}
+.ed-publication-card h2{font-size:clamp(22px,2.3vw,29px);line-height:1.5;margin:15px 0 12px;overflow-wrap:anywhere}
+.ed-publication-card>p{font-size:15px;line-height:1.85;margin:0 0 18px;white-space:pre-line;overflow-wrap:anywhere}
+.ed-publication-cover{margin:0 0 20px;background:#f1f7fb;border:1px solid #dfebf4;border-radius:12px;overflow:hidden;aspect-ratio:16/9}
+.ed-publication-cover img{display:block;width:100%;height:100%;object-fit:contain}
+.ed-publication-meta{display:grid;gap:10px;margin:0 0 20px;padding:15px;background:#f5faff;border-radius:10px;font-size:13px}
+.ed-publication-meta>div{display:grid;grid-template-columns:minmax(75px,.4fr) minmax(0,1fr);gap:12px}
+.ed-publication-meta dt{font-weight:700;color:#365a78}
+.ed-publication-meta dd{margin:0;color:#536d84;overflow-wrap:anywhere}
+.ed-publication-details{border-top:1px solid #dce9f2;padding-top:15px}
+.ed-publication-details>summary{min-height:44px;padding:10px 0;font-weight:700;color:#1269dc;cursor:pointer;list-style-position:inside}
+.ed-publication-details>summary:focus-visible{outline:3px solid #05b9ac;outline-offset:3px;border-radius:5px}
+.ed-publication-copy{white-space:pre-wrap;overflow-wrap:anywhere;color:#435d76;font-size:15px;line-height:1.9;padding:15px 0 0}
+.ed-publication-pages{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:28px}
+.ed-publication-card[lang="ar"]{font-family:"Tajawal",Arial,sans-serif}
+.ed-publication-card[lang="en"]{font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+.ed-publication-card[lang] :is(h2,p,summary,dt,dd){font-family:inherit}
+@media(max-width:760px){.ed-publication-grid{grid-template-columns:minmax(0,1fr)}.ed-publication-card{padding:20px}.ed-publications .ed-filter-row{align-items:stretch}.ed-publications .ed-filter{width:100%}.ed-publications .ed-filter-row .ed-btn{width:auto}.ed-publication-meta>div{grid-template-columns:1fr;gap:3px}}

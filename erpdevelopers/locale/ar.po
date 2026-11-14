@@ -553,3 +553,148 @@ msgstr "لم تُرسل الرسالة النصية. يُرجى التواصل �
 
 msgid "Verification code email not sent. Please contact Administrator."
 msgstr "لم تُرسل رسالة رمز التحقق. يُرجى التواصل مع مسؤول النظام."
+
+# Public project stories and team-authored guidance.
+msgid "Projects"
+msgstr "المشاريع"
+
+msgid "Project"
+msgstr "مشروع"
+
+msgid "Team Advice"
+msgstr "نصائح الفريق"
+
+msgid "ERP Developers Publication"
+msgstr "منشورات ERP Developers"
+
+msgid "Publication details"
+msgstr "تفاصيل المنشور"
+
+msgid "Publication type"
+msgstr "نوع المنشور"
+
+msgid "Industry"
+msgstr "القطاع"
+
+msgid "Technologies"
+msgstr "التقنيات"
+
+msgid "Author"
+msgstr "الكاتب"
+
+msgid "Public author name"
+msgstr "اسم الكاتب المعروض للجمهور"
+
+msgid "Arabic author name"
+msgstr "اسم الكاتب بالعربية"
+
+msgid "Plain text, up to 600 characters."
+msgstr "نص عادي بحد أقصى 600 محرف."
+
+msgid "Arabic summary"
+msgstr "الملخص بالعربية"
+
+msgid "Publication content"
+msgstr "محتوى المنشور"
+
+msgid "Content"
+msgstr "المحتوى"
+
+msgid "Arabic content"
+msgstr "المحتوى بالعربية"
+
+msgid "Plain text, up to 12000 characters. Describe the project or explain your recommendations; no HTML is rendered."
+msgstr "نص عادي بحد أقصى 12000 محرف. صِف المشروع أو اشرح توصياتك؛ لا يُعرض تنسيق HTML."
+
+msgid "Add Arabic title, summary and content together. Otherwise the complete English entry is shown."
+msgstr "أضف العنوان والملخص والمحتوى بالعربية معاً. وإلا سيُعرض المنشور كاملاً بالإنجليزية."
+
+msgid "Public from upload, including on drafts. Upload only images approved for public sharing."
+msgstr "تكون الصور عامة منذ رفعها، حتى في المسودات. ارفع فقط الصور المعتمدة للمشاركة العامة."
+
+msgid "Approved for public sharing"
+msgstr "معتمد للمشاركة العامة"
+
+msgid "Confirm permission to publish all text, client names and images. No internal ERPNext records are imported."
+msgstr "تأكد من الإذن بنشر النصوص وأسماء العملاء والصور. لا يتم استيراد أي سجلات داخلية من ERPNext."
+
+msgid "View on website"
+msgstr "عرض على الموقع"
+
+msgid "Select a valid publication type and topic."
+msgstr "اختر نوعاً وموضوعاً صحيحين للمنشور."
+
+msgid "Keep publication text within the field limits and remove control characters."
+msgstr "التزم بالحد الأقصى لطول حقول المنشور وأزل محارف التحكم."
+
+msgid "Enter the publication title, summary and content."
+msgstr "أدخل عنوان المنشور وملخصه ومحتواه."
+
+msgid "Review the content and confirm public sharing before publishing."
+msgstr "راجع المحتوى وأكّد اعتماده للمشاركة العامة قبل النشر."
+
+msgid "Enter a public author name before publishing team advice."
+msgstr "أدخل اسم الكاتب المخصص للعرض العام قبل نشر نصائح الفريق."
+
+msgid "Explore published project stories, technologies and lessons from delivery."
+msgstr "استكشف تجارب المشاريع المنشورة والتقنيات المستخدمة والدروس المستفادة من التنفيذ."
+
+msgid "Practical recommendations from our team on ERP, development and technology decisions."
+msgstr "توصيات عملية من فريقنا حول أنظمة الأعمال والتطوير والقرارات التقنية."
+
+msgid "PROJECT STORIES"
+msgstr "تجارب المشاريع"
+
+msgid "FROM OUR TEAM"
+msgstr "من فريقنا"
+
+msgid "Explore projects"
+msgstr "استكشف المشاريع"
+
+msgid "Read team advice"
+msgstr "اقرأ نصائح الفريق"
+
+msgid "Manage publications"
+msgstr "إدارة المنشورات"
+
+msgid "REVIEWED BEFORE PUBLICATION"
+msgstr "مراجعة قبل النشر"
+
+msgid "Experience worth sharing."
+msgstr "خبرات تستحق المشاركة."
+
+msgid "Practical guidance. Clear context."
+msgstr "إرشادات عملية في سياق واضح."
+
+msgid "Only stories approved for public sharing appear here. Internal project records remain private."
+msgstr "تظهر هنا التجارب المعتمدة للمشاركة العامة فقط. وتظل سجلات المشاريع الداخلية خاصة."
+
+msgid "Explore the context behind each recommendation and discuss how it applies to your situation."
+msgstr "تعرّف على سياق كل توصية وناقش كيفية تطبيقها بما يناسب احتياجاتك."
+
+msgid "Read project story"
+msgstr "اقرأ تجربة المشروع"
+
+msgid "Read advice"
+msgstr "اقرأ النصيحة"
+
+msgid "No matching project stories are published yet."
+msgstr "لا توجد تجارب مشاريع منشورة مطابقة حالياً."
+
+msgid "No matching team advice is published yet."
+msgstr "لا توجد نصائح منشورة مطابقة حالياً."
+
+msgid "Try another topic or return after new content has been reviewed and published."
+msgstr "اختر موضوعاً آخر أو عُد بعد مراجعة محتوى جديد ونشره."
+
+msgid "Publication pages"
+msgstr "صفحات المنشورات"
+
+msgid "Discuss your next project"
+msgstr "ناقش مشروعك القادم"
+
+msgid "Put the advice into context"
+msgstr "ناقش النصيحة في سياق احتياجاتك"
+
+msgid "Talk with us about your goals, constraints and next steps."
+msgstr "تحدث معنا عن أهدافك ومتطلباتك وخطواتك القادمة."

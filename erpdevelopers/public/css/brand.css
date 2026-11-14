@@ -21,10 +21,10 @@
  * arrival from redistributing links. No cloned menu, late class swap or JS layout.
  */
 .ed-nav{position:sticky;top:0;z-index:110;border-bottom:1px solid var(--ed-border);background:#fff;box-shadow:0 8px 22px #0c305310}
-.ed-nav-inner{min-height:75px;display:grid;grid-template-columns:207px minmax(0,1fr) 244px;align-items:center;gap:18px;min-width:0}
+.ed-nav-inner{min-height:75px;display:grid;grid-template-columns:207px minmax(0,1fr) 244px;align-items:center;gap:18px;min-width:0;width:min(1360px,calc(100% - 44px))}
 .ed-brand{display:flex;align-items:center;min-width:0}
 .ed-brand img{display:block;width:207px;height:69px;max-width:100%;object-fit:contain}
-.ed-nav nav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));align-items:center;min-width:0}
+.ed-nav nav{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));align-items:center;min-width:0}
 .ed-nav nav a{display:flex;align-items:center;justify-content:center;min-width:0;min-height:44px;padding:8px 4px;color:#364d66;font-size:13px;line-height:1.4;font-weight:700;white-space:nowrap;word-break:normal;overflow-wrap:normal;text-wrap:nowrap;border-radius:7px}
 .ed-nav nav a:hover{color:var(--ed-blue);background:#f1f8fd}
 .ed-nav-tools{display:grid;grid-template-columns:112px 120px;align-items:center;gap:12px;width:244px;min-width:0}
@@ -150,16 +150,18 @@
 .ed-footer-links{display:flex;flex-wrap:wrap;gap:10px 18px}
 .ed-footer-links a{flex:none;white-space:nowrap;color:var(--ed-blue);font-size:12px;font-weight:740;min-height:32px;display:inline-flex;align-items:center}
 
-/* Responsive layout: two stable header rows, with whole labels in one scroll row. */
-@media(max-width:1100px){
+/* Eight links need a full-width lower row before text becomes cramped. */
+@media(max-width:1360px){
   .ed-site{--ed-header-anchor-offset:145px}
-  .ed-shell{width:calc(100% - 38px)}
   .ed-brand img{width:185px;height:62px}
   .ed-nav-inner{grid-template-columns:minmax(0,1fr) 244px;gap:0 14px;padding-block:6px}
   .ed-brand{grid-column:1;grid-row:1}
   .ed-nav nav{display:flex;flex-wrap:nowrap;grid-row:2;grid-column:1/-1;justify-content:flex-start;gap:4px;overflow-x:auto;scrollbar-width:thin;overflow-y:hidden;min-height:52px;padding-block:3px;overscroll-behavior-inline:contain;border-top:1px solid #edf3f8}
   .ed-nav nav a{font-size:13px;flex:0 0 104px;min-height:44px}
   .ed-nav-tools{grid-row:1;grid-column:2;justify-self:end}
+}
+@media(max-width:1100px){
+  .ed-shell{width:calc(100% - 38px)}
   .ed-hero-inner{gap:25px}
   .ed-art{height:355px}
   .ed-art-core{width:158px;height:148px}
