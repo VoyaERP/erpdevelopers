@@ -1,11 +1,12 @@
 /* Extra public pages only; extend existing ERP Developers website tokens. */
 .ed-page-hero{padding-block:52px 56px;background:linear-gradient(110deg,#f7fbff 2%,#edf7ff 75%,#e8f9f7 100%);border-bottom:1px solid #dce9f5}
-.ed-page-hero-inner{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(270px,.65fr);gap:46px;align-items:center}
-.ed-page-hero h1{margin:13px 0 17px;max-width:720px;color:#071c3c;font-weight:830;line-height:1.08;letter-spacing:-.045em;font-size:clamp(39px,4.5vw,59px)}
+.ed-page-hero-inner{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,.65fr);gap:clamp(22px,4vw,46px);align-items:center}
+.ed-page-hero-inner>*{min-width:0}
+.ed-page-hero h1{margin:13px 0 17px;max-width:720px;color:#071c3c;font-weight:820;line-height:1.25;letter-spacing:-.035em;font-size:clamp(36px,4.3vw,58px)}
 .ed-page-hero p:not(.ed-kicker){color:#5c6e85;font-size:16px;line-height:1.75;max-width:660px;margin:0}
 .ed-page-hero-aside{padding:25px;border-radius:17px;background:#fff;border:1px solid #dce9f5;box-shadow:0 12px 34px #153b670b}
 .ed-page-hero-aside span{font-size:10px;font-weight:830;letter-spacing:.11em;color:#128aa4}
-.ed-page-hero-aside strong{display:block;margin:10px 0 11px;font-size:21px;line-height:1.35;color:#071c3c}
+.ed-page-hero-aside strong{display:block;margin:10px 0 11px;font-size:21px;line-height:1.55;color:#071c3c;overflow-wrap:break-word}
 .ed-page-hero-aside p{font-size:13px!important;line-height:1.7!important}
 .ed-page-section{background:#fff}
 .ed-resource-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
@@ -13,9 +14,9 @@
 .ed-resource-card[hidden]{display:none}
 .ed-card-meta{display:flex;flex-wrap:wrap;gap:8px}
 .ed-card-meta span{padding:5px 8px;background:#edf7fd;border-radius:6px;font-size:11px;color:#1c6b8e;font-weight:730}
-.ed-resource-card h3{font-size:21px;line-height:1.35;letter-spacing:-.02em;margin:16px 0 10px;font-weight:760;color:#071c3c}
+.ed-resource-card h3{font-size:21px;line-height:1.45;letter-spacing:-.015em;margin:16px 0 10px;font-weight:760;color:#071c3c}
 .ed-resource-card>p{color:#61748d;font-size:13px;line-height:1.73}
-.ed-card-bottom{display:flex;gap:13px;justify-content:space-between;align-items:center;margin-top:auto;padding-top:21px;font-size:12px}
+.ed-card-bottom{display:flex;flex-wrap:wrap;gap:10px 13px;justify-content:space-between;align-items:center;margin-top:auto;padding-top:21px;font-size:12px;line-height:1.6}
 .ed-card-bottom>span{color:#6c7d90}
 .ed-card-bottom a{color:#1269dc!important;font-weight:770}
 .ed-editor-note{border-inline-start:3px solid #08b7ae;background:#f4fafc;border-radius:0 9px 9px 0;padding:13px 15px;margin:7px 0 8px}
@@ -29,7 +30,7 @@
 .ed-empty strong{display:block;color:#123451;font-size:18px;margin-bottom:9px}
 .ed-empty p{max-width:530px;margin:0 auto;color:#61768c;font-size:13px;line-height:1.65}
 .ed-learning-paths{background:#f5faff}
-.ed-path-callout{display:flex;justify-content:space-between;align-items:center;gap:25px;padding:26px 32px;border:1px solid #d8e8f4;border-radius:16px;background:#f6faff}
+.ed-path-callout{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:25px;padding:26px 32px;border:1px solid #d8e8f4;border-radius:16px;background:#f6faff}
 .ed-path-callout h2{font-size:clamp(23px,2.8vw,32px);margin-top:8px}
 .ed-form-layout{display:grid;grid-template-columns:minmax(250px,.72fr) minmax(0,1.28fr);gap:50px;align-items:start}
 .ed-form-intro{max-width:350px;color:#5c6e85;font-size:14px;line-height:1.72;margin-top:17px}
@@ -57,7 +58,7 @@
 .ed-nav nav a.ed-nav-talk{color:#08798d;font-weight:800}
 .ed-footer-links{flex-wrap:wrap}
 .ed-assistant{position:fixed;inset-inline-end:18px;bottom:19px;z-index:200;max-width:min(370px,calc(100vw - 35px));font-family:inherit}
-.ed-assistant-toggle{border:1px solid #096c90;border-radius:30px;padding:12px 18px;background:#0c5ca4;color:#fff;font-size:13px;font-weight:780;box-shadow:0 7px 19px #0e488a38;cursor:pointer}
+.ed-assistant-toggle{border:1px solid #096c90;border-radius:30px;padding:12px 18px;background:#0c5ca4;color:#fff;font-size:13px;font-weight:780;line-height:1.6;max-width:100%;white-space:normal;box-shadow:0 7px 19px #0e488a38;cursor:pointer}
 .ed-assistant-panel{background:#fff;border:1px solid #cfe2ef;border-radius:16px;box-shadow:0 14px 46px #0c34583d;padding:18px;margin-bottom:8px;max-height:min(520px,75vh);overflow-y:auto}
 .ed-assistant-panel[hidden]{display:none}
 .ed-assistant-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#071c3c}
@@ -72,9 +73,9 @@
 .ed-assistant-questions button:hover{background:#f1f8fc}
 .ed-assistant-roadmap{font-size:11px;color:#687e93;line-height:1.6;margin-top:12px}
 html[lang^="ar"] .ed-page-hero-aside span,html[lang^="ar"] .ed-link-card small{letter-spacing:0}
-@media(max-width:1100px){.ed-nav nav{gap:10px}.ed-nav nav a{font-size:12px}.ed-nav-inner{gap:11px}.ed-resource-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:830px){.ed-page-hero-inner{grid-template-columns:1fr;gap:20px}.ed-page-hero{padding-block:38px}.ed-form-layout{grid-template-columns:1fr;gap:24px}}
-@media(max-width:540px){.ed-page-hero h1{font-size:38px}.ed-resource-grid{grid-template-columns:1fr}.ed-form-grid{grid-template-columns:1fr}.ed-form-card{padding:20px}.ed-path-callout{flex-direction:column;align-items:flex-start;padding:21px}.ed-catalog-count{margin-inline-start:0}.ed-assistant{inset-inline-end:10px;bottom:10px}}
+@media(max-width:1100px){.ed-resource-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:960px){.ed-page-hero-inner{grid-template-columns:minmax(0,1fr);gap:20px}.ed-page-hero{padding-block:38px}.ed-form-layout{grid-template-columns:1fr;gap:24px}}
+@media(max-width:540px){.ed-page-hero h1{font-size:clamp(34px,8.5vw,40px)}.ed-resource-grid{grid-template-columns:1fr}.ed-form-grid{grid-template-columns:1fr}.ed-form-card{padding:20px}.ed-path-callout{flex-direction:column;align-items:flex-start;padding:21px}.ed-catalog-count{margin-inline-start:0}.ed-assistant{inset-inline-end:10px;bottom:10px}}
 @media(prefers-reduced-motion:reduce){.ed-link-card{transition:none}.ed-link-card:hover{transform:none}}
 /* Unnumbered learning ideas; compact rather than a step-by-step lecture. */
 .ed-learning-lanes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}

@@ -14,16 +14,17 @@
 }
 .ed-site .ed-meeting-layout{
   display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);
-  gap:clamp(28px,5vw,76px);align-items:center;position:relative;z-index:1;
+  gap:clamp(28px,5vw,70px);align-items:center;position:relative;z-index:1;
 }
+.ed-meeting-layout>*{min-width:0}
 .ed-meeting-story{position:relative;min-width:0}
-.ed-meeting-eyebrow{display:inline-flex;align-items:center;gap:11px;font-size:10px;letter-spacing:.16em;font-weight:800;color:#b1dcf4}
+.ed-meeting-eyebrow{display:inline-flex;align-items:center;flex-wrap:wrap;gap:11px;font-size:10px;letter-spacing:.13em;font-weight:800;line-height:1.6;color:#b1dcf4}
 .ed-meeting-signal{width:8px;height:8px;border-radius:100%;background:#56e3ce;box-shadow:0 0 0 7px #5ae7d41b}
-.ed-meeting-story h1{font-size:clamp(42px,4.5vw,71px);line-height:1.09;letter-spacing:-.054em;margin:23px 0 19px;color:#fff;font-weight:830}
+.ed-meeting-story h1{font-size:clamp(40px,4.25vw,65px);line-height:1.22;letter-spacing:-.04em;margin:23px 0 19px;color:#fff;font-weight:825;overflow-wrap:break-word}
 .ed-meeting-story h1 em{font-style:normal;color:#8be1e4}
 .ed-meeting-story>p:not(.ed-meeting-note){font-size:15px;line-height:1.85;max-width:540px;color:#d1e4f6}
 .ed-meeting-topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:25px}
-.ed-meeting-topics span{display:inline-flex;padding:8px 12px;border-radius:100px;border:1px solid #ffffff30;background:#ffffff0e;color:#e1f6ff;font-size:11px;font-weight:700}
+.ed-meeting-topics span{display:inline-flex;max-width:100%;padding:8px 12px;border-radius:100px;border:1px solid #ffffff30;background:#ffffff0e;color:#e1f6ff;font-size:11px;font-weight:700;line-height:1.7;white-space:normal}
 .ed-meeting-orbit{height:180px;width:min(100%,390px);margin:20px auto 0;position:relative;display:grid;place-items:center}
 .ed-meeting-orbit img{position:relative;z-index:2;width:100px;height:100px;object-fit:contain;background:#fff;border:1px solid #9bcde7;border-radius:25px;padding:9px;box-shadow:0 13px 40px #0005}
 .ed-meeting-orbit-ring,.ed-meeting-orbit-halo{position:absolute;border:1px solid #73b8d566;border-radius:50%;inset:12px 69px;transform:rotate(29deg)}
@@ -32,23 +33,24 @@
 .ed-meeting-node-one{top:20px;left:28%}.ed-meeting-node-two{right:20%;bottom:29px}
 .ed-meeting-note{margin:5px 0 0;color:#9dcae5;font-size:12px;font-weight:650}
 .ed-booking-card{min-width:0;background:#fff;border-radius:22px;box-shadow:0 25px 84px #030b273f;border:1px solid #dfeaf5;padding:clamp(22px,3vw,34px);color:#092b4f}
-.ed-booking-head{display:flex;align-items:start;justify-content:space-between;gap:15px;padding-bottom:18px;border-bottom:1px solid #e5edf4}
+.ed-booking-head{display:flex;align-items:start;justify-content:space-between;flex-wrap:wrap;gap:10px 15px;padding-bottom:18px;border-bottom:1px solid #e5edf4}
+.ed-booking-head>div{min-width:0;flex:1 1 220px}
 .ed-booking-overline{color:#088d9e;font-size:10px;font-weight:850;letter-spacing:.12em}
-.ed-booking-head h2{font-size:clamp(22px,2.5vw,31px);letter-spacing:-.035em;line-height:1.2;margin:6px 0 0;color:#0b2949}
-.ed-booking-duration{flex:none;font-size:11px;font-weight:710;color:#426885;background:#eaf7fb;border-radius:50px;padding:7px 10px}
+.ed-booking-head h2{font-size:clamp(22px,2.4vw,30px);letter-spacing:-.025em;line-height:1.34;margin:6px 0 0;color:#0b2949}
+.ed-booking-duration{flex:0 1 auto;max-width:100%;font-size:11px;font-weight:710;line-height:1.55;text-align:center;color:#426885;background:#eaf7fb;border-radius:50px;padding:7px 10px}
 .ed-meeting-progress{display:flex;gap:7px;margin:19px 0 22px}
 .ed-meeting-progress span{width:35px;height:4px;border-radius:4px;background:#e3ecf3}
 .ed-meeting-progress span.is-active{background:linear-gradient(90deg,#116ddd,#0bb8b2)}
 .ed-booking-pane[hidden]{display:none!important}
-.ed-booking-pane h3{font-size:20px;font-weight:810;letter-spacing:-.03em;color:#0d2c4c;margin:0 0 17px}
-.ed-meeting-label{display:block;font-weight:740;font-size:12px;color:#385672;margin:0 0 8px}
-.ed-booking-pane select,.ed-booking-pane :is(input,textarea){background:#fff;color:#113453;border:1px solid #cfdfe9;min-width:0;border-radius:10px;padding:11px 12px;font-size:13px;min-height:44px;width:100%}
+.ed-booking-pane h3{font-size:20px;font-weight:810;line-height:1.4;letter-spacing:-.02em;color:#0d2c4c;margin:0 0 17px}
+.ed-meeting-label{display:block;font-weight:740;font-size:12px;line-height:1.6;color:#385672;margin:0 0 8px}
+.ed-booking-pane select,.ed-booking-pane :is(input,textarea){background:#fff;color:#113453;border:1px solid #cfdfe9;min-width:0;border-radius:10px;padding:11px 12px;font-size:13px;line-height:1.55;min-height:44px;width:100%}
 .ed-booking-pane :is(input,select,textarea):focus-visible{outline:2px solid #0c79b3;outline-offset:1px}
-.ed-meeting-picker{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(160px,.95fr);gap:17px;margin-top:18px}
+.ed-meeting-picker{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:17px;margin-top:18px}
 .ed-meeting-calendar{background:#f8fbfe;border-radius:14px;padding:14px 12px;border:1px solid #e1ebf4;min-width:0}
 .ed-meeting-calendar-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
-.ed-meeting-calendar-top strong{font-size:14px;font-weight:790;color:#163958}
-.ed-meeting-month-controls{display:flex;gap:4px}
+.ed-meeting-calendar-top strong{flex:1 1 auto;min-width:0;font-size:14px;line-height:1.6;font-weight:790;color:#163958}
+.ed-meeting-month-controls{display:flex;gap:4px;flex:none}
 .ed-meeting-month-controls button{width:30px;height:30px;border:1px solid #d6e5ed;border-radius:8px;background:#fff;color:#1b5e7e;font-size:22px;line-height:1;cursor:pointer}
 .ed-meeting-month-controls button:disabled{opacity:.3;cursor:not-allowed}
 .ed-meeting-weekdays,.ed-meeting-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;text-align:center}
@@ -65,14 +67,15 @@
 .ed-meeting-slot:hover:not(:disabled){background:#f1f9fe;border-color:#1a87b7}
 .ed-meeting-slot[aria-pressed="true"]{background:#0d71d2!important;border-color:#0d71d2!important;color:#fff!important}
 .ed-meeting-slot:disabled{opacity:.35;cursor:not-allowed}
-.ed-meeting-slot-placeholder{grid-column:1/-1;padding:18px 6px;margin:0;color:#778da2;font-size:12px;line-height:1.65}
-.ed-meeting-selection{display:flex;align-items:center;gap:10px;min-height:45px;margin:18px 0 14px;padding:10px 12px;border-radius:10px;background:#eef8fb;color:#2e667e;font-size:12px;font-weight:730}
+.ed-meeting-slot-placeholder{grid-column:1/-1;padding:18px 6px;margin:0;color:#778da2;font-size:12px;line-height:1.8}
+.ed-meeting-selection{display:flex;align-items:center;gap:10px;min-height:45px;margin:18px 0 14px;padding:10px 12px;border-radius:10px;background:#eef8fb;color:#2e667e;font-size:12px;font-weight:730;line-height:1.75}
+.ed-meeting-selection>span:last-child{min-width:0;flex:1;overflow-wrap:break-word}
 .ed-meeting-selection-dot{width:7px;height:7px;border-radius:50%;background:#0cbbb4;flex:none}
-.ed-meeting-main-action{width:100%;border:0;justify-content:center;cursor:pointer;min-height:48px}
+.ed-meeting-main-action{width:100%;border:0;justify-content:center;flex-wrap:wrap;cursor:pointer;min-height:48px}
 .ed-meeting-main-action:disabled{opacity:.45;cursor:not-allowed}
 .ed-meeting-contact-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
 .ed-meeting-contact-grid .ed-field{min-width:0}
-.ed-meeting-contact-grid .ed-field label{display:block;margin:0 0 6px;color:#47627d;font-size:12px;font-weight:720}
+.ed-meeting-contact-grid .ed-field label{display:block;margin:0 0 6px;color:#47627d;font-size:12px;line-height:1.65;font-weight:720}
 .ed-meeting-contact-grid .ed-field-full{grid-column:1/-1}
 .ed-meeting-contact-grid textarea{resize:vertical;min-height:100px}
 .ed-meeting-back{border:0;background:transparent;color:#116f99;cursor:pointer;font-size:12px;font-weight:730;margin:0 0 17px;padding:0}
@@ -80,7 +83,7 @@
 .ed-meeting-consent input{margin:4px 0 0;width:auto;min-height:auto;flex:none}
 .ed-meeting-consent a{color:#1269dc;text-decoration:underline!important}
 .ed-meeting-mail-note{font-size:11px;color:#71869a;margin:13px 0;line-height:1.6}
-.ed-meeting-feedback{font-size:12px;line-height:1.5;min-height:16px;color:#137e76;font-weight:720;margin:12px 0 0}
+.ed-meeting-feedback{font-size:12px;line-height:1.75;min-height:16px;color:#137e76;font-weight:720;margin:12px 0 0;overflow-wrap:break-word}
 .ed-meeting-feedback.is-error{color:#b22f43}
 .ed-meeting-honeypot{position:absolute;clip-path:inset(50%);width:1px;height:1px;overflow:hidden}
 .ed-meeting-done{text-align:center;padding:40px 6px 23px}
@@ -90,11 +93,38 @@
 .ed-meeting-unavailable-icon{display:grid;place-items:center;background:#e6f7fb;color:#0a7d9d;border-radius:16px;width:62px;height:62px;font-size:32px;margin:0 auto 20px}
 .ed-meeting-unavailable h3{font-size:22px;color:#153753}
 .ed-meeting-unavailable p{color:#657c90;line-height:1.7;max-width:420px;margin:10px auto 21px;font-size:13px}
-html[dir="rtl"] .ed-meeting-story h1{letter-spacing:0}
+/* RTL/Arabic inherits the shared typography from brand.css. */
 html[dir="rtl"] .ed-meeting-month-controls button{transform:scaleX(-1)}
-html[dir="rtl"] .ed-meeting-eyebrow{letter-spacing:0}
-html[dir="rtl"] .ed-meeting-main-action span,html[dir="rtl"] .ed-meeting-back span{display:inline-block;transform:scaleX(-1)}
-@media(max-width:1050px){.ed-meeting-layout{grid-template-columns:1fr 1.18fr;gap:27px}.ed-meeting-picker{grid-template-columns:1fr}.ed-meeting-slots{min-height:60px;max-height:115px;grid-template-columns:repeat(4,minmax(0,1fr))}.ed-meeting-orbit{height:145px}}
-@media(max-width:800px){.ed-meeting-layout{grid-template-columns:1fr}.ed-meeting-stage{padding:37px 0}.ed-meeting-story h1{font-size:clamp(40px,7vw,55px);max-width:650px}.ed-meeting-story{max-width:680px}.ed-meeting-orbit{display:none}.ed-booking-card{width:100%}.ed-meeting-picker{grid-template-columns:minmax(0,1fr) minmax(160px,.8fr)}}
-@media(max-width:540px){.ed-booking-card{padding:20px 15px}.ed-booking-duration{display:none}.ed-meeting-picker{grid-template-columns:1fr;gap:13px}.ed-meeting-slots{grid-template-columns:repeat(3,minmax(0,1fr));max-height:147px}.ed-meeting-contact-grid{grid-template-columns:1fr}.ed-meeting-stage{padding:24px 0 45px}.ed-meeting-story h1{font-size:clamp(35px,9vw,43px)}}
-@media(prefers-reduced-motion:reduce){.ed-meeting-stage *{scroll-behavior:auto!important;transition:none!important}}
+html[dir="rtl"] .ed-meeting-main-action span,
+html[dir="rtl"] .ed-meeting-back span{display:inline-block;transform:scaleX(-1)}
+@media(max-width:1050px){
+  .ed-meeting-layout{grid-template-columns:minmax(0,1fr) minmax(0,1.18fr);gap:27px}
+  .ed-meeting-picker{grid-template-columns:1fr}
+  .ed-meeting-slots{min-height:60px;max-height:150px;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .ed-meeting-orbit{height:145px}
+}
+@media(max-width:960px){
+  .ed-meeting-layout{grid-template-columns:1fr}
+  .ed-meeting-stage{padding:37px 0}
+  .ed-meeting-story h1{font-size:clamp(40px,6.2vw,55px);max-width:650px}
+  .ed-meeting-story{max-width:680px}
+  .ed-meeting-orbit{display:none}
+  .ed-booking-card{width:100%}
+  .ed-meeting-picker{grid-template-columns:minmax(0,1fr) minmax(0,.85fr)}
+}
+@media(max-width:700px){
+  .ed-meeting-picker{grid-template-columns:1fr;gap:17px}
+  .ed-meeting-slots{grid-template-columns:repeat(3,minmax(0,1fr));min-height:75px;max-height:190px}
+}
+@media(max-width:540px){
+  .ed-booking-card{padding:20px 15px}
+  .ed-booking-duration{display:none}
+  .ed-meeting-contact-grid{grid-template-columns:1fr}
+  .ed-meeting-stage{padding:24px 0 45px}
+  .ed-meeting-story h1{font-size:clamp(35px,9vw,43px)}
+  .ed-booking-pane :is(input,select,textarea){font-size:16px}
+  .ed-meeting-slots{gap:6px}
+}
+@media(prefers-reduced-motion:reduce){
+  .ed-meeting-stage *{scroll-behavior:auto!important;transition:none!important}
+}
