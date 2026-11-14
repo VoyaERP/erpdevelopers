@@ -1,23 +1,65 @@
-"""Read-only public views of explicitly published ERP Developers Desk content."""
-from erpdevelopers.catalog_rules import external_https_url
+"""Curator-reviewed public catalogue; no Guest DocType permissions are granted.
+
+During a partial/stale migration, a public index remains renderable as empty.
+Operators can diagnose missing schemas with catalog_health via bench execute.
+Other database failures still raise normally, rather than being silently hidden.
+"""
+from erpdevelopers.catalog_rules import external_https_url, youtube_playlist_id
+
+PLAYLIST_DOCTYPE = "ERP Developers Playlist"
+RESOURCE_DOCTYPE = "ERP Developers Resource"
+PLAYLIST_FIELDS = (
+    "title", "title_ar", "topic", "level", "language",
+    "description", "playlist_url", "playlist_id",
+)
+RESOURCE_FIELDS = (
+    "title", "title_ar", "topic", "summary", "editorial_note",
+    "language", "source_kind", "external_url", "source_name", "web_page",
+)
 
 
-def public_playlists():
+def _schema_status(doctype, fields):
+    """One DB metadata lookup: do not query a table missing after partial migrate."""
     import frappe
 
-    items = frappe.get_all(
-        "ERP Developers Playlist",
+    if not frappe.db.table_exists(doctype, cached=False):
+        return {"table_present": False, "missing_columns": list(fields)}
+
+    required = set(fields) | {"published", "sort_order", "modified"}
+    existing = set(frappe.db.get_table_columns(doctype))
+    return {
+        "table_present": True,
+        "missing_columns": sorted(required - existing),
+    }
+
+
+def catalog_health():
+    """Read-only diagnostic for Bench operators, not a public API endpoint."""
+    return {
+        PLAYLIST_DOCTYPE: _schema_status(PLAYLIST_DOCTYPE, PLAYLIST_FIELDS),
+        RESOURCE_DOCTYPE: _schema_status(RESOURCE_DOCTYPE, RESOURCE_FIELDS),
+    }
+
+
+def _published_rows(doctype, fields):
+    import frappe
+
+    status = _schema_status(doctype, fields)
+    if not status["table_present"] or status["missing_columns"]:
+        return []
+    return frappe.get_all(
+        doctype,
         filters={"published": 1},
-        fields=["title", "title_ar", "topic", "level", "language",
-                "description", "playlist_url", "playlist_id"],
+        fields=list(fields),
         order_by="sort_order asc, modified desc",
         limit_page_length=60,
     )
-    # Treat record URLs as untrusted even after saving: defense in depth.
-    from erpdevelopers.catalog_rules import youtube_playlist_id
 
+
+def public_playlists():
+    rows = _published_rows(PLAYLIST_DOCTYPE, PLAYLIST_FIELDS)
     result = []
-    for item in items:
+    for item in rows:
         try:
             list_id = youtube_playlist_id(item.playlist_url)
         except ValueError:
@@ -31,23 +73,19 @@ def public_playlists():
 def public_resources():
     import frappe
 
-    rows = frappe.get_all(
-        "ERP Developers Resource",
-        filters={"published": 1},
-        fields=["title", "title_ar", "topic", "summary", "editorial_note",
-                "language", "source_kind", "external_url", "source_name", "web_page"],
-        order_by="sort_order asc, modified desc",
-        limit_page_length=60,
-    )
+    rows = _published_rows(RESOURCE_DOCTYPE, RESOURCE_FIELDS)
     internal = {r.web_page for r in rows if r.source_kind == "Original Article" and r.web_page}
     published_pages = {}
     if internal:
-        pages = frappe.get_all(
-            "Web Page",
-            filters={"name": ["in", sorted(internal)], "published": 1},
-            fields=["name", "route"],
-        )
-        published_pages = {p.name: p.route for p in pages if p.route}
+        # If Frappe's own Web Page table is undergoing migration, do not expose
+        # a draft article and do not render its link.
+        if frappe.db.table_exists("Web Page", cached=False):
+            pages = frappe.get_all(
+                "Web Page",
+                filters={"name": ["in", sorted(internal)], "published": 1},
+                fields=["name", "route"],
+            )
+            published_pages = {p.name: p.route for p in pages if p.route}
 
     result = []
     for row in rows:
