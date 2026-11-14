@@ -87,13 +87,25 @@
   grep -Fq 'id="book-meeting"' "$TMP/lets-talk.html" || {
     echo "STOP: meeting scheduler container missing"; exit 3;
   }
-  if grep -Fq 'id="ed-meeting-form"' "$TMP/lets-talk.html"; then
-    grep -Fq "Your meeting is confirmed after you verify it." "$TMP/lets-talk.html" || {
-      echo "STOP: native booking email confirmation copy missing"; exit 3;
+  grep -Fq 'id="ed-meeting-form"' "$TMP/lets-talk.html" || {
+    echo "STOP: the public booking form must be visible even while calendar is unconfigured"; exit 3;
+  }
+  grep -Fq 'id="ed-meeting-slots"' "$TMP/lets-talk.html" || {
+    echo "STOP: the real booking calendar area is missing"; exit 3;
+  }
+  grep -Fq "Your meeting is confirmed after you verify it." "$TMP/lets-talk.html" || {
+    echo "STOP: booking email verification disclaimer missing"; exit 3;
+  }
+  if grep -Fq 'data-booking-ready="0"' "$TMP/lets-talk.html"; then
+    grep -Fq 'ed-meet-offline-notice' "$TMP/lets-talk.html" || {
+      echo "STOP: offline booking must show a clear unavailable notice"; exit 3;
+    }
+    grep -Fq '<fieldset class="ed-meet-fields" disabled' "$TMP/lets-talk.html" || {
+      echo "STOP: offline booking form must be disabled"; exit 3;
     }
   else
-    grep -Fq 'ed-meeting-unavailable' "$TMP/lets-talk.html" || {
-      echo "STOP: meeting booking must fail closed when calendar is unconfigured"; exit 3;
+    grep -Fq 'data-booking-ready="1"' "$TMP/lets-talk.html" || {
+      echo "STOP: expected explicit server-side booking readiness"; exit 3;
     }
   fi
   echo "=== Verify native booking assets and page without leaking appointment data ==="

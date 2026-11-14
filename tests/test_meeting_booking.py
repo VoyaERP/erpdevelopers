@@ -228,7 +228,17 @@ class TestNativeAPIBoundary(TestCase):
         self.assertNotIn("localStorage", script)
         self.assertNotIn("innerHTML", script)
         self.assertNotIn("fetch(", script)
-        self.assertIn("data-meeting-stage", (ROOT / "www/lets-talk.html").read_text())
+        html = (ROOT / "www/lets-talk.html").read_text()
+        self.assertIn('data-meeting-stage="details"', html)
+        self.assertIn('data-meeting-stage="contact"', html)
+        self.assertIn('data-booking-ready=', html)
+        self.assertIn('if (!state.ready) {', script)
+        self.assertIn('fields.disabled = true;', script)
+        self.assertIn('slotHint(state.active ? message("dateHint") : message("offline"))', script)
+        self.assertIn('submit.disabled = !(state.active', script)
+        self.assertNotIn("ed-meeting-next", script)
+        self.assertNotIn("localStorage", html)
+
 
 
 if __name__ == "__main__":
