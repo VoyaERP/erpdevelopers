@@ -13,12 +13,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Archive only tracked source, never runner credentials
+      - name: Archive tracked source and canonical planning revision
         run: |
           mkdir -p /tmp/erpdev-source
           git archive --format=tar HEAD > /tmp/erpdev-source/source.tar
           git rev-parse HEAD > /tmp/erpdev-source/COMMIT
-          sha256sum /tmp/erpdev-source/source.tar > /tmp/erpdev-source/SHA256SUMS
+          git fetch --depth=1 origin main
+          git archive --format=tar FETCH_HEAD -- README.md docs > /tmp/erpdev-source/planning.tar
+          git rev-parse FETCH_HEAD > /tmp/erpdev-source/PLANNING_COMMIT
+          cd /tmp/erpdev-source
+          sha256sum source.tar planning.tar > SHA256SUMS
       - uses: actions/upload-artifact@v4
         with:
           name: reviewed-source
