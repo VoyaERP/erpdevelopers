@@ -1,9 +1,9 @@
 name: Frappe v16 static checks
 on:
   push:
-    branches: [version-16, "feat/**", "fix/**"]
+    branches: [version-16, production-v16, "feat/**", "fix/**", "refactor/**"]
   pull_request:
-    branches: [version-16]
+    branches: [version-16, production-v16]
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -17,28 +17,8 @@ jobs:
           python-version: "3.14"
       - name: Install pure translation and image test dependencies
         run: python -m pip install Babel==2.17.0 Pillow==12.0.0
-      - name: Python compile
-        run: python -m compileall -q erpdevelopers tests scripts
-      - name: Bash syntax
-        run: |
-          bash -n scripts/install_erptest_lightnode.sh
-          bash -n scripts/install_existing_site_erptest_lightnode.sh
-          bash -n scripts/update_erptest_lightnode.sh
-          bash -n scripts/deploy_erptest_lightnode.sh
-          bash -n scripts/verify_frontend.sh
-          bash -n scripts/install_local_v16.sh
-      - name: Contract tests
-        run: python -m unittest discover -s tests -v
-      - name: Validate website and Desk JavaScript
-        run: |
-          node --check erpdevelopers/public/js/meeting.js
-          node --check erpdevelopers/public/js/assistant.js
-          node --check erpdevelopers/public/js/catalog.js
-          node --test tests/test_catalog_player.mjs
-          node --check erpdevelopers/erp_developers/doctype/erp_developers_playlist/erp_developers_playlist.js
-          node --check erpdevelopers/erp_developers/doctype/erp_developers_event/erp_developers_event.js
-      - name: Compile native Arabic gettext catalog
-        run: pybabel compile -i erpdevelopers/locale/ar.po -o /tmp/erpdevelopers-ar.mo -l ar
+      - name: Shared source, schema, JavaScript and translation checks
+        run: bash scripts/check_source.sh
   schema-upgrade:
     runs-on: ubuntu-24.04
     timeout-minutes: 5

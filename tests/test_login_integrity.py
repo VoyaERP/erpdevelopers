@@ -31,7 +31,8 @@ class TestNativeLogin(unittest.TestCase):
         self.assertTrue((APP / "public/images/login-network.svg").is_file())
     def test_ci_checks_static_css_first_paint_contract(self):
         workflow = (ROOT / ".github/workflows/v16-static-validation.yml").read_text(encoding="utf-8")
-        self.assertIn("python -m unittest discover -s tests -v", workflow)
+        self.assertIn("bash scripts/check_source.sh", workflow)
+        self.assertIn('"$PYTHON" -m unittest discover -s tests -v', (ROOT / "scripts/check_source.sh").read_text())
         self.assertNotIn("login_chrome_dom", workflow)
         self.assertNotIn("login_chrome.js", workflow)
     def test_navbar_and_login_logo_use_unmodified_approved_png(self):
@@ -80,13 +81,12 @@ class TestNativeLogin(unittest.TestCase):
         self.assertIn("merge-base --is-ancestor", script)
         self.assertIn("backup --with-files", script)
         self.assertLess(script.index("backup --with-files"), script.index("merge --ff-only"))
-        self.assertLess(script.index("unittest discover"), script.index('bench --site "$SITE" migrate'))
+        self.assertLess(script.index("scripts/check_source.sh"), script.index('bench --site "$SITE" migrate'))
         self.assertNotIn("bench new-site", script)
         self.assertNotIn("bench update", script)
         self.assertNotIn("supervisorctl restart", script)
         self.assertNotIn('node --check "$APP/erpdevelopers/public/js/login_chrome.js"', script)
         self.assertIn('test ! -e "$APP/erpdevelopers/public/js/login_chrome.js"', script)
-        self.assertLess(script.index("unittest discover"), script.index('bench --site "$SITE" migrate'))
 
     def test_native_navbar_logo_parser_accepts_equivalent_html(self):
         from importlib.util import module_from_spec, spec_from_file_location

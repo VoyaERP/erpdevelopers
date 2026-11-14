@@ -5,6 +5,8 @@ Operators can diagnose missing schemas with catalog_health via bench execute.
 Other database failures still raise normally, rather than being silently hidden.
 """
 from erpdevelopers.catalog_rules import external_https_url, youtube_playlist_id
+# Retain the old import name for existing tests and integrations, not a second implementation.
+from erpdevelopers.catalog_support import schema_status as _schema_status
 
 PLAYLIST_DOCTYPE = "ERP Developers Playlist"
 RESOURCE_DOCTYPE = "ERP Developers Resource"
@@ -16,21 +18,6 @@ RESOURCE_FIELDS = (
     "title", "title_ar", "topic", "summary", "editorial_note",
     "language", "source_kind", "external_url", "source_name", "web_page",
 )
-
-
-def _schema_status(doctype, fields):
-    """One DB metadata lookup: do not query a table missing after partial migrate."""
-    import frappe
-
-    if not frappe.db.table_exists(doctype, cached=False):
-        return {"table_present": False, "missing_columns": list(fields)}
-
-    required = set(fields) | {"published", "sort_order", "modified"}
-    existing = set(frappe.db.get_table_columns(doctype))
-    return {
-        "table_present": True,
-        "missing_columns": sorted(required - existing),
-    }
 
 
 def catalog_health():
@@ -59,8 +46,8 @@ def _published_rows(doctype, fields):
     )
 
 
-def public_playlists():
-    rows = _published_rows(PLAYLIST_DOCTYPE, PLAYLIST_FIELDS)
+def _playlist_entries(rows):
+    """One URL projection for rows whose audience was already checked."""
     result = []
     for item in rows:
         try:
@@ -74,6 +61,10 @@ def public_playlists():
         entry["watch_url"] = f"https://www.youtube.com/playlist?list={list_id}"
         result.append(entry)
     return result
+
+
+def public_playlists():
+    return _playlist_entries(_published_rows(PLAYLIST_DOCTYPE, PLAYLIST_FIELDS))
 
 
 def authorized_private_playlists():
@@ -95,24 +86,15 @@ def authorized_private_playlists():
         order_by="sort_order asc, modified desc",
         limit_page_length=60,
     )
-    result = []
-    for item in rows:
-        try:
-            list_id = youtube_playlist_id(item["playlist_url"])
-        except ValueError:
-            continue
-        entry = dict(item)
-        entry["playlist_id"] = list_id
-        entry["watch_url"] = f"https://www.youtube.com/playlist?list={list_id}"
-        result.append(entry)
-    return result
+    return _playlist_entries(rows)
 
 
 def public_resources():
     import frappe
 
     rows = _published_rows(RESOURCE_DOCTYPE, RESOURCE_FIELDS)
-    internal = {r.web_page for r in rows if r.source_kind == "Original Article" and r.web_page}
+    internal = {r.get("web_page") for r in rows
+                if r.get("source_kind") == "Original Article" and r.get("web_page")}
     published_pages = {}
     if internal:
         # If Frappe's own Web Page table is undergoing migration, do not expose
@@ -123,7 +105,7 @@ def public_resources():
                 filters={"name": ["in", sorted(internal)], "published": 1},
                 fields=["name", "route"],
             )
-            published_pages = {p.name: p.route for p in pages if p.route}
+            published_pages = {p["name"]: p["route"] for p in pages if p.get("route")}
 
     result = []
     for row in rows:
@@ -142,6 +124,7 @@ def public_resources():
             item["external"] = True
         result.append(item)
     return result
+
 
 def public_catalog_topics(rows):
     """Get distinct topics from published catalog dictionaries.

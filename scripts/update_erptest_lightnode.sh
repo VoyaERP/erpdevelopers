@@ -10,12 +10,15 @@
   APP="$BENCH/apps/erpdevelopers"
   REPO="https://github.com/VoyaERP/erpdevelopers.git"
   EXPECTED_SHA="${EXPECTED_SHA:-}"
+  RELEASE_BRANCH="${RELEASE_BRANCH:-version-16}"
+  ALLOW_BRANCH_SWITCH="${ALLOW_BRANCH_SWITCH:-0}"
+  case "$RELEASE_BRANCH" in version-16|production-v16) ;; *) echo "STOP: unsupported release branch"; exit 2;; esac
 
   case "$(uname -n)" in erptest-lightnode|erptest-lightnode.*) ;; *) echo "STOP: wrong host"; exit 2;; esac
   test "$(id -u)" -ne 0 || { echo "STOP: do not use root"; exit 2; }
   test -f "$BENCH/sites/$SITE/site_config.json" || { echo "STOP: target site missing"; exit 2; }
   test -d "$APP/.git" || { echo "STOP: existing app checkout missing"; exit 2; }
-  if [ -n "$EXPECTED_SHA" ] && ! [[ "$EXPECTED_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+  if ! [[ "$EXPECTED_SHA" =~ ^[0-9a-f]{40}$ ]]; then
     echo "STOP: EXPECTED_SHA must be an exact 40-character commit SHA"; exit 2;
   fi
 
@@ -24,9 +27,7 @@
     echo "STOP: app not installed on target site"; exit 2;
   }
   test -z "$(git -C "$APP" status --porcelain)" || { echo "STOP: dirty checkout"; exit 2; }
-  test "$(git -C "$APP" branch --show-current)" = "version-16" || {
-    echo "STOP: wrong app branch"; exit 2;
-  }
+  CURRENT_BRANCH="$(git -C "$APP" branch --show-current)"
 
   REMOTE=""
   for name in upstream origin; do
@@ -36,31 +37,45 @@
   done
   test -n "$REMOTE" || { echo "STOP: unexpected GitHub remote"; exit 2; }
 
-  echo "=== Back up target site including all files ==="
-  bench --site "$SITE" backup --with-files
-
   echo "=== Fetch and validate intended release ==="
   export GIT_TERMINAL_PROMPT=0
-  git -C "$APP" fetch "$REMOTE" version-16
+  git -C "$APP" fetch "$REMOTE" "$RELEASE_BRANCH"
   TARGET="$(git -C "$APP" rev-parse FETCH_HEAD)"
   CURRENT="$(git -C "$APP" rev-parse HEAD)"
-  if [ -n "$EXPECTED_SHA" ] && [ "$TARGET" != "$EXPECTED_SHA" ]; then
+  if [ "$TARGET" != "$EXPECTED_SHA" ]; then
     echo "STOP: fetched $TARGET does not match EXPECTED_SHA $EXPECTED_SHA"; exit 3;
   fi
   git -C "$APP" merge-base --is-ancestor "$CURRENT" "$TARGET" || {
     echo "STOP: non-fast-forward update"; exit 3;
   }
+  POLICY_DIR="$(mktemp -d)"
+  trap 'rm -rf "$POLICY_DIR"' EXIT
+  git -C "$APP" show "${TARGET}:scripts/release_policy.py" > "$POLICY_DIR/policy.py"
+  "$BENCH/env/bin/python" "$POLICY_DIR/policy.py" "$CURRENT_BRANCH" "$RELEASE_BRANCH" "$TARGET" --allow-switch "$ALLOW_BRANCH_SWITCH"
+  if [ "$CURRENT_BRANCH" != "$RELEASE_BRANCH" ] && git -C "$APP" show-ref --verify --quiet "refs/heads/$RELEASE_BRANCH"; then
+    git -C "$APP" merge-base --is-ancestor "$RELEASE_BRANCH" "$TARGET" || {
+      echo "STOP: existing production branch diverges from target"; exit 3;
+    }
+  fi
+
+  echo "=== Back up target site including all files ==="
+  bench --site "$SITE" backup --with-files
+
+  if [ "$CURRENT_BRANCH" != "$RELEASE_BRANCH" ]; then
+    if git -C "$APP" show-ref --verify --quiet "refs/heads/$RELEASE_BRANCH"; then
+      git -C "$APP" switch "$RELEASE_BRANCH"
+    else
+      git -C "$APP" switch -c "$RELEASE_BRANCH" "$CURRENT"
+    fi
+  fi
   git -C "$APP" merge --ff-only "$TARGET"
   test "$(git -C "$APP" rev-parse HEAD)" = "$TARGET"
+  test "$(git -C "$APP" branch --show-current)" = "$RELEASE_BRANCH"
 
   echo "=== Static checks BEFORE database migration ==="
   test -f "$APP/erpdevelopers/modules.txt"
   test -f "$APP/erpdevelopers/patches.txt"
-  "$BENCH/env/bin/python" -m compileall -q "$APP/erpdevelopers" "$APP/tests"
-  "$BENCH/env/bin/python" -m unittest discover -s "$APP/tests" -v
-  command -v node >/dev/null
-  node --check "$APP/erpdevelopers/public/js/catalog.js"
-  node --test "$APP/tests/test_catalog_player.mjs"
+  PYTHON="$BENCH/env/bin/python" bash "$APP/scripts/check_source.sh"
   # Native login stays CSS-first; the removed login script must not return.
   test ! -e "$APP/erpdevelopers/public/js/login_chrome.js"
   test ! -e "$APP/tests/login_chrome_dom.test.cjs"
@@ -77,6 +92,6 @@
   bench --site "$SITE" clear-cache
   bench --site "$SITE" clear-website-cache
 
-  echo "Updated $SITE to ERP Developers commit $TARGET"
+  echo "Updated $SITE on $RELEASE_BRANCH to ERP Developers commit $TARGET"
   echo "No shared services restarted; reload the web service separately and verify frontend."
 )

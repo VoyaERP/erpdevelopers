@@ -2,7 +2,7 @@
 from datetime import datetime, timezone
 from urllib.parse import urlencode
 from babel.dates import format_date
-from erpdevelopers.catalog import _schema_status
+from erpdevelopers.catalog_support import schema_status as _schema_status, page_number
 from erpdevelopers.catalog_rules import event_https_url
 from erpdevelopers.event_rules import FORMATS, TOPICS, _time
 from erpdevelopers.event_media import attach_public_event_media
@@ -22,10 +22,7 @@ def _query_options(params):
     def value(key):
         item = params.get(key, "")
         return item.strip() if isinstance(item, str) else ""
-    try:
-        page = max(1, min(10000, int(value("page") or "1")))
-    except ValueError:
-        page = 1
+    page = page_number(value("page"), maximum=10000)
     return {
         "topic": value("topic") if value("topic") in TOPICS else "",
         "country": value("country")[:140],

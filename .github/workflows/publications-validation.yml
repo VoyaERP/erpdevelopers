@@ -1,9 +1,9 @@
 name: Projects and Team Advice publication checks
 on:
   push:
-    branches: [version-16, "feat/**", "fix/**"]
+    branches: [version-16, production-v16, "feat/**", "fix/**", "refactor/**"]
   pull_request:
-    branches: [version-16]
+    branches: [version-16, production-v16]
 jobs:
   publications-browser:
     runs-on: ubuntu-24.04

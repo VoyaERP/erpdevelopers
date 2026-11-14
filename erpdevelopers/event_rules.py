@@ -5,10 +5,8 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from erpdevelopers.catalog_rules import event_https_url
 
-TOPICS = (
-    "ERP & Business Applications", "Solution Architecture", "Developer Practices",
-    "Cloud & DevOps", "AI & Data", "Cybersecurity", "Digital Transformation", "General Technology",
-)
+from erpdevelopers.taxonomy import TOPICS
+
 FORMATS = ("In person", "Online", "Hybrid")
 EVENT_TYPES = ("Conference", "Exhibition", "Workshop", "Webinar", "Meetup")
 STATUSES = ("Scheduled", "Postponed", "Cancelled")

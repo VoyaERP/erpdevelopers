@@ -8,6 +8,9 @@ BENCH="${BENCH:-/data/frappe/frappe-bench}"
 APP="$BENCH/apps/erpdevelopers"
 WEB="frappe-bench-web:frappe-bench-frappe-web"
 EXPECTED_SHA="${EXPECTED_SHA:-}"
+RELEASE_BRANCH="${RELEASE_BRANCH:-version-16}"
+ALLOW_BRANCH_SWITCH="${ALLOW_BRANCH_SWITCH:-0}"
+case "$RELEASE_BRANCH" in version-16|production-v16) ;; *) echo "STOP: unsupported release branch" >&2; exit 2;; esac
 TMP=""
 STAGE="preflight"
 cleanup() { if [ -n "$TMP" ]; then rm -rf "$TMP"; fi; }
@@ -28,7 +31,7 @@ test -d "$APP/.git"
 test -x "$BENCH/env/bin/python"
 for command in git curl bash sudo; do command -v "$command" >/dev/null; done
 cd "$BENCH"
-test "$(git -C "$APP" branch --show-current)" = "version-16"
+CURRENT_BRANCH="$(git -C "$APP" branch --show-current)"
 test -z "$(git -C "$APP" status --porcelain)"
 REMOTE=""
 for candidate in upstream origin; do
@@ -38,15 +41,17 @@ for candidate in upstream origin; do
 done
 test -n "$REMOTE"
 export GIT_TERMINAL_PROMPT=0
-git -C "$APP" fetch "$REMOTE" version-16
+git -C "$APP" fetch "$REMOTE" "$RELEASE_BRANCH"
 test "$(git -C "$APP" rev-parse FETCH_HEAD)" = "$EXPECTED_SHA"
 git -C "$APP" merge-base --is-ancestor HEAD "$EXPECTED_SHA"
-sudo supervisorctl status "$WEB"
 TMP="$(mktemp -d)"
+git -C "$APP" show "${EXPECTED_SHA}:scripts/release_policy.py" > "$TMP/policy.py"
+"$BENCH/env/bin/python" "$TMP/policy.py" "$CURRENT_BRANCH" "$RELEASE_BRANCH" "$EXPECTED_SHA" --allow-switch "$ALLOW_BRANCH_SWITCH"
+sudo supervisorctl status "$WEB"
 git -C "$APP" show "${EXPECTED_SHA}:scripts/update_erptest_lightnode.sh" > "$TMP/update.sh"
 bash -n "$TMP/update.sh"
 STAGE="backup, tests and application update"
-BENCH="$BENCH" EXPECTED_SHA="$EXPECTED_SHA" bash "$TMP/update.sh"
+BENCH="$BENCH" EXPECTED_SHA="$EXPECTED_SHA" RELEASE_BRANCH="$RELEASE_BRANCH" ALLOW_BRANCH_SWITCH="$ALLOW_BRANCH_SWITCH" bash "$TMP/update.sh"
 test "$(git -C "$APP" rev-parse HEAD)" = "$EXPECTED_SHA"
 STAGE="web restart"
 sudo supervisorctl restart "$WEB"
