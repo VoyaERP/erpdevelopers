@@ -61,7 +61,7 @@ def available_slot_matches(slots, requested_date, requested_time):
         if hasattr(when, "strftime"):
             day, time = when.strftime("%Y-%m-%d"), when.strftime("%H:%M:%S")
         elif isinstance(when, str):
-            match = re.search(r"^(\\d{4}-\\d{2}-\\d{2})[ T](\\d{2}:\\d{2}:\\d{2})", when)
+            match = re.search(r"^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}:\d{2})", when)
             day, time = (match.group(1), match.group(2)) if match else ("", "")
         else:
             continue

@@ -131,7 +131,7 @@
         let available=0;
         for(const entry of Array.isArray(result)?result:[]){
           const raw=String(entry.time||"");
-          const match=raw.match(/(?:^|[T ])(\\d{2}:\\d{2}:\\d{2})/);
+          const match=raw.match(/(?:^|[T ])(\d{2}:\d{2}:\d{2})/);
           if(!match)continue;
           const time=match[1];
           const button=document.createElement("button");

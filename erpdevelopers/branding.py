@@ -81,7 +81,7 @@ def versioned_public_asset(relative_path):
     """Hash site-specific CSS/JS to avoid stale assets after deployment."""
     allowed = {
         "css/portal.css", "js/catalog.js", "js/assistant.js",
-        "js/consultation.js",
+        "js/consultation.js", "css/meeting.css", "js/meeting.js",
     }
     if relative_path not in allowed:
         raise ValueError("Unexpected public asset")
