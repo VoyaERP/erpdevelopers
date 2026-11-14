@@ -25,7 +25,7 @@
         <p class="ed-kicker">{{ _("LEARNING LIBRARY") }}</p>
         <h2 id="ed-playlist-heading">{{ _("Video playlists") }}</h2>
       </div>
-      <p>{{ _("Choose Watch here to open a protected video frame. YouTube content is not loaded until you open the player.") }}</p>
+      <p>{{ _("Public playlists play here. Private collections require sign-in and access permission.") }}</p>
     </div>
     <div class="ed-filter-row">
       <label for="ed-topic-filter">{{ _("Filter by topic") }}</label>
@@ -45,6 +45,7 @@
         <div class="ed-card-meta">
           <span>{{ _(item.topic) | e }}</span>
           <span>{{ _(item.level) | e }}</span>
+          {% if item.visibility == "Private" %}<span class="ed-private-tag">{{ _("Members only") }}</span>{% endif %}
         </div>
         <h3>{% if boot.lang == "ar" and item.title_ar %}{{ item.title_ar | e }}{% else %}{{ item.title | e }}{% endif %}</h3>
         <p>{{ item.description | e }}</p>
@@ -56,9 +57,7 @@
                data-playlist-id="{{ item.playlist_id | e }}"
                data-playlist-title="{% if boot.lang == 'ar' and item.title_ar %}{{ item.title_ar | e }}{% else %}{{ item.title | e }}{% endif %}">
               <span class="ed-playlist-play-icon" aria-hidden="true">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" focusable="false">
-                  <path d="M9 6.8L17.3 12 9 17.2V6.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path>
-                </svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" focusable="false"><path d="M8 5.8a1 1 0 0 1 1.51-.86l9.1 6.2a1.05 1.05 0 0 1 0 1.72l-9.1 6.2A1 1 0 0 1 8 18.2Z"></path></svg>
               </span>
               <span>{{ _("Watch here") }}</span>
               <span class="ed-playlist-watch-cue" aria-hidden="true">↗</span>
@@ -77,6 +76,9 @@
       <p>{{ _("We will publish collections after checking their relevance, accuracy and source rights.") }}</p>
     </div>
     {% endif %}
+    {% if not is_authenticated %}
+    <p class="ed-private-intro">{{ _("Have access to a private learning collection?") }} <a href="/login?redirect-to=/training">{{ _("Sign in to view your playlists") }}</a></p>
+    {% endif %}
   </div>
 </section>
 <dialog id="ed-playlist-dialog" class="ed-playlist-dialog"
@@ -90,13 +92,13 @@
             aria-label="{{ _('Close video player') }}">×</button>
   </div>
   <div class="ed-playlist-player">
+    <p class="ed-player-status" data-player-status role="status">{{ _("Loading playlist… If unavailable, use Open on YouTube below.") }}</p>
     <iframe data-player-frame title="{{ _('YouTube playlist player') | e }}"
             loading="lazy" referrerpolicy="strict-origin-when-cross-origin"
-            sandbox="allow-scripts allow-same-origin allow-presentation"
-            allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
   </div>
   <div class="ed-playlist-dialog-foot">
-    <p id="ed-playlist-privacy">{{ _("YouTube is contacted only when you open this player. Close the window to stop playback.") }}</p>
+    <p id="ed-playlist-privacy">{{ _("YouTube loads only when you choose to watch. Some videos cannot be embedded; use Open on YouTube if needed. Close to stop playback.") }}</p>
     <a data-player-external href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">
       {{ _("Open on YouTube") }} <span aria-hidden="true">↗</span>
     </a>
