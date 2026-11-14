@@ -1,17 +1,17 @@
-"""Measure the real shared header before/after delayed native language hydration.
+"""Real public header: visible locale links, no hydration shift, EN/AR navigation.
 
-Reuses existing actual-template fixtures, restoring the real nav and footer.
-Frappe's pinned picker method runs with an isolated AJAX/DOM adapter. No live
-account, cookie, database or network service is modified. External font responses
-are stubbed; this does not test real font delivery or the complete Frappe runtime.
+Frappe's outer shell and session identities are isolated fixtures, not real logins.
+The shipped script is tested with JS blocked/disabled and with the language API
+unavailable. Native authentication and external font delivery are not tested here.
 """
-from hashlib import sha1
 from pathlib import Path
 from threading import Thread
-from types import SimpleNamespace
+from types import ModuleType, SimpleNamespace
 from urllib.parse import parse_qs, urlsplit
-from urllib.request import urlopen
+from unittest.mock import patch
 import json
+import os
+import sys
 
 import test_training_browser as fixture
 from erpdevelopers.www.erp_developers_home import get_context as home_context
@@ -19,35 +19,40 @@ from playwright.sync_api import expect, sync_playwright
 
 OUT = fixture.ROOT / "test-artifacts/navigation"
 WIDTHS = (320, 390, 540, 768, 1100, 1101, 1360, 1361, 1440)
-NATIVE_URL = "https://raw.githubusercontent.com/frappe/frappe/v16.56.0/frappe/website/js/website.js"
-NATIVE_SHA = "c29cd08cdcecc823194efe98636af4602fd5afbe"
-OLD_CSS_URL = "https://raw.githubusercontent.com/VoyaERP/erpdevelopers/8c24b9a33a171c3f6a7a00d3fc3c0f3b22331dfd/erpdevelopers/public/css/brand.css"
-OLD_CSS_SHA = "786d080ff7d7642d103bd9775e2c203ebcd0b418"
-
-
-def pinned_text(url, blob_sha):
-    with urlopen(url, timeout=25) as response:
-        payload = response.read()
-    actual = sha1(b"blob " + str(len(payload)).encode() + b"\0" + payload).hexdigest()
-    if actual != blob_sha:
-        raise RuntimeError("Pinned source bytes do not match: " + url)
-    return payload.decode("utf-8")
-
-
-for component in ("nav", "footer"):
-    fixture.OVERRIDES.pop(f"templates/includes/erpdevelopers_{component}.html", None)
+SCRIPT = fixture.APP / "public/js/language.js"
+for part in ("nav", "footer"):
+    fixture.OVERRIDES.pop(f"templates/includes/erpdevelopers_{part}.html", None)
+fixture.OVERRIDES["templates/web.html"] = fixture.BASE.replace(
+    "body{margin:0}", "body{margin:0}.hide{display:none!important}").replace(
+    "</head>", "<script>window.show_language_picker={{ show_language_picker or 'false' }};</script></head>")
 fixture.ENV.cache.clear()
 ORIGINAL_RENDER = fixture.render
+
+
+def request_module(params):
+    fake = ModuleType("frappe")
+    fake.local = SimpleNamespace(form_dict={key: value[0] for key, value in params.items()})
+    fake.session = SimpleNamespace(user=params.get("test_user", ["Guest"])[0])
+    return fake
+
+
+def render(route, params):
+    with patch.dict(sys.modules, {"frappe": request_module(params)}):
+        return ORIGINAL_RENDER(route, params)
+
+
+fixture.render = render
 
 
 def render_home(params):
     lang = "ar" if params.get("_lang", ["en"])[0] == "ar" else "en"
     context = SimpleNamespace()
-    home_context(context)
+    with patch.dict(sys.modules, {"frappe": request_module(params)}):
+        home_context(context)
     values = vars(context)
     values.update(boot=SimpleNamespace(lang=lang), fixture_route="home",
-        web_include_css=fixture.web_include_css,
-        _=(lambda value: fixture.ARABIC.get(value, value)) if lang == "ar" else (lambda value: value))
+                  web_include_css=fixture.web_include_css,
+                  _=(lambda s: fixture.ARABIC.get(s, s)) if lang == "ar" else (lambda s: s))
     return fixture.ENV.get_template("www/erp-developers-home.html").render(values).encode()
 
 
@@ -55,155 +60,168 @@ class Handler(fixture.Handler):
     def do_GET(self):
         url = urlsplit(self.path)
         if url.path == "/":
-            data = render_home(parse_qs(url.query))
+            payload = render_home(parse_qs(url.query))
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Length", str(len(data)))
+            self.send_header("Content-Length", str(len(payload)))
             self.end_headers()
-            self.wfile.write(data)
+            self.wfile.write(payload)
         else:
             super().do_GET()
 
 
-SNAPSHOT = """() => {
- const selectors=['.ed-nav','.ed-brand','.ed-brand img','.ed-nav-links','.ed-nav-tools','#language-switcher','.ed-nav-cta'];
- const elements=selectors.map(s=>document.querySelector(s)).concat([...document.querySelectorAll('.ed-nav-links a')]);
- return elements.map(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};});
-}"""
+SNAPSHOT = """() => [...document.querySelectorAll(
+ '.ed-nav,.ed-brand,.ed-brand img,.ed-nav-links,.ed-nav-tools,#language-switcher,.ed-nav-cta,.ed-nav-links a'
+)].map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};})"""
 
 
-def max_delta(a, b):
-    return max(abs(first[key] - second[key]) for first, second in zip(a, b) for key in first)
+def max_delta(before, after):
+    assert len(before) == len(after)
+    return max(abs(a[key] - b[key]) for a, b in zip(before, after) for key in a)
 
 
-def install_native_picker(page, method, lang, mismatch=False):
-    bootstrap = """({language, mismatch}) => {
-      window.$ = value => {
-        const nodes = typeof value === 'string'
-          ? (value.startsWith('<option') ? [document.createElement('option')] : [...document.querySelectorAll(value)])
-          : [value];
-        return {
-          nodes,
-          attr(key,value){nodes.forEach(n=>n.setAttribute(key,value));return this;},
-          text(value){nodes.forEach(n=>n.textContent=value);return this;},
-          append(child){nodes.forEach(n=>child.nodes.forEach(c=>n.appendChild(c)));return this;},
-          removeClass(value){nodes.forEach(n=>n.classList.remove(value));return this;},
-          val(value){if(value===undefined)return nodes[0]?.value;nodes.forEach(n=>n.value=value);return this;},
-          change(fn){nodes.forEach(n=>n.addEventListener('change',fn));return this;}
-        };
-      };
-      window.show_language_picker=true;
-      window.frappe={session:{user:'Guest'},get_cookie:()=>mismatch?'':language,
-        call:()=>new Promise(resolve=>window.finishPicker=()=>resolve({message:[
-          {language_code:'en',language_name:'English'},
-          {language_code:'ar',language_name:'\\u0627\\u0644\\u0639\\u0631\\u0628\\u064a\\u0629'}
-        ]}))};
-    }"""
-    page.evaluate(bootstrap, {"language": lang, "mismatch": mismatch})
-    page.evaluate("Object.assign(frappe, {" + method + "}); frappe.show_language_picker();")
-
-
-def assert_labels(page):
+def check_header(page, lang):
+    switch = page.locator("#language-switcher")
+    expect(switch).to_be_visible()
+    expect(switch).to_have_text("English" if lang == "ar" else "\u0627\u0644\u0639\u0631\u0628\u064a\u0629")
+    assert switch.evaluate("e=>e.tagName") == "A"
+    assert switch.get_attribute("data-language-switch") == ("en" if lang == "ar" else "ar")
     assert page.locator("header.ed-nav").count() == 1
     assert page.locator("#language-switcher").count() == 1
     assert page.locator(".ed-nav-links a").count() == 8
-    assert page.locator(".ed-footer-links a").count() == 3
-    problems = page.locator(".ed-nav-links a, .ed-nav-cta, .ed-footer-links a").evaluate_all("""els => els.flatMap(el=>{
+    assert page.evaluate("window.show_language_picker") is False
+    assert page.evaluate("document.documentElement.scrollWidth<=innerWidth+1")
+    bad = page.locator(".ed-nav-links a,.ed-nav-cta,.ed-footer-links a,#language-switcher span").evaluate_all("""els=>els.flatMap(el=>{
       const range=document.createRange();range.selectNodeContents(el);
-      const lines=[...new Set([...range.getClientRects()].filter(r=>r.width>0).map(r=>Math.round(r.y)))];
-      return lines.length>1 || el.scrollWidth>el.clientWidth+1 ? [el.textContent.trim()] : [];
+      const ys=[...new Set([...range.getClientRects()].filter(r=>r.width>0).map(r=>Math.round(r.y)))];
+      return ys.length>1||el.scrollWidth>el.clientWidth+1?[el.textContent.trim()]:[];
     })""")
-    assert not problems, "Wrapped or clipped short controls: " + repr(problems)
-    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"), "Page overflows viewport"
+    assert not bad, bad
+    bounds, tools = switch.bounding_box(), page.locator(".ed-nav-tools").bounding_box()
+    assert bounds["height"] >= 44
+    assert switch.evaluate("e=>e.scrollWidth<=e.clientWidth+1")
+    assert bounds["x"] >= tools["x"] - 1
+    assert bounds["x"] + bounds["width"] <= tools["x"] + tools["width"] + 1
+
+
+def context_for(browser, width=390, **options):
+    context = browser.new_context(viewport={"width": width, "height": 900}, reduced_motion="reduce", **options)
+    fixture.routes(context, [])
+    calls = []
+    context.route("**/api/method/frappe.translate.get_all_languages*",
+                  lambda route: (calls.append(route.request.url), route.abort()))
+    return context, calls
 
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
-    native = pinned_text(NATIVE_URL, NATIVE_SHA)
-    method = native[native.index("\tshow_language_picker() {"):native.index("\n\tsetup_videos:")].strip().rstrip(",")
-    old_css = pinned_text(OLD_CSS_URL, OLD_CSS_SHA)
-    fixture.OVERRIDES["templates/web.html"] = fixture.BASE.replace(
-        "body{margin:0}", "body{margin:0}.hide{display:none!important}")
-    fixture.ENV.cache.clear()
     server = fixture.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     thread = Thread(target=server.serve_forever, daemon=True)
     thread.start()
     origin = f"http://127.0.0.1:{server.server_port}"
-    results = []
+    measurements = []
+    behavior_cases = 0
     try:
         with sync_playwright() as p:
-            for engine in (p.chromium, p.firefox):
-                browser = engine.launch(headless=True)
+            for engine_name in os.environ.get("ERPDEV_TEST_ENGINES", "chromium,firefox").split(","):
+                engine = getattr(p, engine_name)
+                executable = os.environ.get("CHROMIUM_EXECUTABLE") if engine_name == "chromium" else None
+                browser = engine.launch(headless=True, **({"executable_path": executable} if executable else {}))
                 try:
-                    old = browser.new_context(viewport={"width":1440,"height":900})
-                    fixture.routes(old, [])
-                    old.route("**/assets/erpdevelopers/css/brand.css*", lambda r:r.fulfill(content_type="text/css",body=old_css))
-                    page = old.new_page(); page.goto(origin + "/training?_lang=en")
-                    initial = page.evaluate(SNAPSHOT)
-                    install_native_picker(page, method, "en")
-                    page.evaluate("finishPicker()")
-                    expect(page.locator("#language-switcher")).to_be_visible()
-                    baseline_delta = max_delta(initial, page.evaluate(SNAPSHOT))
-                    assert baseline_delta > 10, "Old stylesheet did not reproduce the hydration shift"
-                    print(f"REPRODUCED {engine.name}: old picker hydration moves geometry {baseline_delta:.2f}px", flush=True)
-                    old.close()
                     for lang in ("en", "ar"):
                         for width in WIDTHS:
-                            for path in ("/", "/training", "/events"):
-                                context = browser.new_context(viewport={"width":width,"height":900},locale="en-US",reduced_motion="reduce")
-                                fixture.routes(context, [])
-                                page = context.new_page(); errors=[]
-                                page.on("pageerror", lambda err:errors.append(str(err)))
-                                target = origin + path + "?_lang=" + lang
-                                page.goto(target)
-                                initial = page.evaluate(SNAPSHOT)
-                                assert page.locator("#language-switcher").evaluate("e=>getComputedStyle(e).visibility") == "hidden"
-                                install_native_picker(page, method, lang)
-                                page.wait_for_timeout(80)
-                                assert max_delta(initial,page.evaluate(SNAPSHOT)) < 0.5
-                                page.evaluate("finishPicker()")
-                                expect(page.locator("#language-switcher")).to_be_visible()
-                                delta = max_delta(initial,page.evaluate(SNAPSHOT))
-                                assert delta < 0.5, (engine.name,lang,width,path,delta)
-                                assert_labels(page)
+                            for route in ("/", "/training", "/events"):
+                                context, calls = context_for(browser, width)
+                                context.route("**/assets/erpdevelopers/js/language.js*", lambda r: r.abort())
+                                page = context.new_page()
+                                errors = []
+                                page.on("pageerror", lambda e: errors.append(str(e)))
+                                page.goto(f"{origin}{route}?_lang={lang}")
+                                check_header(page, lang)  # Visible even when its script cannot load.
+                                before = page.evaluate(SNAPSHOT)
+                                page.add_script_tag(path=str(SCRIPT))
+                                page.add_script_tag(path=str(SCRIPT))  # Re-evaluation is idempotent.
+                                delta = max_delta(before, page.evaluate(SNAPSHOT))
+                                assert delta < 0.5, (lang, width, route, delta)
+                                check_header(page, lang)
                                 if width <= 1360:
-                                    assert page.locator(".ed-nav-links").bounding_box()["width"] >= page.locator(".ed-nav-inner").bounding_box()["width"] - 1
+                                    track = page.locator(".ed-nav-links")
                                     for link in page.locator(".ed-nav-links a").all():
                                         link.focus()
                                         expect(link).to_be_focused()
                                         link.evaluate("e=>e.scrollIntoView({block:'nearest',inline:'nearest'})")
-                                        bounds=link.bounding_box(); track=page.locator(".ed-nav-links").bounding_box()
-                                        assert bounds["x"] >= track["x"] - 1 and bounds["x"]+bounds["width"] <= track["x"]+track["width"]+1
+                                        box, outer = link.bounding_box(), track.bounding_box()
+                                        assert box["x"] >= outer["x"] - 1
+                                        assert box["x"] + box["width"] <= outer["x"] + outer["width"] + 1
                                     page.locator(".ed-nav-links a").first.evaluate("e=>e.scrollIntoView({block:'nearest',inline:'nearest'})")
                                 page.evaluate("window.scrollTo(0,300)")
-                                expect(page.locator(".ed-nav")).to_be_visible()
                                 assert abs(page.locator(".ed-nav").bounding_box()["y"]) < 1
                                 page.evaluate("window.scrollTo(0,0)")
-                                if engine.name == "chromium" and path == "/" and width in (390,1440):
-                                    page.screenshot(path=OUT/f"header-{lang}-{width}.png")
-                                page.reload(); refreshed=page.evaluate(SNAPSHOT)
-                                assert max_delta(initial,refreshed) < 0.5
-                                assert not errors, errors
-                                results.append(dict(engine=engine.name,lang=lang,width=width,path=path,delta=delta))
+                                page.reload()
+                                check_header(page, lang)
+                                assert max_delta(before, page.evaluate(SNAPSHOT)) < 0.5
+                                assert calls == [] and errors == [], (calls, errors)
+                                if route == "/" and width in (390, 1440) and engine_name == "chromium":
+                                    page.screenshot(path=OUT / f"language-{lang}-{width}.png")
+                                measurements.append(dict(engine=engine_name, lang=lang, width=width, route=route, delta=delta))
                                 context.close()
-                            print(f"PASS {engine.name}: {lang} {width}px, 3 routes, delayed picker/refresh/nowrap/keyboard/sticky",flush=True)
-                    context=browser.new_context(viewport={"width":390,"height":900},locale="en-US")
-                    fixture.routes(context,[]); page=context.new_page();page.goto(origin+"/training?_lang=ar")
-                    initial=page.evaluate(SNAPSHOT)
-                    install_native_picker(page,method,"ar",mismatch=True);page.evaluate("finishPicker()")
-                    expect(page.locator("#language-switcher")).to_be_visible()
-                    assert page.locator("html").get_attribute("lang")=="en", "Expected native language guess"
-                    assert page.locator("header.ed-nav").get_attribute("lang")=="ar"
-                    assert page.locator("header.ed-nav").evaluate("e=>getComputedStyle(e).direction")=="rtl"
-                    assert max_delta(initial,page.evaluate(SNAPSHOT)) < 0.5
+                            print(f"PASS {engine_name}: {lang} {width}px, visible control, fixed layout, refresh and keyboard", flush=True)
+
+                    for user in ("Guest", "member@example.invalid", "Administrator"):
+                        for javascript in (True, False):
+                            context, calls = context_for(browser, java_script_enabled=javascript)
+                            if javascript:
+                                context.add_init_script("window.frappe={session:{user:" + json.dumps(user) + "}};")
+                            page = context.new_page()
+                            url = f"{origin}/events?topic=Cloud%20%26%20DevOps&country=United%20Arab%20Emirates&_lang=en"
+                            page.goto(url + "#content")
+                            if javascript:
+                                page.evaluate("location.hash = 'top'")
+                            switch = page.locator("#language-switcher")
+                            expect(switch).to_be_visible()
+                            switch.click()
+                            expect(page.locator("header.ed-nav")).to_have_attribute("lang", "ar")
+                            current = urlsplit(page.url)
+                            query = parse_qs(current.query)
+                            assert query["topic"] == ["Cloud & DevOps"]
+                            assert query["country"] == ["United Arab Emirates"]
+                            assert query["_lang"] == ["ar"]
+                            if javascript:
+                                assert current.fragment == "top"
+                                assert any(c["name"] == "preferred_language" and c["value"] == "ar" and c["path"] == "/" for c in context.cookies())
+                                assert page.locator('form[method="get"] input[name="_lang"]').count() == 1
+                                page.locator('.ed-nav-links a[href="/training"]').click()
+                                assert parse_qs(urlsplit(page.url).query)["_lang"] == ["ar"]
+                                expect(page.locator("header.ed-nav")).to_have_attribute("lang", "ar")
+                            assert calls == []
+                            context.close()
+                            behavior_cases += 1
+                            print(f"PASS {engine_name}: {user}, JavaScript={javascript}, native _lang request and filter preservation", flush=True)
+                    # Language enhancement cannot alter unrelated/private destinations.
+                    context, calls = context_for(browser)
+                    page = context.new_page()
+                    page.goto(origin + "/?_lang=ar")
+                    result = page.evaluate("""() => {
+                      const paths=['https://example.org/event','/desk','/api/method/ping','/files/photo.png','#top','mailto:team@example.org'];
+                      return paths.map(href=>{
+                        const a=document.createElement('a');a.href=href;
+                        a.addEventListener('click',e=>e.preventDefault());
+                        document.querySelector('.ed-site').appendChild(a);a.click();
+                        const result=a.getAttribute('href');a.remove();return result;
+                      });
+                    }""")
+                    assert result == ['https://example.org/event', '/desk', '/api/method/ping', '/files/photo.png', '#top', 'mailto:team@example.org']
+                    assert calls == []
                     context.close()
-                    print(f"PASS {engine.name}: rendered Arabic header stays RTL despite native root-language guess",flush=True)
+                    behavior_cases += 1
                 finally:
                     browser.close()
     finally:
-        server.shutdown();server.server_close();thread.join(timeout=5)
-    (OUT/"measurements.json").write_text(json.dumps(results,indent=2))
-    print(f"{len(results)} EN/AR route/viewport cases passed, plus 2 baseline reproductions and 2 native-language mismatch cases.")
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+    (OUT / "measurements.json").write_text(json.dumps(measurements, indent=2))
+    print(f"PASS: {len(measurements)} layout cases and {behavior_cases} language/fallback/boundary cases. No live account tested.")
 
 
 if __name__ == "__main__":

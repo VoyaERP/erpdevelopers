@@ -6,19 +6,21 @@ APP = Path(__file__).resolve().parents[1] / "erpdevelopers"
 
 
 class TestNavigationStability(TestCase):
-    def test_language_picker_keeps_its_space_during_native_loading(self):
+    def test_language_control_visible_in_a_fixed_slot(self):
         css = (APP / "public/css/brand.css").read_text()
-        self.assertIn('.ed-nav .ed-language-switcher{display:block!important', css)
-        self.assertIn('.ed-nav .ed-language-switcher.hide{visibility:hidden;pointer-events:none}', css)
-        self.assertNotIn('.ed-language-switcher.hide{display:none', css)
+        self.assertIn('.ed-nav .ed-language-switcher{display:flex', css)
+        self.assertNotIn('.ed-language-switcher.hide', css)
+        self.assertNotIn('visibility:hidden', css)
         self.assertIn('grid-template-columns:112px 120px', css)
         self.assertIn('grid-template-columns:70px 108px', css)
 
-    def test_one_header_and_native_picker_no_new_navigation_script(self):
+    def test_one_header_and_server_rendered_link_no_inline_script(self):
         nav = (APP / "templates/includes/erpdevelopers_nav.html").read_text()
         self.assertEqual(nav.count('<header '), 1)
         self.assertEqual(nav.count('id="language-switcher"'), 1)
-        self.assertEqual(nav.count('<select '), 1)
+        self.assertEqual(nav.count('data-language-switch='), 1)
+        self.assertNotIn('<select ', nav)
+        self.assertIn('language_queries[other_language]', nav)
         self.assertNotIn('<script', nav)
         self.assertNotIn('onclick=', nav)
         self.assertNotIn('onchange=', nav)

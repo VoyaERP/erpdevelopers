@@ -5,6 +5,7 @@ from erpdevelopers.content import ECOSYSTEM, VALUES
 from erpdevelopers.seo import homepage_seo_context
 from erpdevelopers.public_pages import PORTAL_CSS, ASSISTANT_JS
 from erpdevelopers.guide_content import INTRO, guide_links
+from erpdevelopers.language_navigation import set_public_language_context
 
 
 def get_context(context):
@@ -12,6 +13,7 @@ def get_context(context):
     for field, value in homepage_seo_context().items():
         setattr(context, field, value)
     context.no_cache = 1
+    set_public_language_context(context)
     context.brand_logo_url = LOGO_URL
     context.desk_signin_url = DESK_SIGNIN_URL
     context.brand_icon_url = FAVICON_URL

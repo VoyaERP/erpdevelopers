@@ -4,6 +4,8 @@ from erpdevelopers.branding import (
     homepage_stylesheet_url, versioned_public_asset,
 )
 
+from erpdevelopers.language_navigation import set_public_language_context
+
 PUBLIC_BASE = f"https://{EXPECTED_SITE}"
 PORTAL_CSS = versioned_public_asset("css/portal.css")
 CATALOG_JS = versioned_public_asset("js/catalog.js")
@@ -32,3 +34,4 @@ def set_public_context(context, *, slug, title, description):
     context.assistant_js_url = ASSISTANT_JS
     context.consultation_js_url = CONSULTATION_JS
     context.no_cache = 1
+    set_public_language_context(context)

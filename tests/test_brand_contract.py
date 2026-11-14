@@ -108,7 +108,7 @@ class TestBrandContract(TestCase):
         self.assertIn("AI advisory features are planned, not active today.", home)
         self.assertNotIn("AI capabilities are live", home)
 
-    def test_native_frappe_bilingual_selector_and_translation_coverage(self):
+    def test_public_language_control_and_translation_coverage(self):
         import csv
         import re
         from babel.messages.pofile import read_po
@@ -143,8 +143,9 @@ class TestBrandContract(TestCase):
         self.assertFalse(missing, f"Missing Arabic translations: {sorted(missing)}")
         nav = sources[1]
         self.assertIn('id="language-switcher"', nav)
-        self.assertIn('id="ed-language-select"', nav)
-        self.assertIn('class="form-control"', nav)
+        self.assertIn('data-language-switch="{{ other_language }}"', nav)
+        self.assertNotIn('<select ', nav)
+        self.assertNotIn('mb-0 hide', nav)
         self.assertIn("{{ _(item.title) | e }}", home)
         self.assertIn("{{ _(value.title) | e }}", home)
         self.assertNotIn("{{ step.index", home)

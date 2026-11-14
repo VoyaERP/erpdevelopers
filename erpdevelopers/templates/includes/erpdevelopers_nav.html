@@ -1,5 +1,5 @@
 <a class="ed-skip" href="#content">{{ _("Skip to content") }}</a>
-{# Pin the rendered header language/direction while Frappe loads its native picker. #}
+{# One visible locale link from first paint; no Guest-only or AJAX dependency. #}
 <header class="ed-nav" lang="{{ boot.lang | e }}" dir="{{ 'rtl' if boot.lang.startswith('ar') else 'ltr' }}">
   <div class="ed-shell ed-nav-inner">
     <a href="/" class="ed-brand" aria-label="ERP Developers">
@@ -17,11 +17,15 @@
       <a href="/lets-talk#meeting-start" class="ed-nav-talk">{{ _("Let's Talk") }}</a>
     </nav>
     <div class="ed-nav-tools">
-      <div id="language-switcher" class="ed-language-switcher form-group mb-0 hide">
-        <label for="ed-language-select">{{ _("Language") }}</label>
-        <select class="form-control" id="ed-language-select"
-                aria-label="{{ _('Language') }}"></select>
-      </div>
+      {% set other_language = 'en' if boot.lang.startswith('ar') else 'ar' %}
+      <a id="language-switcher" class="ed-language-switcher"
+         href="{{ language_queries[other_language] | e }}"
+         data-language-switch="{{ other_language }}" hreflang="{{ other_language }}"
+         lang="{{ other_language }}" dir="{{ 'rtl' if other_language == 'ar' else 'ltr' }}"
+         aria-label="{{ 'Switch to English' if other_language == 'en' else 'التبديل إلى العربية' }}">
+        <svg aria-hidden="true" focusable="false" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a19 19 0 0 1 0 18 19 19 0 0 1 0-18Z"/></svg>
+        <span>{{ 'English' if other_language == 'en' else 'العربية' }}</span>
+      </a>
       <a class="ed-nav-cta" href="{{ desk_signin_url | e }}">{{ _("Team Login") }}</a>
     </div>
   </div>

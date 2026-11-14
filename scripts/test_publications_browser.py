@@ -98,9 +98,10 @@ def main():
                                 expect(page.locator(".ed-publication-copy")).to_be_visible()
                                 assert page.evaluate("window.bad") is None
                                 assert page.evaluate("document.documentElement.scrollWidth<=innerWidth+1")
-                                # Frappe's language picker appears later; its existing reserved slot must not move links.
+                                # The language link is visible immediately and keeps its fixed slot.
                                 before = page.locator(".ed-nav-links").bounding_box()
-                                page.locator("#language-switcher").evaluate("e=>{e.querySelector('select').add(new Option('English','en'));e.classList.remove('hide')}")
+                                expect(page.locator("#language-switcher")).to_be_visible()
+                                assert page.locator("#language-switcher").evaluate("e=>e.tagName") == "A"
                                 after = page.locator(".ed-nav-links").bounding_box()
                                 assert all(abs(before[k] - after[k]) <= 1 for k in ("x", "y", "width", "height"))
                                 for link in page.locator(".ed-nav-links > a").all():
