@@ -13,7 +13,7 @@ class TestBrandContract(unittest.TestCase):
         images = APP / "public" / "images"
         logo = (images / LOGO).read_bytes()
         self.assertEqual(len(logo), 419610)
-        self.assertTrue(logo.startswith(b"\x89PNG\r\n\x1a\n"))
+        self.assertTrue(logo.startswith(bytes((137, 80, 78, 71, 13, 10, 26, 10))))
         self.assertEqual(hashlib.sha256(logo).hexdigest(), "250df1886e13229aa0e260949f66cb91a627b220a03c36b5c1d4ede1ad06d95d")
         self.assertEqual(hashlib.sha256((images / ICON).read_bytes()).hexdigest(), "f329dde3a9af289c82a03601e15a30fe46809cd2a717457cdf62823aecc4524c")
 
