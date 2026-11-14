@@ -102,7 +102,10 @@ class TestERPNextPublicHubContracts(unittest.TestCase):
 
     def test_guest_submission_is_opt_in_and_crm_conversion_is_staff_only(self):
         code = (APP / "appointments.py").read_text()
-        self.assertIn('frappe.conf.get("erpdev_consultation_open", 0)', code)
+        flags = (APP / "consultation_flags.py").read_text()
+        self.assertIn('frappe.conf.get("erpdev_consultation_open", 0)', flags)
+        self.assertIn('frappe.local.site == EXPECTED_SITE', flags)
+        self.assertIn('from erpdevelopers.consultation_flags import booking_open', code)
         self.assertIn('@frappe.whitelist(allow_guest=True, methods=["POST"])', code)
         self.assertIn('@rate_limit(limit=5, seconds=3600, methods="POST")', code)
         self.assertIn('frappe.get_doc("ERP Developers Consultation"', code)
