@@ -1,0 +1,19 @@
+{% extends "templates/web.html" %}
+{% block head_include %}
+{{ super() }}
+<link rel="canonical" href="{{ canonical_url | e }}">
+<link rel="stylesheet" href="{{ homepage_css_url | e }}">
+<link rel="stylesheet" href="{{ portal_css_url | e }}">
+{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block page_container %}
+<main class="ed-site ed-public-page" id="top">
+  {% include "templates/includes/erpdevelopers_nav.html" %}
+  <div id="content">
+    {% block ed_content %}{% endblock %}
+  </div>
+  {% include "templates/includes/erpdevelopers_footer.html" %}
+  {% include "templates/includes/erpdevelopers_assistant.html" %}
+</main>
+{% endblock %}

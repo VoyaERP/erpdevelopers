@@ -66,6 +66,37 @@
   }
   grep -Fq 'أكاديمية التعلم' "$TMP/home-ar.html"
 
+  echo "=== Public Hub: Team Login, training, insights, consultation and privacy ==="
+  grep -Fq "Team Login" "$TMP/home-en.html" || {
+    echo "STOP: Team Login label not rendered"; exit 3;
+  }
+  for entry in "training:ed-training-title" "insights:ed-insights-title" \
+               "lets-talk:ed-talk-title" "privacy:ed-privacy-title"; do
+    route="${entry%%:*}"
+    marker="${entry#*:}"
+    curl -kfsSL --connect-timeout 5 --max-time 20 \
+      --resolve "$SITE:443:127.0.0.1" \
+      "https://$SITE/$route?_lang=en" -o "$TMP/$route.html"
+    grep -Fq "id=\"$marker\"" "$TMP/$route.html" || {
+      echo "STOP: public hub page $route did not render correctly"; exit 3;
+    }
+    grep -Fq 'href="/training"' "$TMP/$route.html" || {
+      echo "STOP: shared hub navigation missing from $route"; exit 3;
+    }
+  done
+  grep -Fq "not a reservation" "$TMP/lets-talk.html" || {
+    echo "STOP: consultation confirmation disclaimer missing"; exit 3;
+  }
+  PORTAL_DIGEST="$(sha256sum "$APP/erpdevelopers/public/css/portal.css" | cut -c1-16)"
+  PORTAL_CSS="/assets/erpdevelopers/css/portal.css?v=$PORTAL_DIGEST"
+  grep -Fq "href=\"$PORTAL_CSS\"" "$TMP/training.html" || {
+    echo "STOP: public hub CSS fingerprint missing"; exit 3;
+  }
+  curl -kfsSL --connect-timeout 5 --max-time 20 \
+    --resolve "$SITE:443:127.0.0.1" "https://$SITE$PORTAL_CSS" -o "$TMP/portal.css"
+  cmp -s "$APP/erpdevelopers/public/css/portal.css" "$TMP/portal.css" || {
+    echo "STOP: public hub CSS bytes differ from the installed app"; exit 3;
+  }
   echo "=== Confirm native Frappe login and language picker render ==="
   curl -kfsSL --connect-timeout 5 --max-time 20 \
     --resolve "$SITE:443:127.0.0.1" \
@@ -123,7 +154,7 @@
   cmp -s "$APP/erpdevelopers/public/images/erpdevelopers-selected-favicon.png" "$TMP/favicon.png"
 
   echo "=== Public Cloudflare HTTPS GET checks ==="
-  for route in / /login /api/method/ping "$CSS" "$LOGIN_CSS" "$LOGO" "$FAVICON"; do
+  for route in / /training /insights /lets-talk /privacy /login /api/method/ping "$CSS" "$LOGIN_CSS" "$PORTAL_CSS" "$LOGO" "$FAVICON"; do
     status="$(curl -fsSL --connect-timeout 5 --max-time 20 \
       -o /dev/null -w '%{http_code}' "https://$SITE$route")" || {
         echo "STOP: public route failed: $route"; exit 4;

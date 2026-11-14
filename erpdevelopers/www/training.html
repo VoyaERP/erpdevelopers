@@ -1,0 +1,84 @@
+{% extends "templates/includes/erpdevelopers_page_base.html" %}
+{% block ed_content %}
+<section class="ed-page-hero" aria-labelledby="ed-training-title">
+  <div class="ed-shell ed-page-hero-inner">
+    <div>
+      <p class="ed-kicker">{{ _("CURATED LEARNING") }}</p>
+      <h1 id="ed-training-title">{{ _("Learn with a clear path.") }}</h1>
+      <p>{{ _("Discover vetted public YouTube playlists across enterprise applications, architecture, development and emerging technology.") }}</p>
+      <div class="ed-actions">
+        <a class="ed-btn ed-btn-primary" href="#playlists">{{ _("Explore playlists") }}</a>
+        <a class="ed-btn ed-btn-secondary" href="/lets-talk">{{ _("Discuss a training plan") }}</a>
+      </div>
+    </div>
+    <div class="ed-page-hero-aside">
+      <span>{{ _("TRAINING MODEL") }}</span>
+      <strong>{{ _("Explore → Apply → Grow") }}</strong>
+      <p>{{ _("This is a curated video directory. Enrollments, progress tracking, assessments and certificates belong to the planned learning academy.") }}</p>
+    </div>
+  </div>
+</section>
+<section class="ed-section ed-page-section" id="playlists" aria-labelledby="ed-playlist-heading">
+  <div class="ed-shell">
+    <div class="ed-section-head">
+      <div>
+        <p class="ed-kicker">{{ _("LEARNING LIBRARY") }}</p>
+        <h2 id="ed-playlist-heading">{{ _("Video playlists") }}</h2>
+      </div>
+      <p>{{ _("Each collection is reviewed before it appears. Videos open on YouTube; no tracking player is embedded on this page.") }}</p>
+    </div>
+    <div class="ed-filter-row">
+      <label for="ed-topic-filter">{{ _("Filter by topic") }}</label>
+      <select id="ed-topic-filter" class="ed-filter" data-catalog-filter="#ed-playlists"
+              data-count-target="#ed-playlist-count">
+        <option value="">{{ _("All topics") }}</option>
+        {% for topic in topics %}
+        <option value="{{ topic | e }}">{{ _(topic) | e }}</option>
+        {% endfor %}
+      </select>
+      <span class="ed-catalog-count"><b id="ed-playlist-count">{{ playlists | length }}</b> {{ _("playlists") }}</span>
+    </div>
+    {% if playlists %}
+    <div class="ed-resource-grid" id="ed-playlists">
+      {% for item in playlists %}
+      <article class="ed-resource-card" data-catalog-topic="{{ item.topic | e }}">
+        <div class="ed-card-meta">
+          <span>{{ _(item.topic) | e }}</span>
+          <span>{{ _(item.level) | e }}</span>
+        </div>
+        <h3>{% if boot.lang == "ar" and item.title_ar %}{{ item.title_ar | e }}{% else %}{{ item.title | e }}{% endif %}</h3>
+        <p>{{ item.description | e }}</p>
+        <div class="ed-card-bottom">
+          <span>{{ _(item.language) | e }}</span>
+          <a href="{{ item.watch_url | e }}" target="_blank" rel="noopener noreferrer">
+            {{ _("Watch playlist on YouTube") }} <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="ed-empty">
+      <strong>{{ _("The playlist library is being curated.") }}</strong>
+      <p>{{ _("We will publish collections after checking their relevance, accuracy and source rights.") }}</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+<section class="ed-section ed-learning-paths">
+  <div class="ed-shell ed-section-head">
+    <div>
+      <p class="ed-kicker">{{ _("OUR LEARNING APPROACH") }}</p>
+      <h2>{{ _("From fundamentals to application.") }}</h2>
+    </div>
+    <p>{{ _("Start with concepts, practice real workflows, and connect the skills to business decisions. Personal learning recommendations are planned.") }}</p>
+  </div>
+  <div class="ed-shell ed-steps">
+    <div><span>01</span><strong>{{ _("Foundations") }}</strong><small>{{ _("Business processes and ERP concepts") }}</small></div>
+    <div><span>02</span><strong>{{ _("Build") }}</strong><small>{{ _("Configurations, development and integrations") }}</small></div>
+    <div><span>03</span><strong>{{ _("Architect") }}</strong><small>{{ _("Security, cloud and scalable design") }}</small></div>
+    <div><span>04</span><strong>{{ _("Advance") }}</strong><small>{{ _("Human-reviewed AI and continuous improvement") }}</small></div>
+  </div>
+</section>
+<script defer src="{{ catalog_js_url | e }}"></script>
+{% endblock %}

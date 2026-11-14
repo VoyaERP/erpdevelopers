@@ -1,0 +1,38 @@
+{# Explicitly a local FAQ assistant. No AI inference, user text, tracking or API keys. #}
+<aside class="ed-assistant" aria-label="{{ _('ERP Developers quick guide') }}">
+  <button type="button" class="ed-assistant-toggle" data-guide-toggle
+          aria-expanded="false" aria-controls="ed-guide-panel">
+    {{ _("Quick Guide") }}
+  </button>
+  <div class="ed-assistant-panel" id="ed-guide-panel" hidden>
+    <div class="ed-assistant-heading">
+      <strong>{{ _("ERP Developers Guide") }}</strong>
+      <button type="button" class="ed-assistant-close" data-guide-close
+              aria-label="{{ _('Close guide') }}">×</button>
+    </div>
+    <p class="ed-assistant-disclaimer">{{ _("FAQ mode — no AI or personal data processing.") }}</p>
+    <div class="ed-assistant-messages" data-guide-messages aria-live="polite">
+      <p>{{ _("Choose a topic to get a quick answer.") }}</p>
+    </div>
+    <div class="ed-assistant-questions">
+      <button type="button" data-guide-question
+              data-answer="{{ _('You can request a meeting using Let’s Talk. A team member confirms the slot; submission is not a booking.') | e }}">
+        {{ _("How do I book a conversation?") }}
+      </button>
+      <button type="button" data-guide-question
+              data-answer="{{ _('Training currently lists curated public YouTube playlists. Course enrollment and learning progress are planned.') | e }}">
+        {{ _("Where can I learn?") }}
+      </button>
+      <button type="button" data-guide-question
+              data-answer="{{ _('Insights include reviewed source links and Frappe-published articles. AI-generated advice is not currently available.') | e }}">
+        {{ _("How is advice reviewed?") }}
+      </button>
+      <button type="button" data-guide-question
+              data-answer="{{ _('LinkedIn authentication and authorized integrations are planned, not connected today.') | e }}">
+        {{ _("Is LinkedIn connected?") }}
+      </button>
+    </div>
+    <p class="ed-assistant-roadmap">{{ _("An AI assistant may be introduced later with permission checks, citations and human review.") }}</p>
+  </div>
+</aside>
+<script defer src="{{ assistant_js_url | e }}"></script>

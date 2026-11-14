@@ -73,15 +73,20 @@ class TestBrandContract(TestCase):
         self.assertEqual(context.no_cache, 1)
 
     def test_brand_assets_have_one_authoritative_source(self):
-        home = (APP / "www" / "erp-developers-home.html").read_text(encoding="utf-8")
-        setup = (APP / "site_setup.py").read_text(encoding="utf-8")
-        self.assertEqual(home.count('{{ brand_logo_url | e }}'), 2)
-        self.assertEqual(home.count('{{ brand_icon_url | e }}'), 1)
+        home = (APP / "www/erp-developers-home.html").read_text()
+        nav = (APP / "templates/includes/erpdevelopers_nav.html").read_text()
+        footer = (APP / "templates/includes/erpdevelopers_footer.html").read_text()
+        setup = (APP / "site_setup.py").read_text()
+        self.assertEqual(nav.count("{{ brand_logo_url | e }}"), 1)
+        self.assertEqual(footer.count("{{ brand_logo_url | e }}"), 1)
+        self.assertEqual(home.count("{{ brand_icon_url | e }}"), 1)
+        self.assertIn('include "templates/includes/erpdevelopers_nav.html"', home)
+        self.assertIn('include "templates/includes/erpdevelopers_footer.html"', home)
         self.assertIn(branding.LOGO_URL, branding.NAVBAR_BRAND_HTML)
-        self.assertIn('website_settings_values()', setup)
-        self.assertNotIn("erp-mark.svg", home + branding.NAVBAR_BRAND_HTML + setup)
-        self.assertNotIn("erp-developers-logo.svg", home + setup)
-        self.assertNotIn("erpdevelopers-selected-logo.png", home)
+        self.assertIn("website_settings_values()", setup)
+        self.assertNotIn("erp-mark.svg", home + nav + footer + setup)
+        self.assertNotIn("erp-developers-logo.svg", home + nav + footer + setup)
+        self.assertNotIn("erpdevelopers-selected-logo.png", home + nav + footer)
 
     def test_static_content_is_typed_and_declared_once(self):
         from erpdevelopers import content
@@ -103,9 +108,12 @@ class TestBrandContract(TestCase):
         self.assertIn("Planned module", home)
 
     def test_html_copy_does_not_claim_roadmap_features_are_running(self):
-        home = (APP / "www" / "erp-developers-home.html").read_text(encoding="utf-8")
-        for word in ("Engage.", "Reason.", "Progress.", "Developers", "AI"):
-            self.assertIn(word, home)
+        from erpdevelopers import content
+        home = (APP / "www/erp-developers-home.html").read_text()
+        nav = (APP / "templates/includes/erpdevelopers_nav.html").read_text()
+        self.assertEqual([v.title for v in content.VALUES], ["Engage.", "Reason.", "Progress."])
+        self.assertIn("ERP Developers", nav)
+        self.assertIn("AI", home)
         self.assertIn("Planned module", home)
         self.assertIn("not active on this preview site", home)
 
@@ -113,23 +121,33 @@ class TestBrandContract(TestCase):
         import csv
         import re
         from erpdevelopers import content
-        home = (APP / "www" / "erp-developers-home.html").read_text(encoding="utf-8")
-        with (APP / "translations" / "ar.csv").open(encoding="utf-8", newline="") as f:
-            rows = list(csv.reader(f))
-        self.assertGreaterEqual(len(rows), 50)
+        from erpdevelopers.intake_rules import TOPICS, WINDOWS
+        home = (APP / "www/erp-developers-home.html").read_text(encoding="utf-8")
+        files = [
+            "templates/includes/erpdevelopers_nav.html",
+            "templates/includes/erpdevelopers_footer.html",
+            "templates/includes/erpdevelopers_assistant.html",
+            "www/training.html", "www/insights.html", "www/lets-talk.html", "www/privacy.html",
+        ]
+        sources = [home] + [(APP / f).read_text(encoding="utf-8") for f in files]
+        with (APP / "translations/ar.csv").open(encoding="utf-8", newline="") as stream:
+            rows = list(csv.reader(stream))
         self.assertTrue(all(len(row) == 2 and row[0] and row[1] for row in rows))
-        translations = {source: target for source, target in rows}
+        translations = {en: ar for en, ar in rows}
         self.assertEqual(len(translations), len(rows), "Arabic keys must be unique")
-        literal_strings = set(re.findall(r'_\("([^"]+)"\)', home))
-        dynamic_strings = set()
+        literals = set()
+        for html in sources:
+            literals.update(m.group(2) for m in re.finditer(r"""_\((["'])(.*?)\1\)""", html))
+        dynamic = set(TOPICS) | set(WINDOWS)
         for items in (content.ECOSYSTEM, content.AI_FLOW, content.ROADMAP):
-            dynamic_strings.update(item.title for item in items)
-            dynamic_strings.update(item.description for item in items)
-        missing = (literal_strings | dynamic_strings) - set(translations)
-        self.assertFalse(missing, f"Untranslated website copy: {sorted(missing)}")
-        self.assertIn('id="language-switcher"', home)
-        self.assertIn('id="ed-language-select"', home)
-        self.assertIn('class="form-control"', home)
+            dynamic.update(x.title for x in items)
+            dynamic.update(x.description for x in items)
+        missing = (literals | dynamic) - set(translations)
+        self.assertFalse(missing, f"Missing Arabic translations: {sorted(missing)}")
+        nav = sources[1]
+        self.assertIn('id="language-switcher"', nav)
+        self.assertIn('id="ed-language-select"', nav)
+        self.assertIn('class="form-control"', nav)
         self.assertIn("{{ _(item.title) | e }}", home)
         self.assertIn("{{ _(step.description) | e }}", home)
 
@@ -147,6 +165,7 @@ class TestBrandContract(TestCase):
     def test_version_boundary(self):
         config = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
         self.assertIn('frappe = ">=16.0.0,<17.0.0"', config)
+        self.assertIn('erpnext = ">=16.0.0,<17.0.0"', config)
 
 
 class TestSiteScopedBranding(TestCase):
