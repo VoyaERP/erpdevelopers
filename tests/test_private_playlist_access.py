@@ -20,6 +20,15 @@ class TestPrivatePlaylistAccess(unittest.TestCase):
         with patch.dict(sys.modules, {"frappe": frappe}):
             self.assertEqual(catalog.authorized_private_playlists(), [])
 
+    def test_signed_in_user_without_read_role_sees_nothing(self):
+        frappe = types.SimpleNamespace(
+            session=types.SimpleNamespace(user="member@example.com"),
+            has_permission=lambda *a, **kw: False,
+            get_list=lambda *a, **kw: self.fail("Unauthorized user queried private records"),
+        )
+        with patch.dict(sys.modules, {"frappe": frappe}):
+            self.assertEqual(catalog.authorized_private_playlists(), [])
+
     def test_signed_in_reads_only_private_published_records_with_permissions(self):
         calls = []
         def get_list(doctype, **kwargs):
