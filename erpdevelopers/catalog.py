@@ -83,7 +83,7 @@ def authorized_private_playlists():
     """
     import frappe
 
-    if frappe.session.user == "Guest":
+    if frappe.session.user == "Guest" or not frappe.has_permission(PLAYLIST_DOCTYPE, "read"):
         return []
     status = _schema_status(PLAYLIST_DOCTYPE, PLAYLIST_FIELDS)
     if not status["table_present"] or status["missing_columns"]:
