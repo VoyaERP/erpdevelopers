@@ -12,6 +12,9 @@ APP_NAME = "ERP Developers"
 TAGLINE = "Engage. Reason. Progress."
 EXPECTED_SITE = "erp-developers.com"
 HOME_ROUTE = "erp-developers-home"
+# Native Frappe v16 honors the sanitized redirect-to parameter after login.
+# This URL is for authorized Desk/System Users, not future website members.
+DESK_SIGNIN_URL = "/login?redirect-to=/desk"
 
 # The original customer-selected PNG is deliberately not regenerated or re-encoded.
 LOGO_URL = "/assets/erpdevelopers/images/erpdevelopers-selected-logo.png"

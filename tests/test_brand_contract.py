@@ -64,6 +64,8 @@ class TestBrandContract(TestCase):
         context = SimpleNamespace()
         get_context(context)
         self.assertEqual(context.brand_logo_url, branding.LOGO_URL)
+        self.assertEqual(context.desk_signin_url, branding.DESK_SIGNIN_URL)
+        self.assertEqual(branding.DESK_SIGNIN_URL, "/login?redirect-to=/desk")
         self.assertEqual(context.brand_icon_url, branding.FAVICON_URL)
         self.assertEqual(context.homepage_css_url, branding.homepage_stylesheet_url())
         self.assertEqual(context.title, branding.APP_NAME + " | " + branding.TAGLINE)

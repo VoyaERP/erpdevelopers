@@ -79,6 +79,9 @@ class TestNativeLogin(unittest.TestCase):
         self.assertNotIn("bench new-site", script)
         self.assertNotIn("bench update", script)
         self.assertNotIn("supervisorctl restart", script)
+        self.assertNotIn('node --check "$APP/erpdevelopers/public/js/login_chrome.js"', script)
+        self.assertIn('test ! -e "$APP/erpdevelopers/public/js/login_chrome.js"', script)
+        self.assertLess(script.index("unittest discover"), script.index('bench --site "$SITE" migrate'))
 
     def test_frontend_verifier_compares_real_css_and_images(self):
         script = (ROOT / "scripts/verify_frontend.sh").read_text(encoding="utf-8")
@@ -91,6 +94,8 @@ class TestNativeLogin(unittest.TestCase):
         self.assertIn("Learning Academy", script)
         self.assertIn("LOGIN_DIGEST=", script)
         self.assertIn("LOGIN_CSS=", script)
+        self.assertIn("SIGNIN_HREF=", script)
+        self.assertIn('"/login?redirect-to=/desk"', script)
         self.assertIn("login_chrome.js", script)
         self.assertIn('cmp -s "$APP/erpdevelopers/public/css/login.css" "$TMP/login.css"', script)
         self.assertIn("?_lang=ar", script)
@@ -124,7 +129,9 @@ class TestNativeLogin(unittest.TestCase):
         self.assertIn("{% block navbar %}{% endblock %}", home)
         self.assertIn("{% block footer %}{% endblock %}", home)
         self.assertIn("{% block page_container %}", home)
-        self.assertIn('href="/login"', home)
+        self.assertEqual(home.count('href="{{ desk_signin_url | e }}"'), 2)
+        self.assertEqual(home.count('{{ _("Desk sign in") }}'), 2)
+        self.assertNotIn('href="/login"', home)
         self.assertFalse((APP / "www/index.html").exists())
 
     def test_existing_site_installer_never_recreates_site(self):

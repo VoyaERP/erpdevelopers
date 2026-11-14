@@ -58,6 +58,17 @@
   grep -Fq 'for-login' "$TMP/login.html"
   grep -Fq 'id="language-switcher"' "$TMP/login.html"
 
+  echo "=== Verify explicit Desk sign-in intent in public homepage ==="
+  SIGNIN_HREF="/login?redirect-to=/desk"
+  SIGNIN_COUNT="$(grep -oF 'href="'$SIGNIN_HREF'"' "$TMP/home.html" | wc -l | tr -d '[:space:]')"
+  test "$SIGNIN_COUNT" = "2" || {
+    echo "STOP: Desk sign-in links must explicitly request /desk"; exit 3;
+  }
+  curl -kfsSL --connect-timeout 5 --max-time 20 \
+    --resolve "$SITE:443:127.0.0.1" \
+    "https://$SITE$SIGNIN_HREF" -o "$TMP/login-desk.html"
+  grep -Fq 'id="page-login"' "$TMP/login-desk.html"
+
   echo "=== First-paint login CSS and approved navbar logo ==="
   grep -Fq "$LOGIN_CSS" "$TMP/login.html" || {
     echo "STOP: fingerprinted login CSS not linked"; exit 3;

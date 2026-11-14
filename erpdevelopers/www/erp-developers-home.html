@@ -27,7 +27,7 @@
           <label for="ed-language-select">{{ _("Language") }}</label>
           <select class="form-control" id="ed-language-select" aria-label="{{ _('Language') }}"></select>
         </div>
-        <a class="ed-nav-cta" href="/login">{{ _("Member sign in") }} <span aria-hidden="true">↗</span></a>
+        <a class="ed-nav-cta" href="{{ desk_signin_url | e }}">{{ _("Desk sign in") }} <span aria-hidden="true">↗</span></a>
       </div>
     </div>
   </header>
@@ -134,7 +134,7 @@
       </a>
       <p>{{ _("Building a smarter, more connected technology community.") }}</p>
       <div class="ed-footer-links">
-        <a href="/login">{{ _("Sign in") }}</a>
+        <a href="{{ desk_signin_url | e }}">{{ _("Desk sign in") }}</a>
         <a href="#top">{{ _("Back to top") }} ↑</a>
       </div>
     </div>

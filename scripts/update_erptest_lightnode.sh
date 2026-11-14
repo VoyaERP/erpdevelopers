@@ -58,9 +58,10 @@
   test -f "$APP/erpdevelopers/patches.txt"
   "$BENCH/env/bin/python" -m compileall -q "$APP/erpdevelopers" "$APP/tests"
   "$BENCH/env/bin/python" -m unittest discover -s "$APP/tests" -v
-  if command -v node >/dev/null 2>&1; then
-    node --check "$APP/erpdevelopers/public/js/login_chrome.js"
-  fi
+  # This release has no custom website JavaScript. The old login script
+  # was removed; never check a file that the application no longer ships.
+  test ! -e "$APP/erpdevelopers/public/js/login_chrome.js"
+  test ! -e "$APP/tests/login_chrome_dom.test.cjs"
   APPROVED_SHA="250df1886e13229aa0e260949f66cb91a627b220a03c36b5c1d4ede1ad06d95d"
   LOGO_SHA="$(sha256sum "$APP/erpdevelopers/public/images/erpdevelopers-selected-logo.png" | cut -d' ' -f1)"
   test "$LOGO_SHA" = "$APPROVED_SHA" || {
