@@ -116,8 +116,11 @@ class TestPublicCatalogTopicContext(unittest.TestCase):
              "language": "Arabic", "watch_url": "https://www.youtube.com/playlist?list=PLother"},
         ]
         with patch.object(training, "public_playlists", return_value=rows), patch.object(
+            training, "authorized_private_playlists", return_value=[]
+        ), patch("frappe.session", create=True) as session, patch.object(
             training, "set_public_context", side_effect=lambda context, **_kwargs: None
         ):
+            session.user = "Guest"
             training.get_context(ctx)
         self.assertEqual(ctx.playlists, rows)
         self.assertEqual(ctx.topics, ["Cloud & DevOps", "Frappe & ERPNext"])
