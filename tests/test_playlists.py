@@ -115,14 +115,16 @@ class TestPlaylistBackend(TestCase):
 
 
 class TestProtectedPlaylistDialog(TestCase):
-    def test_embed_is_user_initiated_privacy_enhanced_and_sandboxed(self):
+    def test_embed_is_user_initiated_privacy_enhanced_and_compatible(self):
         html = (ROOT / "www/training.html").read_text()
         js = (ROOT / "public/js/catalog.js").read_text()
         css = (ROOT / "public/css/portal.css").read_text()
         self.assertIn('id="ed-playlist-dialog"', html)
         self.assertIn('data-playlist-id="{{ item.playlist_id | e }}"', html)
         self.assertIn('data-player-frame', html)
-        self.assertIn('sandbox="allow-scripts allow-same-origin allow-presentation"', html)
+        self.assertNotIn('sandbox=', html)
+        self.assertIn('allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"', html)
+        self.assertIn("data-player-status", html)
         self.assertIn('referrerpolicy="strict-origin-when-cross-origin"', html)
         self.assertNotIn('src="https://www.youtube', html, "Do not embed on page load")
         self.assertIn("youtube-nocookie.com/embed/videoseries", js)
