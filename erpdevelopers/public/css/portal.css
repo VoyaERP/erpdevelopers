@@ -86,12 +86,16 @@ html[lang^="ar"] .ed-page-hero-aside span,html[lang^="ar"] .ed-link-card small{l
 
 /* Curated playlist playback. An isolated YouTube iframe is only created
    on an explicit visitor click; catalog filtering is unchanged. */
-.ed-playlist-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:10px}
+.ed-playlist-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:12px;min-width:0}
 .ed-playlist-actions>a{font-size:12px;line-height:1.5}
-.ed-playlist-watch{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#0e6ec5;color:#fff;border:1px solid #0e6ec5;border-radius:10px;padding:9px 13px;cursor:pointer;font:inherit;font-size:12px;line-height:1.5;font-weight:770}
-.ed-playlist-watch:hover{background:#075aab;border-color:#075aab}
+.ed-playlist-watch{display:inline-flex;align-items:center;justify-content:center;gap:10px;max-width:100%;padding:5px 14px 5px 6px;min-height:46px;background:linear-gradient(112deg,#0969cb,#087eaf);color:#fff!important;border:1px solid #137abe;border-radius:13px;box-shadow:0 7px 16px #0871ba32;cursor:pointer;font:inherit;font-size:13px;line-height:1.55;font-weight:780;text-decoration:none!important;transition:transform .2s,box-shadow .2s,background .2s}
+.ed-playlist-watch:hover{background:linear-gradient(112deg,#0756a9,#0a6e97);color:#fff!important;transform:translateY(-2px);box-shadow:0 10px 22px #0871ba48}
 .ed-playlist-watch:focus-visible,.ed-playlist-close:focus-visible{outline:3px solid #10b8ac;outline-offset:3px}
 .ed-playlist-watch[hidden]{display:none}
+.ed-playlist-play-icon{display:grid;place-items:center;width:34px;height:34px;flex:none;background:#ffffff26;border:1px solid #ffffff47;border-radius:10px;color:#fff}
+.ed-playlist-play-icon svg{display:block}
+.ed-playlist-watch-cue{margin-inline-start:auto;color:#c7f7fb;font-size:14px;line-height:1}
+@media(prefers-reduced-motion:reduce){.ed-playlist-watch{transition:none}.ed-playlist-watch:hover{transform:none}}
 .ed-playlist-dialog{position:fixed;inset:0;margin:auto;width:min(970px,calc(100vw - 28px));max-width:calc(100vw - 28px);max-height:min(91dvh,900px);padding:0;color:#12324e;border:1px solid #bfd7e9;border-radius:20px;background:#fff;box-shadow:0 40px 95px #051c3566;overflow:auto}
 .ed-playlist-dialog:not([open]){display:none}
 .ed-playlist-dialog::backdrop{background:#041c35ca;backdrop-filter:blur(7px)}

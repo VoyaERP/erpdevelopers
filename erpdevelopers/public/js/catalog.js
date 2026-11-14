@@ -1,45 +1,57 @@
 /* Accessible client-only filtering: server sends only published curated rows. */
 (() => {
   "use strict";
-  // Only approved public playlist IDs reach the DOM. Validate again before
-  // assigning an iframe src, and never load YouTube before an explicit click.
+  // Progressive enhancement: the original anchor always points to the safe,
+  // server-validated YouTube playlist. A failed/missing script or unsupported
+  // HTMLDialogElement must NEVER leave the Watch button without an action.
+  // No iframe request occurs before a visitor explicitly clicks Watch.
   function initPlaylistPlayer() {
     const dialog = document.getElementById("ed-playlist-dialog");
-    if (!dialog) return;
-    const buttons = [...document.querySelectorAll("[data-playlist-open]")];
+    if (!dialog || typeof dialog.showModal !== "function") return;
     const frame = dialog.querySelector("[data-player-frame]");
     const title = dialog.querySelector("#ed-playlist-dialog-title");
     const external = dialog.querySelector("[data-player-external]");
     const close = dialog.querySelector("[data-player-close]");
+    if (!frame || !title || !external || !close) return;
+
     const idPattern = /^[A-Za-z0-9_-]{12,64}$/;
-    if (typeof dialog.showModal !== "function") {
-      buttons.forEach(button => { button.hidden = true; });
-      return;
-    }
     let lastFocus = null;
+
     const stopPlayback = () => {
       frame.removeAttribute("src");
       if (lastFocus && lastFocus.isConnected) lastFocus.focus();
+      lastFocus = null;
     };
     dialog.addEventListener("close", stopPlayback);
     close.addEventListener("click", () => dialog.close());
     dialog.addEventListener("click", event => {
       if (event.target === dialog) dialog.close();
     });
-    buttons.forEach(button => {
-      button.addEventListener("click", () => {
-        const id = button.dataset.playlistId || "";
-        if (!idPattern.test(id)) return;
+
+    document.querySelectorAll("[data-playlist-open]").forEach(link => {
+      link.addEventListener("click", event => {
+        const id = link.dataset.playlistId || "";
+        if (!idPattern.test(id)) return; // native YouTube link still works
+
         const watch = new URL("https://www.youtube.com/playlist");
         watch.searchParams.set("list", id);
-        const embed = new URL("https://www.youtube-nocookie.com/embed");
-        embed.searchParams.set("listType", "playlist");
+
+        // YouTube's Share > Embed playlist form. The old /embed?listType=
+        // form can fail to resolve playlists in privacy-enhanced embeds.
+        const embed = new URL("https://www.youtube-nocookie.com/embed/videoseries");
         embed.searchParams.set("list", id);
         embed.searchParams.set("autoplay", "0");
-        title.textContent = button.dataset.playlistTitle || "Video playlist";
+        embed.searchParams.set("playsinline", "1");
+
+        try {
+          dialog.showModal();
+        } catch (_) {
+          return; // opening a new-tab YouTube playlist remains possible
+        }
+        event.preventDefault(); // only intercept when the dialog actually opened
+        lastFocus = link;
+        title.textContent = link.dataset.playlistTitle || "Video playlist";
         external.href = watch.toString();
-        lastFocus = button;
-        dialog.showModal();
         frame.src = embed.toString();
         close.focus();
       });

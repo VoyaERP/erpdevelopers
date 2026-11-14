@@ -68,6 +68,9 @@ def public_playlists():
         except ValueError:
             continue
         entry = dict(item)
+        # Always take the validated ID from the canonical URL. Older imported
+        # records can have a blank/stale read-only playlist_id field.
+        entry["playlist_id"] = list_id
         entry["watch_url"] = f"https://www.youtube.com/playlist?list={list_id}"
         result.append(entry)
     return result
