@@ -134,6 +134,9 @@ class TestERPNextPublicHubContracts(unittest.TestCase):
         self.assertIn("textContent", guide)
         self.assertNotIn("fetch(", guide)
         self.assertNotIn("frappe.call", guide)
+        self.assertIn("--ed-guide-footer-visible", guide)
+        self.assertIn('footer.getBoundingClientRect()', guide)
+        self.assertIn('window.addEventListener("scroll", scheduleFooterSync', guide)
 
     def test_fingerprinted_asset_url_fails_closed(self):
         for name in ("css/portal.css", "js/consultation.js", "js/catalog.js", "js/assistant.js", "css/meeting.css", "js/meeting.js"):

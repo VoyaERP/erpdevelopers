@@ -9,6 +9,30 @@
     const panel = root.querySelector("#ed-guide-panel");
     const messages = root.querySelector("[data-guide-messages]");
     const questions = [...root.querySelectorAll("[data-guide-question]")];
+    // Keep the floating guide clear of the footer links. Only its vertical
+    // position changes: the widget remains usable until the bottom of the page.
+    const footer = root.closest(".ed-site")?.querySelector(".ed-footer");
+    if (footer) {
+      let queued = false;
+      const syncFooter = () => {
+        queued = false;
+        const rect = footer.getBoundingClientRect();
+        const visible = Math.max(0,
+          Math.min(window.innerHeight, rect.bottom) - Math.max(0, rect.top));
+        root.style.setProperty("--ed-guide-footer-visible", Math.ceil(visible) + "px");
+      };
+      const scheduleFooterSync = () => {
+        if (queued) return;
+        queued = true;
+        window.requestAnimationFrame(syncFooter);
+      };
+      window.addEventListener("scroll", scheduleFooterSync, { passive: true });
+      window.addEventListener("resize", scheduleFooterSync, { passive: true });
+      if (window.ResizeObserver) {
+        new ResizeObserver(scheduleFooterSync).observe(footer);
+      }
+      scheduleFooterSync();
+    }
     const setOpen = (open) => {
       panel.hidden = !open;
       opener.setAttribute("aria-expanded", String(open));
