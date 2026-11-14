@@ -41,7 +41,7 @@
   grep -Fq '"@type":"Organization"' "$TMP/home.html" || {
     echo "STOP: Organization JSON-LD missing"; exit 3;
   }
-  curl -kfsSL --connect-timeout 5 --max-time 20 \\
+  curl -kfsSL --connect-timeout 5 --max-time 20 \
     --resolve "$SITE:443:127.0.0.1" "https://$SITE/sitemap.xml" -o "$TMP/sitemap.xml"
   grep -Fq '<urlset' "$TMP/sitemap.xml" || {
     echo "STOP: Frappe sitemap XML is missing"; exit 3;
