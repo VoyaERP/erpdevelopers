@@ -6,7 +6,8 @@
       const target = document.querySelector(select.dataset.catalogFilter);
       if (!target) return;
       const cards = [...target.querySelectorAll("[data-catalog-topic]")];
-      const counter = document.querySelector(select.dataset.countTarget || "");
+      const counterSelector = select.dataset.countTarget;
+      const counter = counterSelector ? document.querySelector(counterSelector) : null;
       const filter = () => {
         let visible = 0;
         cards.forEach((card) => {

@@ -112,6 +112,7 @@ class TestERPNextPublicHubContracts(unittest.TestCase):
         self.assertNotIn('ignore_permissions=True', code.split("def create_or_link_lead")[1])
         client = (APP / "public/js/consultation.js").read_text()
         self.assertIn("frappe.call", client)
+        self.assertIn('if not frappe.has_permission("Lead", ptype="read", doc=consultation.lead)', code)
         self.assertNotIn("localStorage", client)
         self.assertNotIn("fetch(", client)
 

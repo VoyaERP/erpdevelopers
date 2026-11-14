@@ -64,6 +64,8 @@ def create_or_link_lead(consultation_name: str):
     if not frappe.has_permission("Lead", ptype="create"):
         frappe.throw(_("Lead creation permission is required."), frappe.PermissionError)
     if consultation.lead:
+        if not frappe.has_permission("Lead", ptype="read", doc=consultation.lead):
+            frappe.throw(_("CRM Lead access is required."), frappe.PermissionError)
         return {"lead": consultation.lead, "existing": True}
 
     existing = frappe.db.get_value("Lead", {"email_id": consultation.email}, "name")
