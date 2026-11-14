@@ -1,5 +1,5 @@
 """Knowledge index linking to vetted external sources or native Web Pages."""
-from erpdevelopers.catalog import public_resources
+from erpdevelopers.catalog import public_catalog_topics, public_resources
 from erpdevelopers.public_pages import set_public_context
 
 sitemap = 1
@@ -11,4 +11,4 @@ def get_context(context):
         description="Read practical technology insights, curated expert sources and architecture advice, with original articles published through Frappe Web Pages.",
     )
     context.resources = public_resources()
-    context.topics = sorted({r.topic for r in context.resources})
+    context.topics = public_catalog_topics(context.resources)
