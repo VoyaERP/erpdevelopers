@@ -76,6 +76,38 @@ def public_playlists():
     return result
 
 
+def authorized_private_playlists():
+    """Return private playlists only with an authenticated, permission-filtered read.
+
+    A Frappe session does not override YouTube's own video privacy rules.
+    """
+    import frappe
+
+    if frappe.session.user == "Guest":
+        return []
+    status = _schema_status(PLAYLIST_DOCTYPE, PLAYLIST_FIELDS)
+    if not status["table_present"] or status["missing_columns"]:
+        return []
+    rows = frappe.get_list(
+        PLAYLIST_DOCTYPE,
+        filters={"published": 1, "visibility": "Private"},
+        fields=["name", *PLAYLIST_FIELDS],
+        order_by="sort_order asc, modified desc",
+        limit_page_length=60,
+    )
+    result = []
+    for item in rows:
+        try:
+            list_id = youtube_playlist_id(item["playlist_url"])
+        except ValueError:
+            continue
+        entry = dict(item)
+        entry["playlist_id"] = list_id
+        entry["watch_url"] = f"https://www.youtube.com/playlist?list={list_id}"
+        result.append(entry)
+    return result
+
+
 def public_resources():
     import frappe
 
