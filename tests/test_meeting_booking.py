@@ -107,6 +107,7 @@ class TestNativeAPIBoundary(TestCase):
     def _modules(self, *, available=True):
         calls = []
         app = ModuleType("frappe")
+        app.local = SimpleNamespace(request=None)
         app.whitelist = lambda **kw: lambda fn: fn
         app.PermissionError = PermissionError
         app._ = lambda value: value
