@@ -26,3 +26,5 @@ jobs:
           bash -n scripts/install_local_v16.sh
       - name: Contract tests
         run: python -m unittest discover -s tests -v
+      - name: Validate meeting calendar JavaScript
+        run: node --check erpdevelopers/public/js/meeting.js

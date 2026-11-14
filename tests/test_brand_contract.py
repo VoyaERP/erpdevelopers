@@ -90,22 +90,21 @@ class TestBrandContract(TestCase):
 
     def test_static_content_is_typed_and_declared_once(self):
         from erpdevelopers import content
-        home = (APP / "www" / "erp-developers-home.html").read_text(encoding="utf-8")
+        home = (APP / "www/erp-developers-home.html").read_text(encoding="utf-8")
         self.assertEqual(len(content.VALUES), 3)
         self.assertEqual(len(content.ECOSYSTEM), 6)
-        self.assertEqual(len(content.AI_FLOW), 4)
-        self.assertEqual(len(content.ROADMAP), 4)
-        for collection in (content.VALUES, content.ECOSYSTEM, content.AI_FLOW, content.ROADMAP):
+        for collection in (content.VALUES, content.ECOSYSTEM):
             self.assertEqual(len({entry.index for entry in collection}), len(collection))
-            for entry in collection:
-                self.assertTrue(entry.title.strip())
-                self.assertTrue(entry.description.strip())
+            self.assertTrue(all(entry.title.strip() and entry.description.strip() for entry in collection))
         self.assertIn("{% for item in ecosystem_items %}", home)
         self.assertIn("{% for value in values_items %}", home)
-        self.assertIn("{% for step in ai_flow_items %}", home)
-        self.assertIn("{% for step in roadmap_items %}", home)
-        self.assertNotIn("<h3>Developer Hub</h3>", home)
+        self.assertNotIn("{{ item.index", home, "Card numbering must not be visible")
+        self.assertNotIn("{{ value.index", home, "Brand pills must not have numbering")
+        self.assertNotIn("{{ step.index", home, "Presentation-style roadmap removed")
+        self.assertNotIn("ed-steps", home)
         self.assertIn("Planned module", home)
+        self.assertIn('href="/lets-talk"', home)
+        self.assertIn("ed-link-grid", home)
 
     def test_html_copy_does_not_claim_roadmap_features_are_running(self):
         from erpdevelopers import content
@@ -113,9 +112,9 @@ class TestBrandContract(TestCase):
         nav = (APP / "templates/includes/erpdevelopers_nav.html").read_text()
         self.assertEqual([v.title for v in content.VALUES], ["Engage.", "Reason.", "Progress."])
         self.assertIn("ERP Developers", nav)
-        self.assertIn("AI", home)
         self.assertIn("Planned module", home)
-        self.assertIn("not active on this preview site", home)
+        self.assertIn("AI advisory features are planned, not active today.", home)
+        self.assertNotIn("AI capabilities are live", home)
 
     def test_native_frappe_bilingual_selector_and_translation_coverage(self):
         import csv
@@ -149,14 +148,15 @@ class TestBrandContract(TestCase):
         self.assertIn('id="ed-language-select"', nav)
         self.assertIn('class="form-control"', nav)
         self.assertIn("{{ _(item.title) | e }}", home)
-        self.assertIn("{{ _(step.description) | e }}", home)
+        self.assertIn("{{ _(value.title) | e }}", home)
+        self.assertNotIn("{{ step.index", home)
 
     def test_css_rules_scoped_and_responsive(self):
         css = (APP / "public" / "css" / "brand.css").read_text(encoding="utf-8")
         login = (APP / "public" / "css" / "login.css").read_text(encoding="utf-8")
         self.assertIn(".ed-site {", css)
         self.assertNotIn(":root {", css)
-        self.assertIn(".ed-hero-inner {", css)
+        self.assertIn(".ed-hero-inner{", css)
         self.assertIn(".ed-skip {", css)
         self.assertIn("@media(max-width:540px)", css)
         self.assertIn('body[data-path="login"]', login)

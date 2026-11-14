@@ -87,27 +87,25 @@ class TestPublicCatalogRendering(unittest.TestCase):
 
 
 class TestBookingPageContext(unittest.TestCase):
-    def test_public_get_does_not_import_crm_post_api(self):
+    def test_public_get_does_not_import_native_post_handler(self):
         source = __import__("pathlib").Path(lets_talk.__file__).read_text()
-        self.assertNotIn("from erpdevelopers.appointments import", source)
-        self.assertIn("from erpdevelopers.consultation_flags import booking_open", source)
+        self.assertNotIn("from erpdevelopers.meeting_booking import", source)
+        self.assertIn("from erpdevelopers.meeting_status import booking_ready", source)
 
     def test_disabled_by_default_and_site_isolation(self):
-        from erpdevelopers.consultation_flags import booking_open
+        from erpdevelopers.meeting_status import booking_ready
         frappe = ModuleType("frappe")
         frappe.local = SimpleNamespace(site=EXPECTED_SITE)
         frappe.conf = {}
         utils = ModuleType("frappe.utils")
         utils.cint = lambda value: int(value or 0)
         with patch.dict(sys.modules, {"frappe": frappe, "frappe.utils": utils}):
-            self.assertFalse(booking_open())
-            frappe.conf["erpdev_consultation_open"] = 1
-            self.assertTrue(booking_open())
+            self.assertFalse(booking_ready())
             frappe.local.site = "another-site.example"
-            self.assertFalse(booking_open())
+            frappe.conf["erpdev_meeting_booking_enabled"] = 1
+            self.assertFalse(booking_ready())
 
-    def test_lets_talk_page_context_does_not_touch_crm(self):
-        from erpdevelopers.public_pages import set_public_context
+    def test_lets_talk_page_context_is_safe_when_booking_offline(self):
         frappe = ModuleType("frappe")
         frappe.local = SimpleNamespace(site=EXPECTED_SITE)
         frappe.conf = {}
@@ -117,9 +115,10 @@ class TestBookingPageContext(unittest.TestCase):
         with patch.dict(sys.modules, {"frappe": frappe, "frappe.utils": utils}):
             lets_talk.get_context(ctx)
         self.assertFalse(ctx.booking_enabled)
-        self.assertEqual(ctx.title, "ERP Developers | Let's Talk")
+        self.assertEqual(ctx.title, "ERP Developers | Book a Meeting")
         self.assertTrue(ctx.topic_options)
-        self.assertTrue(ctx.time_windows)
+        self.assertIn("meeting.css?v=", ctx.meeting_css_url)
+        self.assertIn("meeting.js?v=", ctx.meeting_js_url)
 
 
 if __name__ == "__main__":
