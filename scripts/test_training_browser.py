@@ -129,6 +129,8 @@ def main():
                             assert parse_qs(src.query)["list"] == [PLAYLIST]
                             page.keyboard.press("Escape")
                             expect(dialog).not_to_be_visible()
+                            # Native dialog close events are queued after the open attribute changes.
+                            page.wait_for_function("!document.querySelector('[data-player-frame]').hasAttribute('src')")
                             assert frame.get_attribute("src") is None
                             expect(watch).to_be_focused()
                             with context.expect_page() as pending:

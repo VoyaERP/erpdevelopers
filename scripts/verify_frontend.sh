@@ -17,6 +17,8 @@
   FAVICON="/assets/erpdevelopers/images/erpdevelopers-selected-favicon.png"
   LOGIN_DIGEST="$(sha256sum "$APP/erpdevelopers/public/css/login.css" | cut -c1-16)"
   LOGIN_CSS="/assets/erpdevelopers/css/login.css?v=$LOGIN_DIGEST"
+  ARABIC_DIGEST="$(sha256sum "$APP/erpdevelopers/public/css/arabic_typography.css" | cut -c1-16)"
+  ARABIC_CSS="/assets/erpdevelopers/css/arabic_typography.css?v=$ARABIC_DIGEST"
 
   echo "=== Origin homepage: stylesheet URL and real CSS bytes ==="
   curl -kfsSL --connect-timeout 5 --max-time 20 \
@@ -135,27 +137,8 @@
   cmp -s "$APP/erpdevelopers/public/js/catalog.js" "$TMP/catalog.js" || {
     echo "STOP: current catalog.js is not served by origin"; exit 3;
   }
-  echo "=== Training: protected click-to-load playlist player ==="
-  grep -Fq 'id="ed-playlist-dialog"' "$TMP/training.html" || {
-    echo "STOP: playlist dialog is missing"; exit 3;
-  }
-  grep -Fq 'data-player-frame' "$TMP/training.html" || {
-    echo "STOP: playlist frame is missing"; exit 3;
-  }
-  grep -Fq 'class="ed-playlist-watch" data-playlist-open' "$TMP/training.html" || {
-    # No public playlists may be published on a new site; inspect only when
-    # the server has rendered at least one candidate.
-    if grep -Fq 'class="ed-resource-card"' "$TMP/training.html"; then
-      echo "STOP: published playlist card missing fallback Watch link"; exit 3;
-    fi
-  }
-  grep -Fq 'sandbox="allow-scripts allow-same-origin allow-presentation"' "$TMP/training.html" || {
-    echo "STOP: playlist player sandbox is missing"; exit 3;
-  }
-  # The external frame must never be embedded until a visitor clicks Watch.
-  if grep -Eq 'src="https://www.youtube(-nocookie)?.com/embed' "$TMP/training.html"; then
-    echo "STOP: training page eagerly embeds YouTube content"; exit 3;
-  fi
+  echo "=== Training: in-page button, deferred script and click-to-load frame ==="
+  "$BENCH/env/bin/python" "$APP/scripts/inspect_training_player.py" "$TMP/training.html"
   curl -kfsSL --connect-timeout 5 --max-time 20 \
     --resolve "$SITE:443:127.0.0.1" "https://$SITE$PORTAL_CSS" -o "$TMP/portal.css"
   cmp -s "$APP/erpdevelopers/public/css/portal.css" "$TMP/portal.css" || {
@@ -168,6 +151,19 @@
   grep -Fq 'id="page-login"' "$TMP/login.html"
   grep -Fq 'for-login' "$TMP/login.html"
   grep -Fq 'id="language-switcher"' "$TMP/login.html"
+
+  echo "=== Greenbox Arabic typography: stylesheet reference and actual bytes ==="
+  for rendered in home-ar training login; do
+    grep -Fq "href=\"$ARABIC_CSS\"" "$TMP/$rendered.html" || {
+      echo "STOP: $rendered missing Arabic typography stylesheet; check web reload"; exit 3;
+    }
+  done
+  curl -kfsSL --connect-timeout 5 --max-time 20 \
+    --resolve "$SITE:443:127.0.0.1" "https://$SITE$ARABIC_CSS" -o "$TMP/arabic.css"
+  cmp -s "$APP/erpdevelopers/public/css/arabic_typography.css" "$TMP/arabic.css" || {
+    echo "STOP: Arabic typography CSS differs from deployed file"; exit 3;
+  }
+  grep -Fq 'family=Tajawal' "$TMP/arabic.css"
 
   echo "=== Verify explicit Desk sign-in intent in public homepage ==="
   SIGNIN_HREF="/login?redirect-to=/desk"
@@ -218,12 +214,12 @@
   cmp -s "$APP/erpdevelopers/public/images/erpdevelopers-selected-favicon.png" "$TMP/favicon.png"
 
   echo "=== Public Cloudflare HTTPS GET checks ==="
-  for route in / /training /insights /lets-talk /privacy /login /api/method/ping "$CSS" "$LOGIN_CSS" "$PORTAL_CSS" "$MEETING_CSS" "$LOGO" "$FAVICON"; do
+  for route in / /training /insights /lets-talk /privacy /login /api/method/ping "$CSS" "$LOGIN_CSS" "$PORTAL_CSS" "$MEETING_CSS" "$ARABIC_CSS" "$CATALOG_JS" "$LOGO" "$FAVICON"; do
     status="$(curl -fsSL --connect-timeout 5 --max-time 20 \
       -o /dev/null -w '%{http_code}' "https://$SITE$route")" || {
         echo "STOP: public route failed: $route"; exit 4;
       }
     echo "$status $route"
   done
-  echo "PASS: EN/AR translation, native login, CSS, approved PNG and public routes"
+  echo "PASS: EN/AR, native login, in-page player markup, Tajawal CSS, approved PNG and public routes"
 )
