@@ -11,8 +11,8 @@ class TestNavigationStability(TestCase):
         self.assertIn('.ed-nav .ed-language-switcher{display:block!important', css)
         self.assertIn('.ed-nav .ed-language-switcher.hide{visibility:hidden;pointer-events:none}', css)
         self.assertNotIn('.ed-language-switcher.hide{display:none', css)
-        self.assertIn('grid-template-columns:112px 104px', css)
-        self.assertIn('grid-template-columns:70px 90px', css)
+        self.assertIn('grid-template-columns:112px 120px', css)
+        self.assertIn('grid-template-columns:70px 108px', css)
 
     def test_one_header_and_native_picker_no_new_navigation_script(self):
         nav = (APP / "templates/includes/erpdevelopers_nav.html").read_text()
