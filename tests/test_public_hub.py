@@ -136,7 +136,7 @@ class TestERPNextPublicHubContracts(unittest.TestCase):
         self.assertNotIn("frappe.call", guide)
 
     def test_fingerprinted_asset_url_fails_closed(self):
-        for name in ("css/portal.css", "js/consultation.js", "js/catalog.js", "js/assistant.js"):
+        for name in ("css/portal.css", "js/consultation.js", "js/catalog.js", "js/assistant.js", "css/meeting.css", "js/meeting.js"):
             expected = sha256((APP / "public" / name).read_bytes()).hexdigest()[:16]
             self.assertEqual(versioned_public_asset(name),
                              f"/assets/erpdevelopers/{name}?v={expected}")

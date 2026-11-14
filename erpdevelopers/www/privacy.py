@@ -6,6 +6,6 @@ sitemap = 1
 
 def get_context(context):
     set_public_context(
-        context, slug="privacy", title="Consultation Privacy Notice",
-        description="Read how consultation enquiries are collected and reviewed in ERP Developers' ERPNext-backed workflow.",
+        context, slug="privacy", title="Meeting Privacy Notice",
+        description="Read how ERP Developers' native ERPNext meeting booking collects and handles appointment details and email verification.",
     )

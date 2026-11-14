@@ -71,7 +71,7 @@
     echo "STOP: Team Login label not rendered"; exit 3;
   }
   for entry in "training:ed-training-title" "insights:ed-insights-title" \
-               "lets-talk:ed-talk-title" "privacy:ed-privacy-title"; do
+               "lets-talk:ed-meet-title" "privacy:ed-privacy-title"; do
     route="${entry%%:*}"
     marker="${entry#*:}"
     curl -kfsSL --connect-timeout 5 --max-time 20 \
@@ -84,8 +84,28 @@
       echo "STOP: shared hub navigation missing from $route"; exit 3;
     }
   done
-  grep -Fq "not a reservation" "$TMP/lets-talk.html" || {
-    echo "STOP: consultation confirmation disclaimer missing"; exit 3;
+  grep -Fq 'id="book-meeting"' "$TMP/lets-talk.html" || {
+    echo "STOP: meeting scheduler container missing"; exit 3;
+  }
+  if grep -Fq 'id="ed-meeting-form"' "$TMP/lets-talk.html"; then
+    grep -Fq "Your meeting is confirmed after you verify it." "$TMP/lets-talk.html" || {
+      echo "STOP: native booking email confirmation copy missing"; exit 3;
+    }
+  else
+    grep -Fq 'ed-meeting-unavailable' "$TMP/lets-talk.html" || {
+      echo "STOP: meeting booking must fail closed when calendar is unconfigured"; exit 3;
+    }
+  fi
+  echo "=== Verify native booking assets and page without leaking appointment data ==="
+  MEETING_DIGEST="$(sha256sum "$APP/erpdevelopers/public/css/meeting.css" | cut -c1-16)"
+  MEETING_CSS="/assets/erpdevelopers/css/meeting.css?v=$MEETING_DIGEST"
+  grep -Fq "href=\"$MEETING_CSS\"" "$TMP/lets-talk.html" || {
+    echo "STOP: meeting CSS fingerprint missing"; exit 3;
+  }
+  curl -kfsSL --connect-timeout 5 --max-time 20 \
+    --resolve "$SITE:443:127.0.0.1" "https://$SITE$MEETING_CSS" -o "$TMP/meeting.css"
+  cmp -s "$APP/erpdevelopers/public/css/meeting.css" "$TMP/meeting.css" || {
+    echo "STOP: meeting CSS differs from installed file"; exit 3;
   }
   PORTAL_DIGEST="$(sha256sum "$APP/erpdevelopers/public/css/portal.css" | cut -c1-16)"
   PORTAL_CSS="/assets/erpdevelopers/css/portal.css?v=$PORTAL_DIGEST"
@@ -154,7 +174,7 @@
   cmp -s "$APP/erpdevelopers/public/images/erpdevelopers-selected-favicon.png" "$TMP/favicon.png"
 
   echo "=== Public Cloudflare HTTPS GET checks ==="
-  for route in / /training /insights /lets-talk /privacy /login /api/method/ping "$CSS" "$LOGIN_CSS" "$PORTAL_CSS" "$LOGO" "$FAVICON"; do
+  for route in / /training /insights /lets-talk /privacy /login /api/method/ping "$CSS" "$LOGIN_CSS" "$PORTAL_CSS" "$MEETING_CSS" "$LOGO" "$FAVICON"; do
     status="$(curl -fsSL --connect-timeout 5 --max-time 20 \
       -o /dev/null -w '%{http_code}' "https://$SITE$route")" || {
         echo "STOP: public route failed: $route"; exit 4;

@@ -2,13 +2,13 @@
 
 **Engage. Reason. Progress.**
 
-Frappe custom app powering the ERP Developers public website on ERPNext 16. The public hub includes curated training playlists, reviewed knowledge sources and an appointment-request workflow. It is **not** a completed LMS, member community, jobs aggregator or AI inference service.
+Frappe custom app powering the ERP Developers public website on ERPNext 16. The public hub includes curated training playlists, reviewed knowledge sources and native ERPNext appointment booking with email verification. It is **not** a completed LMS, member community, jobs aggregator or AI inference service.
 
 ## Compatibility
 
 - Branch: `version-16`
 - Python: 3.14+ (Frappe 16 runtime)
-- Runtime: Frappe 16.x + ERPNext 16.x (ERPNext required for consultation-to-Lead integration)
+- Runtime: Frappe 16.x + ERPNext 16.x (ERPNext required for native Appointment, CRM Lead and Calendar integration)
 - Frappe 15 is a separate compatibility target; do not install this branch on a v15 bench.
 
 ## Install on a NEW isolated development site only (not the live site)
@@ -69,11 +69,31 @@ Bench upgrade. After deployment, authenticate as a permitted ERPNext System
 User and verify the ERPNext tile and dock use the compact shield, including
 legacy Desktop Icons mode if enabled, while other sites retain their own icons.
 
+## Live meeting booking + new visitor experience (2026-11-14)
+
+The website now uses a simpler, unnumbered editorial design: a welcoming
+hero, three active destinations (Training, Insights, Book a Meeting),
+compact future-community cards and one thoughtful AI roadmap section.
+The former numbered slide-like roadmap is no longer rendered.
+
+**Let's Talk now books real ERPNext appointment slots** rather than only
+collecting an unconfirmed date preference. The visitor chooses a live slot,
+adds a topic/contact details, then verifies the appointment by email.
+ERPNext's own Appointment controller completes agent assignment, CRM
+Lead/Customer matching and Event creation after verification. No duplicate
+calendar or CRM engine was added. Online booking is explicitly disabled
+until the site's native Appointment Booking Settings, email account,
+privacy policy and `erpdev_meeting_booking_enabled` are configured.
+
+Follow the [meeting booking prerequisites and secure rollout guide](docs/PUBLIC_HUB.md)
+before enabling guest bookings. Publishing the GitHub code is not proof
+of a working production calendar or email flow.
+
 ## Public hub — Training, Insights, Let's Talk (release candidate)
 
 **Routes:** `/training`, `/insights`, `/lets-talk`, `/privacy`. The homepage uses shared bilingual navigation and footer and now labels the authorized staff action **Team Login**. Static FAQ quick-guide content remains on-device only; it is **not AI**. No LinkedIn OAuth or job feed has been enabled.
 
-**ERPNext-backed content:** Website Managers and System Managers maintain **ERP Developers Playlist** and **ERP Developers Resource** records, publishing curated YouTube collections, authored Frappe Web Pages and attributed external sources. Content is explicitly unpublished by default; guest users see only approved fields, without DocType read permission. Staff coordinate appointments through private **ERP Developers Consultation** records. The guarded staff CRM action creates or links an authorized **ERPNext Lead**, and a **Frappe Event** is required before status can become Confirmed.
+**ERPNext-backed content:** Website Managers and System Managers maintain **ERP Developers Playlist** and **ERP Developers Resource** records, publishing curated YouTube collections, authored Frappe Web Pages and attributed external sources. Content is explicitly unpublished by default; guest users see only approved fields, without DocType read permission. **New public bookings use native ERPNext Appointments**. Historic **ERP Developers Consultation** records and their staff-only CRM actions remain available but are no longer the public booking path. Email confirmation activates native Lead/Customer and Event handling.
 
 **Critical setup:** Guest consultation requests are disabled until `erpdev_consultation_open=1` is deliberately configured after privacy review, ownership, spam/consent and retention controls. The public website explains that submitting preferred availability is *not* an actual booking. Avoid adding third-party booking widgets that bypass this security boundary.
 

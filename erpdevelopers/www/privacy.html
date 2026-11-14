@@ -3,24 +3,22 @@
 <section class="ed-page-hero" aria-labelledby="ed-privacy-title">
   <div class="ed-shell">
     <p class="ed-kicker">{{ _("DATA RESPONSIBILITY") }}</p>
-    <h1 id="ed-privacy-title">{{ _("Consultation privacy notice") }}</h1>
-    <p>{{ _("This notice describes the information collected through the consultation request form when enabled.") }}</p>
+    <h1 id="ed-privacy-title">{{ _("Meeting privacy notice") }}</h1>
+    <p>{{ _("Your meeting details belong in a secure workflow, not an open directory.") }}</p>
   </div>
 </section>
 <section class="ed-section">
   <div class="ed-shell ed-legal">
-    <h2>{{ _("Information you provide") }}</h2>
-    <p>{{ _("The form collects your name, email, optional company, consultation topic, preferred meeting date and time zone, and the details you choose to share.") }}</p>
-    <h2>{{ _("Why we use it") }}</h2>
-    <p>{{ _("Authorized staff use the request to assess your enquiry, contact you, and—if appropriate—create or link an ERPNext CRM Lead and arrange a meeting.") }}</p>
-    <h2>{{ _("Access and third-party services") }}</h2>
-    <p>{{ _("Consultation records are kept in the ERPNext-backed site and are not displayed to visitors. No LinkedIn or AI service receives request content through this feature.") }}</p>
-    <h2>{{ _("Security and retention") }}</h2>
-    <p>{{ _("The form is rate-limited and access-controlled. A formal retention schedule and privacy contact must be approved before public submissions are enabled.") }}</p>
-    <h2>{{ _("Your choice") }}</h2>
-    <p>{{ _("Submitting the form is optional. You may decide not to share sensitive or confidential information in the free-text field.") }}</p>
-    <p class="ed-small-note">{{ _("Operational draft: the site administrator must approve the final policy and retention schedule before enabling consultation submissions.") }}</p>
-    <a href="/lets-talk" class="ed-btn ed-btn-secondary">{{ _("Return to Let's Talk") }}</a>
+    <h2>{{ _("What we collect") }}</h2>
+    <p>{{ _("When booking is enabled, we collect your name, email, optional phone and company, selected topic, meeting date and time zone, and any notes you choose to share.") }}</p>
+    <h2>{{ _("How the meeting works") }}</h2>
+    <p>{{ _("ERPNext initially records an unverified Appointment and emails a confirmation link. After verification, ERPNext may create or link a CRM Lead or Customer, assign a team member and create a Calendar Event.") }}</p>
+    <h2>{{ _("Who can access it") }}</h2>
+    <p>{{ _("Authorized staff access meeting and CRM information according to ERPNext permissions. Meeting details are never published on this website or sent to LinkedIn or an AI assistant.") }}</p>
+    <h2>{{ _("Your choice and security") }}</h2>
+    <p>{{ _("Booking requires your consent, uses rate limiting and email verification, and is optional. Please avoid entering confidential information in your notes.") }}</p>
+    <p class="ed-small-note">{{ _("This is an operational privacy draft. The site administrator must approve a privacy contact, retention period and final policy before enabling public bookings.") }}</p>
+    <a href="/lets-talk" class="ed-btn ed-btn-secondary">{{ _("Return to meeting booking") }}</a>
   </div>
 </section>
 {% endblock %}
