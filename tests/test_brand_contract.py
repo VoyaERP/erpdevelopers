@@ -9,6 +9,24 @@ ICON = "erpdevelopers-selected-favicon.png"
 
 
 class TestBrandContract(unittest.TestCase):
+    def test_homepage_stylesheet_loaded_once_in_supported_frappe_block(self):
+        home = (APP / "www" / "erp-developers-home.html").read_text(encoding="utf-8")
+        hooks = (APP / "hooks.py").read_text(encoding="utf-8")
+        css = (APP / "public" / "css" / "brand.css").read_text(encoding="utf-8")
+        stylesheet = "/assets/erpdevelopers/css/brand.css"
+        self.assertIn("{% extends \"templates/web.html\" %}", home)
+        self.assertIn("{% block head_include %}", home)
+        self.assertIn("{{ super() }}", home)
+        self.assertIn('rel="stylesheet"', home)
+        self.assertIn(stylesheet + "?v=20261114-website-fix-1", home)
+        self.assertEqual(home.count(stylesheet), 1)
+        self.assertNotIn(stylesheet, hooks)
+        self.assertIn("login.css", hooks)
+        self.assertIn(".ed-site", css)
+        self.assertIn(".ed-hero-inner", css)
+        self.assertIn(".ed-skip", css)
+        self.assertIn("@media(max-width:540px)", css)
+
     def test_exact_user_selected_logo_bytes(self):
         images = APP / "public" / "images"
         logo = (images / LOGO).read_bytes()

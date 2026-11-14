@@ -1,4 +1,9 @@
 {% extends "templates/web.html" %}
+{# Homepage CSS is loaded here independently of globally cached web hooks. #}
+{% block head_include %}
+{{ super() }}
+<link rel="stylesheet" href="/assets/erpdevelopers/css/brand.css?v=20261114-website-fix-1">
+{% endblock %}
 {% block navbar %}{% endblock %}
 {% block footer %}{% endblock %}
 {% block page_container %}

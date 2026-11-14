@@ -8,10 +8,8 @@ app_license = "MIT"
 app_version = app_version
 
 # Frappe owns /login, 2FA, password reset, social login and sessions.
-# Website assets are loaded by Frappe's native website template only.
-# The login script and login stylesheet are strictly scoped to /login.
-web_include_css = [
-    "/assets/erpdevelopers/css/brand.css",
-    "/assets/erpdevelopers/css/login.css",
-]
+# The homepage loads brand.css explicitly from its head_include block.
+# Avoid loading it globally or twice; login.css only styles /login.
+# Frappe's native template and auth handling remain unchanged.
+web_include_css = ["/assets/erpdevelopers/css/login.css"]
 web_include_js = ["/assets/erpdevelopers/js/login_chrome.js"]
