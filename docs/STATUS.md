@@ -4,6 +4,14 @@
 
 > حالة التنفيذ مبنية على أدلة من GitHub ومن مخرجات المستخدم فقط. لا يتم اعتبار الكود مختبرًا لمجرد رفعه.
 
+## 2026-11-14 — Maintainability/security refactor completed in GitHub (deployment and browser UAT pending)
+
+- **Refactored `version-16` HEAD:** **404cfa128f47327fbc8467ba626fe3a4a85d380f**, [GitHub Actions CI PASS](https://github.com/VoyaERP/erpdevelopers/actions/runs/43533258437): Python 3.14 compile, JavaScript syntax, Bash syntax and source/behavior tests passed. This is **not** a live Bench integration run.
+- Added pure `erpdevelopers/branding.py` as canonical source of site hostname, Frappe homepage, original uploaded PNG/favicons, branded Website Settings and a 16-char content-addressed `brand.css` URL. `www/erp_developers_home.py` binds logo/style URLs to the Jinja page, which uses the native Frappe `head_include` block once. Removes stale hardcoded CSS cache date and repeated Python logo strings.
+- Added typed `erpdevelopers/content.py` and loop-driven Jinja templates for three principles, six **planned** ecosystem features, four AI flow steps and four roadmap stages (no duplicated card HTML). Reformatted responsive CSS, scoped homepage variables to `.ed-site`, and consolidated decorative native login JS image/nav helpers. Exact customer PNG remains unchanged. No API, data model, privileged method, workflow or native auth override added.
+- Added behavioral unit tests for wrong-site refusal before database access, idempotent site settings, static content, exact PNG hashes and page/CSS content fingerprint. Guarded updater now validates source **before migration**, supports strict `EXPECTED_SHA` comparison, checks approved logo, backs up target site with files and does not auto-restart shared services. New read-only `scripts/verify_frontend.sh` compares actual Origin CSS bytes, selected logos and six server-rendered cards; probes Cloudflare routes/assets.
+- **Last user screenshot showed CSS not applying**. Prior patch `ec75d35` and this refactor address code-side loading/caching, but no server deployment evidence of the refactor, web restart, new HTML/CSS consistency or browser UAT is available. The previously confirmed server installation was `39659d4`; user may have advanced it independently. Keep [GitHub issue #13](https://github.com/VoyaERP/erpdevelopers/issues/13) OPEN. Operator must stage the pinned update script outside the mutable Git checkout, update the **existing** site, coordinate a web-only Gunicorn restart with shared-Bench sites, then run the read-only frontend verifier and real browser/auth/RTL UAT.
+
 ## 2026-11-14 — Homepage CSS loading bug found; route-scoped asset fix ready
 
 - User screenshot after selected-logo deployment showed an **unstyled homepage**: visible skip-to-content link, enormous unstyled header text and misaligned navigation. Customer PNG itself loaded correctly. These symptoms show missing/inoperative `brand.css` in the browser; response/static-file diagnostics from the user's server have not yet been captured, so the precise transport/caching failure is unconfirmed.
@@ -101,7 +109,7 @@
 | --- | --- | --- |
 | [ED-00 #1](https://github.com/VoyaERP/erpdevelopers/issues/1) Environment | **Blocked: disk capacity + compatibility review** | Current-host guarded installer available, 3.6GB fails >=8GiB preflight; MariaDB v12.3 compatibility, Mac smoke |
 | [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Green Box-style native login, homepage and static CI ready; UAT pending** | Final approved logo asset, EN/AR content, SEO, device/auth UAT |
-| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Correct PNG displayed but CSS not applied; route-scoped fix ec75d35 CI PASS** | Deploy, verify link/CSS HTTP 200 and visual/auth UAT |
+| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Refactor 404cfa1 CI PASS; source ready, CSS screenshot issue pending live validation** | Pinned deploy to existing site, targeted web restart, Origin CSS/logo/card smoke, auth/RTL UAT |
 | [ED-02 #3](https://github.com/VoyaERP/erpdevelopers/issues/3) IAM/privacy | **Planned** | Role matrix + threat model |
 | [ED-03 #4](https://github.com/VoyaERP/erpdevelopers/issues/4) Community | **Planned** | ED-02 approval |
 | [ED-04 #5](https://github.com/VoyaERP/erpdevelopers/issues/5) Developer Hub | **Planned** | ED-02 approval |
