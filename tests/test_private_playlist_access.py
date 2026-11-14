@@ -15,6 +15,7 @@ class TestPrivatePlaylistAccess(unittest.TestCase):
         frappe = types.SimpleNamespace(
             session=types.SimpleNamespace(user="Guest"),
             get_list=lambda *a, **kw: self.fail("Guest queried private records"),
+            has_permission=lambda *a, **kw: self.fail("Guest checked private permissions"),
         )
         with patch.dict(sys.modules, {"frappe": frappe}):
             self.assertEqual(catalog.authorized_private_playlists(), [])
@@ -32,6 +33,7 @@ class TestPrivatePlaylistAccess(unittest.TestCase):
         frappe = types.SimpleNamespace(
             session=types.SimpleNamespace(user="learner@example.com"),
             get_list=get_list,
+            has_permission=lambda *a, **kw: True,
         )
         with patch.dict(sys.modules, {"frappe": frappe}), patch.object(
             catalog, "_schema_status", return_value={"table_present": True, "missing_columns": []}
@@ -45,6 +47,7 @@ class TestPrivatePlaylistAccess(unittest.TestCase):
     def test_rejects_invalid_url_from_private_catalog(self):
         frappe = types.SimpleNamespace(
             session=types.SimpleNamespace(user="learner@example.com"),
+            has_permission=lambda *a, **kw: True,
             get_list=lambda *args, **kwargs: [
                 {"playlist_url": "https://evil.example/playlist?list=PLabc1234567890123"}
             ],
