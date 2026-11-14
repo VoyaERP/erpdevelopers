@@ -110,7 +110,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "read_only": 1,
+   "read_only": 0,
    "default": "Requested",
    "options": "Requested\nContacted\nConfirmed\nClosed\nRejected",
    "in_list_view": 1
@@ -155,7 +155,7 @@
    "report": 1,
    "create": 1,
    "write": 1,
-   "delete": 1,
+   "delete": 0,
    "print": 1
   },
   {
@@ -170,5 +170,9 @@
  "title_field": "contact_name",
  "search_fields": "contact_name,email,company",
  "links": [],
- "states": []
+ "states": [],
+ "creation": "2026-11-14 00:00:00",
+ "modified": "2026-11-14 00:00:00",
+ "modified_by": "Administrator",
+ "owner": "Administrator"
 }

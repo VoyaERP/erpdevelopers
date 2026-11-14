@@ -151,5 +151,9 @@
  "title_field": "title",
  "search_fields": "title",
  "links": [],
- "states": []
+ "states": [],
+ "creation": "2026-11-14 00:00:00",
+ "modified": "2026-11-14 00:00:00",
+ "modified_by": "Administrator",
+ "owner": "Administrator"
 }

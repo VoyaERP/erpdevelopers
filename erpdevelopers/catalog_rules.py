@@ -43,10 +43,10 @@ def external_https_url(url: str) -> str:
             raise ValueError()
         try:
             ipaddress.ip_address(host)
+        except ValueError:
+            pass  # DNS hostname rather than an IP literal.
+        else:
             raise ValueError()
-        except ValueError as e:
-            if not str(e).startswith("'") and "does not appear to be an IPv" not in str(e):
-                raise
         return value
     except ValueError:
         raise ValueError("Use an external HTTPS domain; private addresses are not allowed") from None
