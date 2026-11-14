@@ -103,7 +103,7 @@ class TestBrandContract(TestCase):
         self.assertNotIn("{{ step.index", home, "Presentation-style roadmap removed")
         self.assertNotIn("ed-steps", home)
         self.assertIn("Planned module", home)
-        self.assertIn('href="/lets-talk"', home)
+        self.assertIn('href="/lets-talk#meeting-start"', home)
         self.assertIn("ed-link-grid", home)
 
     def test_html_copy_does_not_claim_roadmap_features_are_running(self):

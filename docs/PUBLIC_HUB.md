@@ -48,9 +48,11 @@ two-stage booking experience. It does not build a second appointment engine.
   Existing `ERP Developers Consultation` records and legacy staff CRM
   action remain available for historical enquiries, but the old public
   `erpdev_consultation_open` endpoint is separate and should stay disabled.
-- The page degrades to a branded availability message while prerequisites
-  are missing; it does not show fictitious time slots or claim a booking is
-  finalized before email verification.
+- The page retains the same **calendar, subject and contact form layout** even
+  while prerequisites are missing. It shows the current month with disabled
+  date/slot controls and an explicit unavailable notice; no fictitious times,
+  guest writes, or appointment confirmation appear until the native ERPNext
+  scheduling and outgoing email requirements are satisfied.
 
 ### Site setup required before enabling public booking
 

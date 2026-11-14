@@ -4,148 +4,172 @@
 {% endblock %}
 {% block ed_content %}
 <section class="ed-meeting-stage" aria-labelledby="ed-meet-title">
-  <div class="ed-shell ed-meeting-layout">
-    <div class="ed-meeting-story">
-      <span class="ed-meeting-eyebrow"><span aria-hidden="true" class="ed-meeting-signal"></span>{{ _("REAL CONVERSATIONS, REAL PROGRESS") }}</span>
-      <h1 id="ed-meet-title">{{ _("A good idea deserves") }} <em>{{ _("a great conversation.") }}</em></h1>
-      <p>{{ _("Tell us what you're building, exploring or trying to solve. We'll bring the right perspective to the conversation.") }}</p>
-      <div class="ed-meeting-topics">
-        <span>{{ _("Enterprise systems") }}</span>
-        <span>{{ _("Architecture & integrations") }}</span>
-        <span>{{ _("Learning & collaboration") }}</span>
-      </div>
-      <div class="ed-meeting-orbit" aria-hidden="true">
-        <span class="ed-meeting-orbit-ring"></span>
-        <span class="ed-meeting-orbit-halo"></span>
-        <img src="{{ brand_icon_url | e }}" alt="" width="92" height="92">
-        <span class="ed-meeting-node ed-meeting-node-one"></span>
-        <span class="ed-meeting-node ed-meeting-node-two"></span>
-      </div>
-      <p class="ed-meeting-note">{{ _("No sales script. Just a focused conversation about your goals.") }}</p>
+  <div class="ed-shell ed-meet-hero-grid">
+    <div class="ed-meet-hero-copy">
+      <span class="ed-meeting-eyebrow"><span class="ed-meeting-signal" aria-hidden="true"></span>{{ _("LET'S CONNECT") }}</span>
+      <h1 id="ed-meet-title">{{ _("Let's make time") }} <em>{{ _("for your next big idea.") }}</em></h1>
+      <p>{{ _("Discuss your ERP challenges, architecture decisions, integrations, training or collaboration with our team.") }}</p>
+      <a class="ed-btn ed-btn-secondary ed-meet-hero-button" href="#meeting-start">{{ _("Choose your meeting time") }} <span aria-hidden="true">↓</span></a>
     </div>
-
-    <div class="ed-booking-card" id="book-meeting">
-      <div class="ed-booking-head">
-        <div>
-          <span class="ed-booking-overline">{{ _("YOUR MEETING") }}</span>
-          <h2>{{ _("Choose a time to connect.") }}</h2>
-        </div>
-        <span class="ed-booking-duration">{{ _("Personal conversation") }}</span>
-      </div>
-
-      {% if booking_enabled %}
-      <form id="ed-meeting-form" novalidate
-            data-load="{{ _('Finding available meeting times…') | e }}"
-            data-date-hint="{{ _('Choose a day to see available times.') | e }}"
-            data-no-slots="{{ _('No open times on this day. Try another date.') | e }}"
-            data-slot-error="{{ _('Could not load the calendar. Try again.') | e }}"
-            data-select-slot="{{ _('Select a time to continue.') | e }}"
-            data-submit="{{ _('Sending your meeting request…') | e }}"
-            data-verified="{{ _('Check your email to verify your meeting. After verification, ERPNext will confirm it and add it to the calendar.') | e }}"
-            data-submit-error="{{ _('We could not submit your booking. Check your email before retrying, or choose another time.') | e }}"
-            data-connection="{{ _('The booking connection is unavailable. Please reload the page.') | e }}"
-            data-month-prev="{{ _('Previous month') | e }}"
-            data-month-next="{{ _('Next month') | e }}"
-            data-choose-day="{{ _('Choose date') | e }}"
-            data-chosen="{{ _('Selected meeting') | e }}">
-        <div class="ed-meeting-progress" aria-hidden="true"><span class="is-active"></span><span></span></div>
-        <section class="ed-booking-pane" data-meeting-stage="time" aria-labelledby="ed-booking-time-title">
-          <h3 id="ed-booking-time-title">{{ _("When would you like to meet?") }}</h3>
-          <label for="ed-meeting-topic" class="ed-meeting-label">{{ _("What's on your mind?") }}</label>
-          <select id="ed-meeting-topic" name="topic" required>
-            <option value="">{{ _("Select a topic") }}</option>
-            {% for topic in topic_options %}
-            <option value="{{ topic | e }}">{{ _(topic) | e }}</option>
-            {% endfor %}
-          </select>
-          <div class="ed-meeting-picker">
-            <div class="ed-meeting-calendar">
-              <div class="ed-meeting-calendar-top">
-                <strong id="ed-meeting-month" aria-live="polite"></strong>
-                <div class="ed-meeting-month-controls">
-                  <button type="button" id="ed-month-prev" aria-label="{{ _('Previous month') }}">‹</button>
-                  <button type="button" id="ed-month-next" aria-label="{{ _('Next month') }}">›</button>
-                </div>
-              </div>
-              <div class="ed-meeting-weekdays" aria-hidden="true"></div>
-              <div class="ed-meeting-days" id="ed-meeting-days" role="group" aria-label="{{ _('Available meeting dates') }}"></div>
-            </div>
-            <div class="ed-meeting-slot-area">
-              <label for="ed-meeting-zone" class="ed-meeting-label">{{ _("Your time zone") }}</label>
-              <select id="ed-meeting-zone" required>
-                <option value="Africa/Cairo">{{ _("Cairo (Egypt)") }}</option>
-                <option value="Asia/Riyadh">{{ _("Riyadh (Saudi Arabia)") }}</option>
-                <option value="Asia/Dubai">{{ _("Dubai (UAE)") }}</option>
-                <option value="Europe/London">{{ _("London (UK)") }}</option>
-                <option value="UTC">UTC</option>
-              </select>
-              <p class="ed-meeting-slot-label">{{ _("Available times") }}</p>
-              <div id="ed-meeting-slots" class="ed-meeting-slots" role="group" aria-label="{{ _('Choose a meeting time') }}" aria-busy="false">
-                <p class="ed-meeting-slot-placeholder">{{ _("Choose a day to see available times.") }}</p>
-              </div>
-            </div>
-          </div>
-          <div class="ed-meeting-selection" id="ed-meeting-selection" aria-live="polite">
-            <span class="ed-meeting-selection-dot"></span>
-            <span id="ed-meeting-selection-value">{{ _("Your date and time will appear here.") }}</span>
-          </div>
-          <button type="button" class="ed-btn ed-btn-primary ed-meeting-main-action" id="ed-meeting-next" disabled>
-            {{ _("Continue with this time") }} <span aria-hidden="true">→</span>
-          </button>
-        </section>
-        <section class="ed-booking-pane" data-meeting-stage="contact" aria-labelledby="ed-booking-contact-title" hidden>
-          <button type="button" class="ed-meeting-back" id="ed-meeting-back">
-            <span aria-hidden="true">←</span> {{ _("Change meeting time") }}
-          </button>
-          <h3 id="ed-booking-contact-title">{{ _("Who will we be speaking with?") }}</h3>
-          <div class="ed-meeting-contact-grid">
-            <div class="ed-field"><label for="ed-meeting-name">{{ _("Your name") }} *</label>
-              <input id="ed-meeting-name" name="name" autocomplete="name" maxlength="120" required>
-            </div>
-            <div class="ed-field"><label for="ed-meeting-email">{{ _("Work email") }} *</label>
-              <input id="ed-meeting-email" name="email" type="email" autocomplete="email" maxlength="200" required>
-            </div>
-            <div class="ed-field"><label for="ed-meeting-company">{{ _("Company (optional)") }}</label>
-              <input id="ed-meeting-company" name="company" autocomplete="organization" maxlength="140">
-            </div>
-            <div class="ed-field"><label for="ed-meeting-phone">{{ _("Phone (optional)") }}</label>
-              <input id="ed-meeting-phone" name="phone" autocomplete="tel" maxlength="45">
-            </div>
-            <div class="ed-field ed-field-full"><label for="ed-meeting-message">{{ _("What would make this conversation useful?") }}</label>
-              <textarea id="ed-meeting-message" name="message" rows="4" maxlength="1500"></textarea>
-            </div>
-          </div>
-          <div class="ed-meeting-honeypot" aria-hidden="true">
-            <label for="ed-meeting-website">{{ _("Website") }}</label>
-            <input id="ed-meeting-website" name="website" tabindex="-1" autocomplete="off">
-          </div>
-          <label class="ed-meeting-consent">
-            <input id="ed-meeting-consent" type="checkbox" name="consent" value="1" required>
-            <span>{{ _("I agree to be contacted about this meeting.") }} <a href="/privacy">{{ _("Privacy notice") }}</a></span>
-          </label>
-          <p class="ed-meeting-mail-note">{{ _("We'll send a verification link to your email. Your meeting is confirmed after you verify it.") }}</p>
-          <button type="submit" class="ed-btn ed-btn-primary ed-meeting-main-action" id="ed-meeting-submit">
-            {{ _("Request this meeting") }} <span aria-hidden="true">→</span>
-          </button>
-        </section>
-        <section class="ed-booking-pane ed-meeting-done" data-meeting-stage="done" hidden aria-live="polite">
-          <span class="ed-meeting-done-mark" aria-hidden="true">✓</span>
-          <h3>{{ _("Nearly there. Check your inbox.") }}</h3>
-          <p>{{ _("We sent a verification link to your email. Please confirm to finalize the meeting in our calendar.") }}</p>
-          <a href="/insights" class="ed-btn ed-btn-secondary">{{ _("Explore insights while you're here") }}</a>
-        </section>
-        <p class="ed-meeting-feedback" id="ed-meeting-feedback" role="status" aria-live="polite"></p>
-      </form>
-      <script defer src="{{ meeting_js_url | e }}"></script>
-      {% else %}
-      <div class="ed-meeting-unavailable" role="status">
-        <span aria-hidden="true" class="ed-meeting-unavailable-icon">✦</span>
-        <h3>{{ _("Our booking calendar is getting ready.") }}</h3>
-        <p>{{ _("Online meeting slots will appear once calendar availability and email confirmation are configured. In the meantime, explore our resources.") }}</p>
-        <a href="/insights" class="ed-btn ed-btn-secondary">{{ _("Explore useful insights") }}</a>
-      </div>
-      {% endif %}
+    <div class="ed-meet-hero-visual" aria-hidden="true">
+      <div class="ed-meet-hero-ring ed-meet-hero-ring-one"></div>
+      <div class="ed-meet-hero-ring ed-meet-hero-ring-two"></div>
+      <div class="ed-meet-hero-symbol"><img src="{{ brand_icon_url | e }}" width="110" height="110" alt=""></div>
+      <span class="ed-meet-hero-label ed-meet-hero-label-top">{{ _("Ideas & strategy") }}</span>
+      <span class="ed-meet-hero-label ed-meet-hero-label-bottom">{{ _("Technology & people") }}</span>
     </div>
   </div>
 </section>
+
+<section class="ed-meet-booking-section" id="book-meeting" aria-labelledby="ed-booking-title">
+  <div class="ed-shell">
+    <header class="ed-meet-section-heading">
+      <div>
+        <p class="ed-kicker">{{ _("A CONVERSATION THAT MATTERS") }}</p>
+        <h2 id="ed-booking-title">{{ _("Choose your time.") }} <em>{{ _("Tell us what matters.") }}</em></h2>
+      </div>
+      <p>{{ _("Pick an available meeting time, then share a little about yourself and what you would like to discuss.") }}</p>
+    </header>
+    <div class="ed-meet-booking-layout">
+      <div class="ed-booking-card" id="meeting-start">
+        <div class="ed-booking-head">
+          <div>
+            <span class="ed-booking-overline">{{ _("BOOK A PERSONAL MEETING") }}</span>
+            <h3>{{ _("Find a time that works for you.") }}</h3>
+          </div>
+          <span class="ed-booking-duration">{{ _("ERP Developers team") }}</span>
+        </div>
+        <form id="ed-meeting-form" novalidate data-booking-ready="{{ '1' if booking_enabled else '0' }}"
+              data-load="{{ _('Finding available meeting times…') | e }}"
+              data-date-hint="{{ _('Choose a day to see available times.') | e }}"
+              data-no-slots="{{ _('No open times on this day. Try another date.') | e }}"
+              data-slot-error="{{ _('Could not load the calendar. Try again.') | e }}"
+              data-submit="{{ _('Sending your meeting request…') | e }}"
+              data-verified="{{ _('Check your email to verify your meeting. After verification, ERPNext will confirm it and add it to the calendar.') | e }}"
+              data-submit-error="{{ _('We could not submit your booking. Check your email before retrying, or choose another time.') | e }}"
+              data-connection="{{ _('The booking connection is unavailable. Please reload the page.') | e }}"
+              data-month-prev="{{ _('Previous month') | e }}"
+              data-month-next="{{ _('Next month') | e }}"
+              data-choose-day="{{ _('Choose date') | e }}"
+              data-chosen="{{ _('Selected meeting') | e }}"
+              data-offline="{{ _('Live appointment times will appear once our calendar is ready.') | e }}">
+          {% if not booking_enabled %}
+          <div class="ed-meet-offline-notice" role="status">
+            <span class="ed-meet-notice-mark" aria-hidden="true"></span>
+            <div>
+              <strong>{{ _("Online booking is temporarily unavailable.") }}</strong>
+              <p>{{ _("We are preparing our appointment calendar. Dates are visible for orientation, but no times can be reserved yet.") }}</p>
+            </div>
+          </div>
+          {% endif %}
+          <fieldset class="ed-meet-fields" {% if not booking_enabled %}disabled{% endif %}>
+            <section class="ed-booking-pane" data-meeting-stage="details" aria-labelledby="ed-booking-time-title">
+              <h4 id="ed-booking-time-title">{{ _("Meeting details") }}</h4>
+              <label for="ed-meeting-topic" class="ed-meeting-label">{{ _("What would you like to discuss?") }} *</label>
+              <select id="ed-meeting-topic" name="topic" required>
+                <option value="">{{ _("Select a topic") }}</option>
+                {% for topic in topic_options %}
+                <option value="{{ topic | e }}">{{ _(topic) | e }}</option>
+                {% endfor %}
+              </select>
+
+              <div class="ed-meeting-picker">
+                <div class="ed-meeting-calendar">
+                  <label class="ed-meeting-label" id="ed-calendar-label">{{ _("Select a meeting date") }}</label>
+                  <div class="ed-meeting-calendar-top">
+                    <button type="button" class="ed-meeting-month-button" id="ed-month-prev" aria-label="{{ _('Previous month') }}">‹</button>
+                    <strong id="ed-meeting-month" aria-live="polite"></strong>
+                    <button type="button" class="ed-meeting-month-button" id="ed-month-next" aria-label="{{ _('Next month') }}">›</button>
+                  </div>
+                  <div class="ed-meeting-weekdays" aria-hidden="true"></div>
+                  <div class="ed-meeting-days" id="ed-meeting-days" role="group" aria-labelledby="ed-calendar-label"></div>
+                </div>
+                <div class="ed-meeting-slot-area">
+                  <label for="ed-meeting-zone" class="ed-meeting-label">{{ _("Your time zone") }}</label>
+                  <select id="ed-meeting-zone" required>
+                    <option value="Africa/Cairo">{{ _("Cairo (Egypt)") }}</option>
+                    <option value="Asia/Riyadh">{{ _("Riyadh (Saudi Arabia)") }}</option>
+                    <option value="Asia/Dubai">{{ _("Dubai (UAE)") }}</option>
+                    <option value="Europe/London">{{ _("London (UK)") }}</option>
+                    <option value="UTC">UTC</option>
+                  </select>
+                  <p class="ed-meeting-slot-label" id="ed-meeting-slots-label">{{ _("Available times") }}</p>
+                  <div id="ed-meeting-slots" class="ed-meeting-slots" role="group" aria-labelledby="ed-meeting-slots-label" aria-busy="false">
+                    <p class="ed-meeting-slot-placeholder">{{ _("Choose a day to see available times.") }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="ed-meeting-selection" id="ed-meeting-selection" aria-live="polite">
+                <span class="ed-meeting-selection-dot" aria-hidden="true"></span>
+                <span id="ed-meeting-selection-value">{{ _("Your date and time will appear here.") }}</span>
+              </div>
+            </section>
+
+            <section class="ed-booking-pane ed-meet-contact-pane" data-meeting-stage="contact" aria-labelledby="ed-booking-contact-title">
+              <h4 id="ed-booking-contact-title">{{ _("Your contact details") }}</h4>
+              <p class="ed-meet-form-intro">{{ _("Share a few details so we can prepare for a useful conversation.") }}</p>
+              <div class="ed-meeting-contact-grid">
+                <div class="ed-field"><label for="ed-meeting-name">{{ _("Your name") }} *</label>
+                  <input id="ed-meeting-name" name="name" autocomplete="name" maxlength="120" required>
+                </div>
+                <div class="ed-field"><label for="ed-meeting-email">{{ _("Work email") }} *</label>
+                  <input id="ed-meeting-email" name="email" type="email" autocomplete="email" maxlength="200" dir="ltr" required>
+                </div>
+                <div class="ed-field"><label for="ed-meeting-company">{{ _("Company (optional)") }}</label>
+                  <input id="ed-meeting-company" name="company" autocomplete="organization" maxlength="140">
+                </div>
+                <div class="ed-field"><label for="ed-meeting-phone">{{ _("Phone (optional)") }}</label>
+                  <input id="ed-meeting-phone" name="phone" type="tel" autocomplete="tel" maxlength="45" dir="ltr">
+                </div>
+                <div class="ed-field ed-field-full"><label for="ed-meeting-message">{{ _("What would make this conversation useful?") }}</label>
+                  <textarea id="ed-meeting-message" name="message" rows="3" maxlength="1500"></textarea>
+                </div>
+              </div>
+              <div class="ed-meeting-honeypot" aria-hidden="true">
+                <label for="ed-meeting-website">{{ _("Website") }}</label>
+                <input id="ed-meeting-website" name="website" tabindex="-1" autocomplete="off">
+              </div>
+              <label class="ed-meeting-consent">
+                <input id="ed-meeting-consent" type="checkbox" name="consent" value="1" required>
+                <span>{{ _("I agree to be contacted about this meeting.") }} <a href="/privacy">{{ _("Privacy notice") }}</a></span>
+              </label>
+              <p class="ed-meeting-mail-note">{{ _("Your meeting is confirmed after you verify it.") }} {{ _("We'll send a verification link to your email.") }}</p>
+              <button type="submit" class="ed-btn ed-btn-primary ed-meeting-main-action" id="ed-meeting-submit" disabled>
+                {{ _("Request this meeting") }} <span aria-hidden="true">↗</span>
+              </button>
+            </section>
+          </fieldset>
+          <section class="ed-booking-pane ed-meeting-done" data-meeting-stage="done" hidden aria-live="polite">
+            <span class="ed-meeting-done-mark" aria-hidden="true">✓</span>
+            <h3 tabindex="-1">{{ _("Nearly there. Check your inbox.") }}</h3>
+            <p>{{ _("We sent a verification link to your email. Please confirm to finalize the meeting in our calendar.") }}</p>
+            <a class="ed-btn ed-btn-secondary" href="/insights">{{ _("Explore insights while you're here") }}</a>
+          </section>
+          <p class="ed-meeting-feedback" id="ed-meeting-feedback" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+      <aside class="ed-meet-aside" aria-labelledby="ed-meet-aside-title">
+        <div class="ed-meet-aside-card">
+          <span class="ed-booking-overline">{{ _("WHAT TO EXPECT") }}</span>
+          <h3 id="ed-meet-aside-title">{{ _("A conversation focused on your goals.") }}</h3>
+          <p>{{ _("Bring your ideas, challenges, or questions. We'll listen, explore options, and focus on practical next steps.") }}</p>
+          <div class="ed-meet-highlights">
+            <div><span class="ed-meet-highlight-icon" aria-hidden="true">⌁</span><span>{{ _("Discuss your priorities") }}</span></div>
+            <div><span class="ed-meet-highlight-icon" aria-hidden="true">◇</span><span>{{ _("Explore useful approaches") }}</span></div>
+            <div><span class="ed-meet-highlight-icon" aria-hidden="true">↗</span><span>{{ _("Leave with a clearer direction") }}</span></div>
+          </div>
+          <div class="ed-meet-aside-summary">
+            <small>{{ _("YOUR MEETING") }}</small>
+            <strong id="ed-meet-aside-selection" aria-live="polite" data-hint="{{ _('Choose a date and time to begin.') | e }}">{{ _("Choose a date and time to begin.") }}</strong>
+          </div>
+        </div>
+        <div class="ed-meet-aside-note">
+          <strong>{{ _("A meaningful discussion, not a sales pitch.") }}</strong>
+          <p>{{ _("Email verification is required to finalize an available appointment.") }}</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+<script defer src="{{ meeting_js_url | e }}"></script>
 {% endblock %}
