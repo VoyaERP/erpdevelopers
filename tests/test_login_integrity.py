@@ -16,7 +16,8 @@ class TestNativeLogin(unittest.TestCase):
     def test_no_custom_form_or_auth_interception(self):
         js = (APP / "public/js/login_chrome.js").read_text(encoding="utf-8")
         self.assertIn('document.getElementById("page-login")', js)
-        self.assertIn('!== "/login"', js)
+        self.assertIn('const LOGIN_PATH = "/login"', js)
+        self.assertIn('if (path !== LOGIN_PATH)', js)
         self.assertIn("document.body.dataset.edLoginEnhanced", js)
         self.assertIn("document.body.prepend(skip, top)", js)
         self.assertIn('document.getElementById("language-switcher")', js)
@@ -49,6 +50,27 @@ class TestNativeLogin(unittest.TestCase):
         for filename in ("hooks.py", "modules.txt", "patches.txt"):
             with self.subTest(filename=filename):
                 self.assertTrue((APP / filename).is_file(), filename)
+
+    def test_updater_uses_pinned_release_and_pre_migration_checks(self):
+        script = (ROOT / "scripts/update_erptest_lightnode.sh").read_text(encoding="utf-8")
+        self.assertIn('EXPECTED_SHA="${EXPECTED_SHA:-}"', script)
+        self.assertIn("rev-parse FETCH_HEAD", script)
+        self.assertIn("merge-base --is-ancestor", script)
+        self.assertIn("backup --with-files", script)
+        self.assertLess(script.index("backup --with-files"), script.index("merge --ff-only"))
+        self.assertLess(script.index("unittest discover"), script.index('bench --site "$SITE" migrate'))
+        self.assertNotIn("bench new-site", script)
+        self.assertNotIn("bench update", script)
+        self.assertNotIn("supervisorctl restart", script)
+
+    def test_frontend_verifier_compares_real_css_and_images(self):
+        script = (ROOT / "scripts/verify_frontend.sh").read_text(encoding="utf-8")
+        self.assertIn("--resolve", script)
+        self.assertIn("brand.css?v=$DIGEST", script)
+        self.assertIn('cmp -s "$APP/erpdevelopers/public/css/brand.css" "$TMP/brand.css"', script)
+        self.assertIn("erpdevelopers-selected-logo.png", script)
+        self.assertIn("erpdevelopers-selected-favicon.png", script)
+        self.assertNotIn("bench migrate", script)
 
     def test_existing_site_installer_recognizes_upstream_remote(self):
         installer = (ROOT / "scripts/install_existing_site_erptest_lightnode.sh").read_text(encoding="utf-8")
