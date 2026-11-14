@@ -4,6 +4,14 @@
 
 > حالة التنفيذ مبنية على أدلة من GitHub ومن مخرجات المستخدم فقط. لا يتم اعتبار الكود مختبرًا لمجرد رفعه.
 
+## 2026-11-14 — Use approved ERP Developers logo for Frappe website, login and Desk (CI PASS; operator deployment pending)
+
+- The user requested replacing the remaining Frappe logo with the exact selected ERP Developers PNG. The source asset is unchanged: `erpdevelopers/public/images/erpdevelopers-selected-logo.png`, SHA-256 `250df1886e13229aa0e260949f66cb91a627b220a03c36b5c1d4ede1ad06d95d`.
+- Verified Frappe **v16.56.0** code: `frappe/www/login.py` sets `context.logo = get_app_logo()`; `frappe/boot.py` sets `bootinfo.app_logo_url = get_app_logo()`; `get_app_logo()` resolves site-local `Website Settings.app_logo` first, then `Navbar Settings.app_logo`, then `app_logo_url` hook. The app already configured `Website Settings.app_logo` and site navbar `brand_html`, but did not explicitly configure the Desk-specific fallback or own app icon hook.
+- **Source fix** at `version-16` **2c452841803f902d49c9cac9b05f0a0dbe2dd352**: `branding.desk_navbar_settings_values()` returns the same exact approved PNG; `site_setup.configure_website()` now updates `Website Settings` and **`Navbar Settings.app_logo`** together, applying only changed fields and committing once. Guard on `frappe.local.site == erp-developers.com` remains before any reads/writes; idempotency and wrong-site tests cover both DocTypes. `hooks.app_logo_url = LOGO_URL` covers the installed app identity/fallback without changes to core. Frontend smoke now verifies both site-local stored logos and parses native login navbar image structurally.
+- [GitHub Actions CI PASS](https://github.com/VoyaERP/erpdevelopers/actions/runs/43537963011) for final commit (29 source/behavior tests, Python and Bash checks). **No evidence yet of server deployment of this commit or visual confirmation.** Operator must use pinned existing-site updater, reload Gunicorn web only (shared-Bench impact), run read-only frontend verification, then check actual login/Desk appearance in EN/AR and native sign-in/2FA. Do **not** modify the actual Frappe system app tile or other sites.
+- Issue [#13](https://github.com/VoyaERP/erpdevelopers/issues/13) remains OPEN for live validation.
+
 ## 2026-11-14 — Live update completed; only native-navbar image assertion failed
 
 - Operator-provided terminal output confirms existing `erp-developers.com` was successfully updated from `46ba70f` to **`2ed646118595308b05f413f095009e8a04f473f2`** on `erptest-lightnode`. Site DB/files backup successful (20261114_025132), 27/27 source tests PASSED, `bench --site erp-developers.com migrate` completed, Arabic translations synchronized, explicit `site_setup.configure_website` changed `brand_html` and `banner_image` only, `bench build --app erpdevelopers` completed and source was verified. Web-only Supervisor Gunicorn restart succeeded.
@@ -145,7 +153,7 @@
 | --- | --- | --- |
 | [ED-00 #1](https://github.com/VoyaERP/erpdevelopers/issues/1) Environment | **Blocked: disk capacity + compatibility review** | Current-host guarded installer available, 3.6GB fails >=8GiB preflight; MariaDB v12.3 compatibility, Mac smoke |
 | [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Green Box-style native login, homepage and static CI ready; UAT pending** | Final approved logo asset, EN/AR content, SEO, device/auth UAT |
-| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **2ed6461 deployed: migration/setup/build/restart PASS; navbar image grep STOP** | Run verifier-only 8d61009; inspect actual native navbar image, finish HTTP + visual/auth UAT |
+| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **2ed6461 live; exact login + Desk logo fix 2c45284 CI PASS, pending deployment** | Pinned update, targeted web reload, verify website/login/Desk approved PNG + auth/RTL UAT |
 | [ED-02 #3](https://github.com/VoyaERP/erpdevelopers/issues/3) IAM/privacy | **Planned** | Role matrix + threat model |
 | [ED-03 #4](https://github.com/VoyaERP/erpdevelopers/issues/4) Community | **Planned** | ED-02 approval |
 | [ED-04 #5](https://github.com/VoyaERP/erpdevelopers/issues/5) Developer Hub | **Planned** | ED-02 approval |
