@@ -64,8 +64,18 @@ def book_meeting(date, time, timezone, contact):
     request = getattr(frappe.local, "request", None)
     origin = request.headers.get("Origin") if request is not None else None
     if origin:
-        parsed = urlsplit(origin)
-        if parsed.scheme != "https" or parsed.hostname != EXPECTED_SITE or parsed.port not in (None, 443):
+        try:
+            parsed = urlsplit(origin)
+            valid_origin = (
+                parsed.scheme == "https"
+                and parsed.hostname == EXPECTED_SITE
+                and parsed.port in (None, 443)
+                and not parsed.username
+                and not parsed.password
+            )
+        except ValueError:
+            valid_origin = False
+        if not valid_origin:
             frappe.throw(_("Meeting requests must originate from this website."), frappe.PermissionError)
     try:
         day = validate_booking_date(date, timezone, state["advance_booking_days"])
