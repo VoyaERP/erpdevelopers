@@ -58,7 +58,7 @@
         : form.dataset.chosen || "";
       summary.textContent = content;
       if (asideSummary) asideSummary.textContent = state.date && state.time
-        ? content : (asideSummary.dataset.hint || asideSummary.textContent);
+        ? content : asideSummary.dataset.hint;
       submit.disabled = !(state.active && state.date && state.time && !state.loading &&
         !state.saving && !state.sent && form.checkValidity());
     }

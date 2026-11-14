@@ -141,7 +141,7 @@
           </fieldset>
           <section class="ed-booking-pane ed-meeting-done" data-meeting-stage="done" hidden aria-live="polite">
             <span class="ed-meeting-done-mark" aria-hidden="true">✓</span>
-            <h3>{{ _("Nearly there. Check your inbox.") }}</h3>
+            <h3 tabindex="-1">{{ _("Nearly there. Check your inbox.") }}</h3>
             <p>{{ _("We sent a verification link to your email. Please confirm to finalize the meeting in our calendar.") }}</p>
             <a class="ed-btn ed-btn-secondary" href="/insights">{{ _("Explore insights while you're here") }}</a>
           </section>
@@ -160,7 +160,7 @@
           </div>
           <div class="ed-meet-aside-summary">
             <small>{{ _("YOUR MEETING") }}</small>
-            <strong id="ed-meet-aside-selection" aria-live="polite">{{ _("Choose a date and time to begin.") }}</strong>
+            <strong id="ed-meet-aside-selection" aria-live="polite" data-hint="{{ _('Choose a date and time to begin.') | e }}">{{ _("Choose a date and time to begin.") }}</strong>
           </div>
         </div>
         <div class="ed-meet-aside-note">
