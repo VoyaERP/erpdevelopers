@@ -3,36 +3,14 @@
 {{ super() }}
 <link rel="canonical" href="{{ canonical_home_url | e }}">
 <link rel="stylesheet" href="{{ homepage_css_url | e }}">
+<link rel="stylesheet" href="{{ portal_css_url | e }}">
 <script type="application/ld+json">{{ structured_data_json | safe }}</script>
 {% endblock %}
 {% block navbar %}{% endblock %}
 {% block footer %}{% endblock %}
 {% block page_container %}
 <main class="ed-site" id="top">
-  <a class="ed-skip" href="#content">{{ _("Skip to content") }}</a>
-
-  <header class="ed-nav">
-    <div class="ed-shell ed-nav-inner">
-      <a href="/" class="ed-brand" aria-label="ERP Developers">
-        <img src="{{ brand_logo_url | e }}" width="222" height="74"
-             alt="ERP Developers — Engage. Reason. Progress.">
-      </a>
-      <nav aria-label="{{ _('Main navigation') }}">
-        <a href="#vision">{{ _("Our vision") }}</a>
-        <a href="#ecosystem">{{ _("Ecosystem") }}</a>
-        <a href="#ai">{{ _("AI & Innovation") }}</a>
-        <a href="#roadmap">{{ _("Roadmap") }}</a>
-      </nav>
-      <div class="ed-nav-tools">
-        {# Frappe 16 populates this native picker; no second language handler. #}
-        <div id="language-switcher" class="ed-language-switcher form-group mb-0 hide">
-          <label for="ed-language-select">{{ _("Language") }}</label>
-          <select class="form-control" id="ed-language-select" aria-label="{{ _('Language') }}"></select>
-        </div>
-        <a class="ed-nav-cta" href="{{ desk_signin_url | e }}">{{ _("Desk sign in") }} <span aria-hidden="true">↗</span></a>
-      </div>
-    </div>
-  </header>
+  {% include "templates/includes/erpdevelopers_nav.html" %}
 
   <div id="content">
     <section class="ed-hero" aria-labelledby="ed-heading">
@@ -43,7 +21,7 @@
           <p class="ed-hero-lead">{{ _("ERP Developers brings people, expertise and intelligent systems into one connected technology ecosystem — not limited to a single ERP, vendor or platform.") }}</p>
           <div class="ed-actions">
             <a class="ed-btn ed-btn-primary" href="#ecosystem">{{ _("Explore our ecosystem") }} <span aria-hidden="true">↗</span></a>
-            <a class="ed-btn ed-btn-secondary" href="#vision">{{ _("Our philosophy") }}</a>
+            <a class="ed-btn ed-btn-secondary" href="/lets-talk">{{ _("Let\'s Talk") }}</a>
           </div>
           <div class="ed-principles" aria-label="{{ _('Brand values') }}">
             {% for value in values_items %}
@@ -64,6 +42,30 @@
           </div>
           <span class="ed-art-badge">AI</span>
           <div class="ed-art-caption">{{ _("Connect knowledge") }} <span>→</span> {{ _("Create progress") }}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ed-section ed-active-journeys" aria-labelledby="ed-explore-heading">
+      <div class="ed-shell">
+        <p class="ed-kicker">{{ _("EXPLORE TODAY") }}</p>
+        <h2 id="ed-explore-heading">{{ _("Learn, discover and connect.") }}</h2>
+        <div class="ed-link-grid">
+          <a class="ed-link-card" href="/training">
+            <small>{{ _("LEARN") }}</small><strong>{{ _("Training Playlists") }}</strong>
+            <p>{{ _("Curated public YouTube collections for practical technology learning.") }}</p>
+            <span>{{ _("Browse training") }}</span>
+          </a>
+          <a class="ed-link-card" href="/insights">
+            <small>{{ _("DISCOVER") }}</small><strong>{{ _("Practical Insights") }}</strong>
+            <p>{{ _("Read original advice and editor-reviewed external sources.") }}</p>
+            <span>{{ _("Explore insights") }}</span>
+          </a>
+          <a class="ed-link-card" href="/lets-talk">
+            <small>{{ _("CONNECT") }}</small><strong>{{ _("Let's Talk") }}</strong>
+            <p>{{ _("Start a consultation request; our team confirms availability.") }}</p>
+            <span>{{ _("Request a conversation") }}</span>
+          </a>
         </div>
       </div>
     </section>
@@ -113,6 +115,21 @@
       </div>
     </section>
 
+    <section class="ed-section ed-future-section" aria-labelledby="ed-connect-title">
+      <div class="ed-shell">
+        <p class="ed-kicker">{{ _("FUTURE CONNECTIONS") }}</p>
+        <h2 id="ed-connect-title">{{ _("Prepared for intelligent integrations.") }}</h2>
+        <div class="ed-future-integrations">
+          <div><span>{{ _("PLANNED") }}</span><strong>{{ _("LinkedIn connections") }}</strong>
+            <p>{{ _("Professional sign-in and approved partner integrations will require OAuth consent and provider authorization. No LinkedIn sync is active.") }}</p>
+          </div>
+          <div><span>{{ _("FAQ PREVIEW") }}</span><strong>{{ _("AI-powered advisory") }}</strong>
+            <p>{{ _("The quick guide answers fixed FAQs locally. Future AI must cite approved sources and respect each user's permissions.") }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section id="roadmap" class="ed-section ed-roadmap" aria-labelledby="ed-roadmap-heading">
       <div class="ed-shell">
         <div class="ed-roadmap-title">
@@ -128,18 +145,7 @@
     </section>
   </div>
 
-  <footer class="ed-footer">
-    <div class="ed-shell ed-footer-inner">
-      <a href="/" class="ed-footer-brand" aria-label="ERP Developers">
-        <img src="{{ brand_logo_url | e }}" width="183" height="62"
-             alt="ERP Developers — Engage. Reason. Progress.">
-      </a>
-      <p>{{ _("Building a smarter, more connected technology community.") }}</p>
-      <div class="ed-footer-links">
-        <a href="{{ desk_signin_url | e }}">{{ _("Desk sign in") }}</a>
-        <a href="#top">{{ _("Back to top") }} ↑</a>
-      </div>
-    </div>
-  </footer>
+  {% include "templates/includes/erpdevelopers_footer.html" %}
+  {% include "templates/includes/erpdevelopers_assistant.html" %}
 </main>
 {% endblock %}

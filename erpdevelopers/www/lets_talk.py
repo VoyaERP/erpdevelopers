@@ -1,5 +1,6 @@
 """Consultation request page: enquiry only, no unverified calendar booking."""
 from erpdevelopers.public_pages import set_public_context
+from erpdevelopers.intake_rules import TOPICS, WINDOWS
 
 sitemap = 1
 
@@ -12,3 +13,5 @@ def get_context(context):
         description="Request a conversation about ERP, solution architecture, training, integrations and digital transformation. Meeting times are confirmed by our team.",
     )
     context.booking_enabled = booking_open()
+    context.topic_options = TOPICS
+    context.time_windows = WINDOWS

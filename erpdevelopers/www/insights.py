@@ -11,3 +11,4 @@ def get_context(context):
         description="Read practical technology insights, curated expert sources and architecture advice, with original articles published through Frappe Web Pages.",
     )
     context.resources = public_resources()
+    context.topics = sorted({r.topic for r in context.resources})

@@ -11,3 +11,4 @@ def get_context(context):
         description="Explore reviewed YouTube playlists about ERP, solution architecture, development, cloud, data and security. Curated learning, with an LMS planned.",
     )
     context.playlists = public_playlists()
+    context.topics = sorted({p.topic for p in context.playlists})
