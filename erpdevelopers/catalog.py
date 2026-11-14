@@ -10,7 +10,7 @@ PLAYLIST_DOCTYPE = "ERP Developers Playlist"
 RESOURCE_DOCTYPE = "ERP Developers Resource"
 PLAYLIST_FIELDS = (
     "title", "title_ar", "topic", "level", "language",
-    "description", "playlist_url", "playlist_id",
+    "description", "playlist_url", "playlist_id", "visibility",
 )
 RESOURCE_FIELDS = (
     "title", "title_ar", "topic", "summary", "editorial_note",
@@ -49,7 +49,10 @@ def _published_rows(doctype, fields):
         return []
     return frappe.get_all(
         doctype,
-        filters={"published": 1},
+        filters=(
+            {"published": 1, "visibility": "Public"}
+            if doctype == PLAYLIST_DOCTYPE else {"published": 1}
+        ),
         fields=list(fields),
         order_by="sort_order asc, modified desc",
         limit_page_length=60,
@@ -61,7 +64,7 @@ def public_playlists():
     result = []
     for item in rows:
         try:
-            list_id = youtube_playlist_id(item.playlist_url)
+            list_id = youtube_playlist_id(item["playlist_url"])
         except ValueError:
             continue
         entry = dict(item)
