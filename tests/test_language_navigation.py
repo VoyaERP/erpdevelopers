@@ -52,7 +52,7 @@ class TestLanguageNavigation(TestCase):
                              {"topic": ["ERP"], "_lang": ["ar"]})
             self.assertEqual(fake.session.user, user)
 
-    def test_enhancement_is_loaded_once_per_custom_page_not_on_native_login(self):
+    def test_enhancement_is_loaded_once_per_page_without_global_injection(self):
         for template in ("www/erp-developers-home.html", "templates/includes/erpdevelopers_page_base.html"):
             source = (APP / template).read_text()
             self.assertEqual(source.count("{{ language_js_url | e }}"), 1)

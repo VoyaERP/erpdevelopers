@@ -3,9 +3,10 @@
  */
 (() => {
   "use strict";
-  const header = document.querySelector("header.ed-nav");
+  const header = document.querySelector("header.ed-nav, nav.ed-login-nav");
   const control = header?.querySelector("[data-language-switch]");
   if (!control || header.dataset.languageBound === "1") return;
+  const scope = header.closest(".ed-site") || header;
   const language = header.lang.toLowerCase().startsWith("ar") ? "ar" : "en";
   const target = control.dataset.languageSwitch;
   if (!["en", "ar"].includes(target)) return;
@@ -28,7 +29,7 @@
   function prepareLink(event) {
     if (event.defaultPrevented || (event.type === "auxclick" && event.button !== 1)) return;
     const anchor = event.target.closest?.("a[href]");
-    if (!anchor || !anchor.closest(".ed-site") || anchor.hasAttribute("download")) return;
+    if (!anchor || !scope.contains(anchor) || anchor.hasAttribute("download")) return;
     if (anchor === control) {
       updateSwitchURL();
       // Frappe reads this cookie for Guests; _lang also works for signed-in users.
@@ -53,7 +54,7 @@
   document.addEventListener("auxclick", prepareLink, true);
 
   // Existing GET directory filters must not reset a signed-in user's page locale.
-  document.querySelectorAll('.ed-site form[method="get" i]').forEach(form => {
+  scope.querySelectorAll('form[method="get" i]').forEach(form => {
     let action;
     try { action = new URL(form.getAttribute("action") || location.href, location.href); } catch (_) { return; }
     if (action.origin !== location.origin || !publicPaths.has(action.pathname)) return;

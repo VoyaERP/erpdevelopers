@@ -28,6 +28,8 @@
   EVENTS_CSS="/assets/erpdevelopers/css/events.css?v=$EVENTS_DIGEST"
   CATALOG_DIGEST="$(sha256sum "$APP/erpdevelopers/public/js/catalog.js" | cut -c1-16)"
   CATALOG_JS="/assets/erpdevelopers/js/catalog.js?v=$CATALOG_DIGEST"
+  LANGUAGE_DIGEST="$(sha256sum "$APP/erpdevelopers/public/js/language.js" | cut -c1-16)"
+  LANGUAGE_JS="/assets/erpdevelopers/js/language.js?v=$LANGUAGE_DIGEST"
   LOGO="/assets/erpdevelopers/images/erpdevelopers-selected-logo.png"
   FAVICON="/assets/erpdevelopers/images/erpdevelopers-selected-favicon.png"
 
@@ -113,7 +115,10 @@
     test "$ACTUAL_LOGO" = "$LOGO" || { echo "STOP: stored logo mismatch for $SETTINGS"; exit 3; }
   done
   grep -Fq "$LOGIN_CSS" "$TMP/login.html"
-  "$BENCH/env/bin/python" "$APP/scripts/inspect_login_brand.py" "$TMP/login.html" --site "$SITE"
+  "$BENCH/env/bin/python" "$APP/scripts/inspect_login_brand.py" "$TMP/login.html" --site "$SITE" --check-language
+  grep -Fq "src=\"$LANGUAGE_JS\"" "$TMP/login.html"
+  origin language.js "$LANGUAGE_JS"
+  cmp -s "$APP/erpdevelopers/public/js/language.js" "$TMP/language.js"
   if grep -Fq 'login_chrome.js' "$TMP/login.html"; then echo "STOP: stale login injection script"; exit 3; fi
   origin login.css "$LOGIN_CSS"
   cmp -s "$APP/erpdevelopers/public/css/login.css" "$TMP/login.css"

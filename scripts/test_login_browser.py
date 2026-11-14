@@ -10,7 +10,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from io import BytesIO
 from pathlib import Path
 from threading import Thread
-from types import SimpleNamespace
+from types import ModuleType, SimpleNamespace
+from unittest.mock import patch
 from urllib.parse import parse_qs, unquote, urlsplit
 from urllib.request import urlopen, Request
 import gettext
@@ -22,16 +23,18 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from babel.messages.mofile import write_mo
 from babel.messages.pofile import read_po
-from jinja2 import DictLoader, Environment, select_autoescape
+from jinja2 import ChoiceLoader, DictLoader, Environment, FileSystemLoader, select_autoescape
 from markupsafe import Markup
 from playwright.sync_api import expect, sync_playwright
 from erpdevelopers.hooks import web_include_css
-from erpdevelopers.branding import LOGO_URL
+from erpdevelopers.branding import EXPECTED_SITE, LOGO_URL
+from erpdevelopers.login_presentation import update_login_context
 
 APP = ROOT / "erpdevelopers"
 PUBLIC = (APP / "public").resolve()
 OUTPUT = ROOT / "test-artifacts/login"
 SOURCES = {
+    "templates/web.html": "a3e19fff788951881e2b9818575ac42d4768165b",
     "www/login.html": "4302103f27d75c7bc14e18d3a2bc5477cfcc7fd1",
     "templates/includes/login/macros.html": "492254e64761966b5b0e561c057d837443d068f4",
     "templates/includes/login/login.js": "bb13da580bb6bc312a23b368a7f82ec5d61f2a97",
@@ -70,11 +73,13 @@ body{margin:0} .flex{display:flex}.flex-col{flex-direction:column}.items-start{a
 input,button{font:inherit}.es-button{display:flex;align-items:center;justify-content:center;border:0;border-radius:8px;text-decoration:none;background:#f3f4f6}
 .icon-sm{width:16px;height:16px}.page-card-head{text-align:left}.text-right{text-align:right}
 </style>
-{% for css in web_include_css %}<link rel="stylesheet" href="{{ css }}">{% endfor %}
+{% block head %}{% for css in web_include_css %}<link rel="stylesheet" href="{{ css }}">{% endfor %}{% endblock %}
 {% block head_include %}{% endblock %}</head>
-<body data-path="login"><nav class="navbar"><div class="container"><a class="navbar-brand" href="/"><img src="{{ logo }}" alt="ERP Developers"></a>
-<div id="language-switcher"><select><option>{{ 'العربية' if boot.lang == 'ar' else 'English' }}</option></select></div></div></nav>
-<div id="page-login"><div class="page-content-wrapper"><main><div class="page_content">{% block page_content %}{% endblock %}</div></main></div></div></body></html>'''
+<body data-path="login">
+{% block navbar %}<nav class="native-fixture-navbar"></nav>{% endblock %}
+{% block content %}{% endblock %}
+{% block base_scripts %}<script>window.fixtureNativePickerEnabled=window.show_language_picker;</script>{% endblock %}
+</body></html>'''
 ENV = None
 
 
@@ -83,13 +88,23 @@ def render(params):
     view = params.get("view", ["login"])[0]
     if view not in {"login", "forgot", "login-with-email-link", "signup"}:
         view = "login"
-    return ENV.get_template("www/login.html").render(
+    class Context(dict):
+        __getattr__ = dict.get
+        __setattr__ = dict.__setitem__
+    ctx = Context(
         boot=SimpleNamespace(lang=lang), _=AR.gettext if lang == "ar" else (lambda text: text),
         web_include_css=web_include_css, view=view, logo=LOGO_URL,
         disable_signup=True, disable_user_pass_login=False, show_language_picker=True,
         login_with_email_link=True, social_login=False, ldap_settings=None,
         include_style=lambda path: Markup(""), for_test="Native login presentation test",
-    ).encode("utf-8")
+        path="login", name="login", pathname="login", route="login",
+    )
+    fake = ModuleType("frappe")
+    fake.local = SimpleNamespace(site=EXPECTED_SITE, form_dict={k:v[0] for k,v in params.items()})
+    with patch.dict(sys.modules, {"frappe": fake}):
+        update_login_context(ctx)
+    return ENV.get_template("www/login.html").render(ctx).encode("utf-8")
+
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -124,8 +139,10 @@ def main():
     missing = sorted(text for text in messages if text != "jane@example.com" and AR.gettext(text) == text)
     assert not missing, "Untranslated native login/JS messages: " + repr(missing)
     print(f"PASS: {len(messages) - 1} native login and JS message IDs have compiled Arabic translations", flush=True)
-    sources["templates/web.html"] = BASE
-    ENV = Environment(loader=DictLoader(sources), autoescape=select_autoescape(["html"]))
+    sources["templates/base.html"] = BASE
+    sources["templates/includes/breadcrumbs.html"] = ""
+    ENV = Environment(loader=ChoiceLoader([DictLoader(sources), FileSystemLoader(APP)]),
+                      autoescape=select_autoescape(["html"]))
     OUTPUT.mkdir(parents=True, exist_ok=True)
     server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     thread = Thread(target=server.serve_forever, daemon=True)
@@ -138,7 +155,7 @@ def main():
                 browser = engine.launch(headless=True)
                 try:
                     for lang in ("en", "ar"):
-                        for width in (1440, 390):
+                        for width in (1440, 768, 390, 320):
                             context = browser.new_context(viewport={"width": width, "height": 900})
                             context.route("https://fonts.googleapis.com/**", lambda r: r.fulfill(content_type="text/css", body=""))
                             context.route("https://fonts.gstatic.com/**", lambda r: r.abort())
@@ -153,6 +170,18 @@ def main():
                                 expected = {"login": "Sign In", "forgot": "Forgot Password?", "login-with-email-link": "Sign In", "signup": "Sign Up"}[view]
                                 expect(heading).to_have_text(AR.gettext(expected) if lang == "ar" else expected)
                                 assert page.locator('nav.navbar .navbar-brand img').count() == 1
+                                assert page.locator('nav.navbar').count() == 1
+                                assert page.locator('#language-switcher').count() == 1
+                                switch = page.locator('#language-switcher')
+                                expect(switch).to_be_visible()
+                                expect(switch).to_have_text("English" if lang == "ar" else "\u0627\u0644\u0639\u0631\u0628\u064a\u0629")
+                                assert page.evaluate("window.fixtureNativePickerEnabled") is False
+                                logo = page.locator('nav.navbar .navbar-brand img').bounding_box()
+                                button = switch.bounding_box()
+                                assert logo['width'] >= (259 if width > 720 else 179), logo
+                                assert abs(logo['width']/logo['height'] - 2048/682) < .02
+                                assert button['height'] >= 44
+                                assert logo['x'] + logo['width'] <= button['x'] + 1 or button['x'] + button['width'] <= logo['x'] + 1
                                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
                                 geometry = page.evaluate('''() => {
                                   const wrapper = document.querySelector('.page-content-wrapper');
@@ -186,7 +215,36 @@ def main():
                                         page.screenshot(path=str(OUTPUT / f"login-{lang}-{width}.png"), full_page=True)
                                 assert not errors, errors
                                 cases += 1
+                            page.goto(f"{origin}/login?_lang={lang}&redirect-to=%2Fdesk&view=forgot#forgot")
+                            switch = page.locator('#language-switcher')
+                            before = switch.bounding_box()
+                            page.locator('#forgot_email').fill('private@example.invalid')
+                            switch.focus()
+                            page.keyboard.press('Enter')
+                            other = 'en' if lang == 'ar' else 'ar'
+                            expect(page.locator('html')).to_have_attribute('lang', other)
+                            current = urlsplit(page.url)
+                            assert parse_qs(current.query)['redirect-to'] == ['/desk']
+                            assert current.fragment == 'forgot'
+                            assert 'private' not in page.url
+                            assert page.locator('#forgot_email').input_value() == ''
+                            assert page.locator('#language-switcher').bounding_box()['width'] == before['width']
+                            assert page.locator('script[src*="/js/language.js"]').count() == 1
+                            page.add_script_tag(url=page.locator('script[src*="/js/language.js"]').get_attribute('src'))
+                            assert page.locator('#language-switcher').count() == 1
+                            # Cookie contains only the selected native locale, never form values.
+                            cookies = {c['name']:c['value'] for c in context.cookies()}
+                            assert cookies.get('preferred_language') == other
                             context.close()
+                            blocked = browser.new_context(java_script_enabled=False, viewport={"width":width,"height":900})
+                            blocked.route("https://fonts.googleapis.com/**", lambda r:r.fulfill(content_type="text/css",body=""))
+                            nojs = blocked.new_page()
+                            nojs.goto(f"{origin}/login?_lang={lang}&redirect-to=%2Fdesk")
+                            expect(nojs.locator('#language-switcher')).to_be_visible()
+                            nojs.locator('#language-switcher').click()
+                            expect(nojs.locator('html')).to_have_attribute('lang', other)
+                            assert parse_qs(urlsplit(nojs.url).query)['redirect-to'] == ['/desk']
+                            blocked.close()
                             print(f"PASS {engine.name}: {lang} {width}px, four native auth states, translation and layout", flush=True)
                 finally:
                     browser.close()

@@ -1,5 +1,7 @@
 # Visible website language control - 2026-11-14
 
+> Login now shares the visible control; see [Login logo and language](LOGIN_LOGO_LANGUAGE.md).
+
 ## Root cause and change
 
 The shared header used an empty hidden `#language-switcher` select. Frappe
