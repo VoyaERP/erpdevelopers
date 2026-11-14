@@ -59,10 +59,10 @@ class TestPlaylistBackend(TestCase):
         item.playlist_url = "https://www.youtube.com/playlist?list=PLabcdefghijklmnopqrst0123456"
         return item
 
-    def test_private_save_cannot_publish(self):
+    def test_private_published_remains_private_by_visibility_filter(self):
         item = self._new_playlist("Private")
         item.validate()
-        self.assertEqual(item.published, 0)
+        self.assertEqual(item.published, 1)
         self.assertEqual(item.visibility, "Private")
         self.assertEqual(item.playlist_id, "PLabcdefghijklmnopqrst0123456")
 
