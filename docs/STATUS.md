@@ -4,6 +4,13 @@
 
 > حالة التنفيذ مبنية على أدلة من GitHub ومن مخرجات المستخدم فقط. لا يتم اعتبار الكود مختبرًا لمجرد رفعه.
 
+## 2026-11-14 — Homepage CSS loading bug found; route-scoped asset fix ready
+
+- User screenshot after selected-logo deployment showed an **unstyled homepage**: visible skip-to-content link, enormous unstyled header text and misaligned navigation. Customer PNG itself loaded correctly. These symptoms show missing/inoperative `brand.css` in the browser; response/static-file diagnostics from the user's server have not yet been captured, so the precise transport/caching failure is unconfirmed.
+- Frappe v16 [`templates/base.html`](https://github.com/frappe/frappe/blob/v16.56.0/frappe/templates/base.html) exposes a `head_include` block. On `version-16` commit **ec75d35f3e233660f062002076d348f8b0981aa2**, the homepage uses that supported block to include `/assets/erpdevelopers/css/brand.css?v=20261114-website-fix-1` explicitly, retaining `{{ super() }}`. Removed `brand.css` from global `web_include_css` to avoid duplication; `login.css` remains global and scoped to native login. No change to exact selected PNG, API, authentication, 2FA, or Frappe core.
+- Added a contract test for explicit once-only route-scoped CSS, source file, media breakpoint and hook isolation. [GitHub Actions CI PASS](https://github.com/VoyaERP/erpdevelopers/actions/runs/43532049626).
+- **Not yet confirmed live**. Next operator action: guarded existing-site updater (backup, migrate, build, test, clear-cache), targeted web-only restart because `hooks.py` changed, then GET homepage verifying `brand.css?v=...` is in head and CSS endpoint returns HTTP 200 with expected selectors. Finally check refreshed browser on desktop/mobile and other shared-Bench sites.
+
 ## 2026-11-14 — Correct customer PNG deployed to source repository; cleaner website UI prepared
 
 - Customer explicitly rejected the earlier Neural Intelligence concept logo and provided the actual selected raster image `ERP DEvlopers.png`. The original **2048×682 transparent RGBA PNG was committed byte-for-byte** at `erpdevelopers/public/images/erpdevelopers-selected-logo.png`, SHA-256 **250df1886e13229aa0e260949f66cb91a627b220a03c36b5c1d4ede1ad06d95d**, Git blob SHA-1 `2d60b2c4183a5813168949e89f1d8473da9be227`. No regeneration/retrace/recoloring. A 96×96 favicon was cropped from the exact supplied icon. Old unrelated SVG logo assets removed.
@@ -94,7 +101,7 @@
 | --- | --- | --- |
 | [ED-00 #1](https://github.com/VoyaERP/erpdevelopers/issues/1) Environment | **Blocked: disk capacity + compatibility review** | Current-host guarded installer available, 3.6GB fails >=8GiB preflight; MariaDB v12.3 compatibility, Mac smoke |
 | [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Green Box-style native login, homepage and static CI ready; UAT pending** | Final approved logo asset, EN/AR content, SEO, device/auth UAT |
-| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Exact selected PNG + revised UI committed at 5e6cb55; CI PASS; server deploy pending** | Update existing site, targeted web restart, inspect visuals and auth |
+| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Correct PNG displayed but CSS not applied; route-scoped fix ec75d35 CI PASS** | Deploy, verify link/CSS HTTP 200 and visual/auth UAT |
 | [ED-02 #3](https://github.com/VoyaERP/erpdevelopers/issues/3) IAM/privacy | **Planned** | Role matrix + threat model |
 | [ED-03 #4](https://github.com/VoyaERP/erpdevelopers/issues/4) Community | **Planned** | ED-02 approval |
 | [ED-04 #5](https://github.com/VoyaERP/erpdevelopers/issues/5) Developer Hub | **Planned** | ED-02 approval |
