@@ -4,6 +4,15 @@
 
 > حالة التنفيذ مبنية على أدلة من GitHub ومن مخرجات المستخدم فقط. لا يتم اعتبار الكود مختبرًا لمجرد رفعه.
 
+## 2026-11-14 — Eliminate standard-login flash; server-render approved logo (CI PASS; deployment pending)
+
+- **User-reported regression:** Frappe's standard login displays briefly, disappears and is replaced by the custom login view. User also reported that the approved logo is not consistently shown. GitHub source review confirmed the cause: `login_chrome.js` injected a new header, story, footer and moved the native language picker **after the initial HTML painted**, so the layout switch is intrinsic to the architecture (not fixable merely with animation/opacity changes).
+- **Architectural fix on `version-16`**: removed the `web_include_js` login hook, **deleted** `public/js/login_chrome.js` and its obsolete Node DOM harness, retained Frappe v16's unchanged `www/login.html` and all native authentication. Styling uses only a **CSS-first** route-scoped stylesheet loaded in the HTML head via `web_include_css = [login_stylesheet_url()]`, where `login_stylesheet_url()` contains a SHA-256 prefix of actual `login.css` bytes. The initial server-rendered navbar/form are the final layout; a CSS-only decorative EN/AR split-panel provides the original visual direction without DOM swaps.
+- **Approved logo correction:** `branding.website_settings_values()` now sets `app_logo`, `banner_image` and supported Frappe `brand_html` to the **same exact uploaded PNG URL** (alt text included in navbar HTML), in addition to the existing favicon and language-picker settings. The original logo file remains unchanged (SHA-256 `250df1886e13229aa0e260949f66cb91a627b220a03c36b5c1d4ede1ad06d95d`), no re-encoding or replacement logo. Website setup is explicit, idempotent and guards `frappe.local.site == erp-developers.com`.
+- Removed obsolete JS/CI tests and rewrote unit tests to cover no injected login scripts, Frappe route-scoped first-paint CSS, approved native navbar/logo settings, hashed CSS URL, Frappe-owned auth and preserved EN/AR homepage. The updated **read-only Origin smoke test** verifies the fingerprinted login CSS is rendered and its **served bytes match the source**, checks actual native HTML contains the approved logo and flags any stale `login_chrome.js` script reference.
+- **Source release `version-16` commit:** **46ba70f102342f683e29a93957ebb826f93099ba**, [CI PASS](https://github.com/VoyaERP/erpdevelopers/actions/runs/43536067952): Python 3.14 compile, Bash syntax and all source/behavior tests. This is NOT a live browser/integration test.
+- **Outstanding:** Operator must deploy a pinned source commit to the already-existing `erp-developers.com` site using guarded backup-first updater, migrate/build/configure/cache clear, then coordinate the Supervisor **web-only** reload, run `scripts/verify_frontend.sh`, and visually test login first paint, actual logo, native sign-in/recovery/2FA, EN/AR/RTL on desktop/mobile and other sites sharing the Bench. Issue #13 stays OPEN pending UAT.
+
 ## 2026-11-14 — Restore original orbit design, English/Arabic and single login header (CI passed; live deploy pending)
 
 - User preferred the **earlier orbit-based visual direction and bilingual experience** and requested only tighter spacing, the exact selected PNG, and a fix for login loading two things. The earlier `ae1a44a` landing/login history and Frappe v16.56.0 template were reviewed before changes.
@@ -119,7 +128,7 @@
 | --- | --- | --- |
 | [ED-00 #1](https://github.com/VoyaERP/erpdevelopers/issues/1) Environment | **Blocked: disk capacity + compatibility review** | Current-host guarded installer available, 3.6GB fails >=8GiB preflight; MariaDB v12.3 compatibility, Mac smoke |
 | [ED-01 #2](https://github.com/VoyaERP/erpdevelopers/issues/2) Public brand/site | **Green Box-style native login, homepage and static CI ready; UAT pending** | Final approved logo asset, EN/AR content, SEO, device/auth UAT |
-| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **Original orbit layout + EN/AR + duplicate-login fix 9a12af6 CI PASS; not live yet** | Pinned deploy, coordinated web restart, Origin EN/AR/CSS/auth UAT and shared-site checks |
+| [ED-01.1 #13](https://github.com/VoyaERP/erpdevelopers/issues/13) erptest-lightnode public deployment | **First-paint CSS and exact server-logo fix 46ba70f CI PASS; not live yet** | Pinned deploy, web-only reload, verify logo/CSS/zero old JS; visually test auth & RTL |
 | [ED-02 #3](https://github.com/VoyaERP/erpdevelopers/issues/3) IAM/privacy | **Planned** | Role matrix + threat model |
 | [ED-03 #4](https://github.com/VoyaERP/erpdevelopers/issues/4) Community | **Planned** | ED-02 approval |
 | [ED-04 #5](https://github.com/VoyaERP/erpdevelopers/issues/5) Developer Hub | **Planned** | ED-02 approval |
