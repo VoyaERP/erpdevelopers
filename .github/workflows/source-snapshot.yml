@@ -1,0 +1,27 @@
+name: Reviewable source snapshot
+on:
+  push:
+    branches: ["refactor/**", production-v16]
+  pull_request:
+    branches: [production-v16]
+permissions:
+  contents: read
+jobs:
+  source-snapshot:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Archive only tracked source, never runner credentials
+        run: |
+          mkdir -p /tmp/erpdev-source
+          git archive --format=tar HEAD > /tmp/erpdev-source/source.tar
+          git rev-parse HEAD > /tmp/erpdev-source/COMMIT
+          sha256sum /tmp/erpdev-source/source.tar > /tmp/erpdev-source/SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reviewed-source
+          path: /tmp/erpdev-source/
+          retention-days: 7
+          if-no-files-found: error
