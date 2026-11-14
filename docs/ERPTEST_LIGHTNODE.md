@@ -1,5 +1,17 @@
 # ERP Developers — deployment on erptest-lightnode
 
+## Interrupted update recovery + Desk routing (2026-11-14)
+
+**Observed operator output:** site `erp-developers.com` has app installed and its checkout was fast-forwarded to `46ba70f102342f683e29a93957ebb826f93099ba`. Source tests passed (27/27), then `node --check .../login_chrome.js` failed with `MODULE_NOT_FOUND` because the removed file was still referenced by `scripts/update_erptest_lightnode.sh`. The updater stopped **before** `bench migrate`, `site_setup.configure_website`, `bench build` and cache clearing. Operator manually restarted shared web and read-only smoke stopped on `fingerprinted login CSS not linked`. This is consistent with a **partially applied deployment**, not evidence of a successful web/branding deployment.
+
+**Fixed source:** `version-16` latest vetted CI commit includes an updater that does not refer to the removed JS and includes a single, explicit `/login?redirect-to=/desk` route for authorized staff, labeled **Desk sign in** in English and **دخول لوحة التحكم** in Arabic. This preserves Frappe's native session/auth/2FA and avoids the Frappe login default of following the public `home_page` when `redirect-to` is omitted. The public website remains the homepage for Guest users and future community features.
+
+**Recovery:** The site already exists and the app is already installed. Do not recreate, reinstall, reset or roll back the DB. Confirm a **clean** checkout, `version-16` branch, correct GitHub upstream, and exact reviewed SHA; stage the new updater in a temporary file via `git show`, then run it with `EXPECTED_SHA`. The script takes a fresh backup, fast-forwards if necessary, tests and then runs the missing migration, website settings, assets build and cache clearing. Only after updater succeeds, coordinate an explicit **web-only** Gunicorn restart, then run `scripts/verify_frontend.sh`. A failure in the smoke checker must be diagnosed before declaring the site ready; do not assume an HTTP 200 implies CSS is loaded.
+
+**Desk validation:** In an unauthenticated/private browser, `https://erp-developers.com/login?redirect-to=/desk` should display the branded native login. After authenticating as an authorized Frappe **System User**, Frappe should navigate to Desk. `Website User` identities should not be forced into Desk; their separate community entry point is a future feature. Verify password reset, 2FA, Arabic/English and the other sites sharing the Bench.
+
+
+
 ## Login first-paint / logo correction (2026-11-14)
 
 Previous bug: Frappe's own login page rendered normally; after `DOMContentLoaded`, the ERP Developers JavaScript inserted its own header/story/footer, causing the user to see the standard layout **flash and then be replaced**. The old navbar also did not reliably show the approved logo.

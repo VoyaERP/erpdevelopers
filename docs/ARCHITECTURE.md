@@ -27,6 +27,12 @@ The homepage header contains the native Frappe `#language-switcher` markup. Frap
 
 Frappe v16 `www/login.html` already emits a native navbar (including `#language-switcher`) and the native form. The earlier DOM enhancement inserted a *second* navbar and story after load, causing a visible first-paint flash and unreliable logo. That JavaScript hook and file have now been removed. Frappe's original navbar and login form are laid out **immediately by CSS** from `web_include_css`. CSS pseudo-elements provide the decorative, bilingual story beside the unchanged `<main>` without modifying form structure, sign-in/recovery/signup views or server-side authentication.
 
+## Login destination and user-type boundaries
+
+The site intentionally sets `Website Settings.home_page = erp-developers-home` for the **public** community homepage. Frappe v16's native login handler uses the `redirect-to` query when supplied, otherwise `data.home_page`. The two current site links labeled `Desk sign in` use `branding.DESK_SIGNIN_URL = "/login?redirect-to=/desk"` and bind it through the homepage controller. This is a deliberate **System User** entry point: Frappe continues to enforce native Desk permissions. Do not rewrite `frappe.auth`, global `get_default_path`, `Website Settings.home_page` or a website-member user's default route just to redirect staff. A future community-member area will require its own authorized entry/navigation.
+
+The guarded updater has no dependency on the removed `login_chrome.js` and asserts the obsolete script and DOM test are absent. Its current source checks must succeed **before** `bench migrate`; if any step stops, treat the site as partially updated, inspect before resuming, and never run a site installer or reset DB.
+
 ## Styling and caching
 
 Frappe's `www/erp-developers-home.html` controller is `www/erp_developers_home.py`: Frappe v16 converts hyphens to underscores when resolving the Python file. The controller binds `brand_logo_url` and `homepage_css_url`; Jinja escapes both. The CSS URL contains a 16-hex-character SHA-256 prefix computed **from the actual `brand.css` bytes**, cached for one process. On deploy, new Gunicorn workers must be loaded so their cache uses the new stylesheet hash. The independently served CSS must match the source file byte-for-byte. Homepage CSS is not inserted into global `web_include_css`; only the **content-hashed native-login stylesheet** is added to the website head before any HTML form rendering.

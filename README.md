@@ -31,6 +31,12 @@ The canonical ERP Developers brand asset is the **exact original image uploaded 
 
 `erpdevelopers/public/images/erpdevelopers-selected-favicon.png` is an icon-only crop of the same approved image, supplied for favicon use. All active website, native login branding, and site-specific Website Settings point to these assets. The old unrelated Neural Intelligence SVG concept was removed.
 
+## Desk sign-in and deployment recovery (2026-11-14)
+
+The two staff sign-in links on the public homepage now use a **single** URL from `branding.DESK_SIGNIN_URL`: `/login?redirect-to=/desk`. Frappe v16's native `login.js` prioritizes the sanitized `redirect-to` query when sign-in succeeds; without it, Frappe navigates to the server-provided `home_page`, which on this public site is the branded homepage. The link is visibly labeled **Desk sign in / دخول لوحة التحكم**; it is for authorized **System Users** only. Future website-member login/portal routes must remain separate; this release does not introduce a member portal or change auth permissions.
+
+The previous deployment was interrupted **after Git fast-forward and 27 passing source tests, before migration/website setup/build/cache clear**, because the updater still called `node --check` on the deleted `login_chrome.js`. The updater no longer does that and instead asserts the obsolete JS and DOM test are absent. Re-run the **pinned existing-site** updater on the already-clean `version-16` checkout; it backs up again, runs tests before migration and finishes website config/build/cache. Restart the shared Gunicorn **web-only** service separately, then run `scripts/verify_frontend.sh`, which confirms the first-paint CSS and selected logo plus both Desk sign-in links.
+
 ## Original-design restoration and bilingual login (2026-11-14)
 
 The original human-collaboration/orbit hero composition has been restored with **less whitespace**, the original customer-approved shield icon extracted from the same PNG, and no alternate/generated logo. Home includes six planned modules, focused vision, AI and roadmap, with compact desktop/mobile/RTL spacing.
