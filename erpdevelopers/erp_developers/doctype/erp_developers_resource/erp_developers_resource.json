@@ -1,0 +1,155 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "doctype": "DocType",
+ "module": "ERP Developers",
+ "name": "ERP Developers Resource",
+ "engine": "InnoDB",
+ "field_order": [
+  "summary_section",
+  "title",
+  "title_ar",
+  "topic",
+  "source_kind",
+  "col_2",
+  "summary",
+  "editorial_note",
+  "language",
+  "source_section",
+  "external_url",
+  "source_name",
+  "web_page",
+  "source_col",
+  "published",
+  "sort_order"
+ ],
+ "fields": [
+  {
+   "fieldname": "summary_section",
+   "fieldtype": "Section Break",
+   "label": "Knowledge & advice"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Title",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "title_ar",
+   "fieldtype": "Data",
+   "label": "Arabic Title"
+  },
+  {
+   "fieldname": "topic",
+   "fieldtype": "Select",
+   "label": "Topic",
+   "reqd": 1,
+   "in_list_view": 1,
+   "options": "ERP & Business Applications\nSolution Architecture\nDeveloper Practices\nAI & Data\nCloud & Security\nDigital Transformation"
+  },
+  {
+   "fieldname": "source_kind",
+   "fieldtype": "Select",
+   "label": "Content Type",
+   "reqd": 1,
+   "default": "External Source",
+   "options": "External Source\nOriginal Article",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "col_2",
+   "fieldtype": "Column Break",
+   "label": ""
+  },
+  {
+   "fieldname": "summary",
+   "fieldtype": "Small Text",
+   "label": "Summary",
+   "reqd": 1
+  },
+  {
+   "fieldname": "editorial_note",
+   "fieldtype": "Small Text",
+   "label": "Our Advice",
+   "reqd": 1
+  },
+  {
+   "fieldname": "language",
+   "fieldtype": "Select",
+   "label": "Language",
+   "default": "English",
+   "options": "English\nArabic\nOther"
+  },
+  {
+   "fieldname": "source_section",
+   "fieldtype": "Section Break",
+   "label": "Source and publication"
+  },
+  {
+   "fieldname": "external_url",
+   "fieldtype": "Data",
+   "label": "External HTTPS URL",
+   "depends_on": "eval:doc.source_kind=='External Source'"
+  },
+  {
+   "fieldname": "source_name",
+   "fieldtype": "Data",
+   "label": "Original Source Name",
+   "depends_on": "eval:doc.source_kind=='External Source'"
+  },
+  {
+   "fieldname": "web_page",
+   "fieldtype": "Link",
+   "label": "Original Frappe Web Page",
+   "options": "Web Page",
+   "depends_on": "eval:doc.source_kind=='Original Article'"
+  },
+  {
+   "fieldname": "source_col",
+   "fieldtype": "Column Break",
+   "label": ""
+  },
+  {
+   "fieldname": "published",
+   "fieldtype": "Check",
+   "label": "Published",
+   "default": "0",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "sort_order",
+   "fieldtype": "Int",
+   "label": "Display Order",
+   "default": "100"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "create": 1,
+   "write": 1,
+   "delete": 1,
+   "print": 1
+  },
+  {
+   "role": "Website Manager",
+   "read": 1,
+   "report": 1,
+   "create": 1,
+   "write": 1,
+   "delete": 1,
+   "print": 1
+  }
+ ],
+ "track_changes": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "title",
+ "search_fields": "title",
+ "links": [],
+ "states": []
+}

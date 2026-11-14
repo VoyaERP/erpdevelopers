@@ -1,0 +1,140 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "doctype": "DocType",
+ "module": "ERP Developers",
+ "name": "ERP Developers Playlist",
+ "engine": "InnoDB",
+ "field_order": [
+  "details_section",
+  "title",
+  "title_ar",
+  "topic",
+  "col_1",
+  "level",
+  "language",
+  "description",
+  "source_section",
+  "playlist_url",
+  "playlist_id",
+  "column_source",
+  "published",
+  "sort_order"
+ ],
+ "fields": [
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "Playlist details"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Title",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "title_ar",
+   "fieldtype": "Data",
+   "label": "Arabic Title"
+  },
+  {
+   "fieldname": "topic",
+   "fieldtype": "Select",
+   "label": "Topic",
+   "reqd": 1,
+   "in_list_view": 1,
+   "options": "Frappe & ERPNext\nDynamics 365 & Business Central\nSolution Architecture\nCloud & DevOps\nAI & Data\nCybersecurity\nGeneral Technology"
+  },
+  {
+   "fieldname": "col_1",
+   "fieldtype": "Column Break",
+   "label": ""
+  },
+  {
+   "fieldname": "level",
+   "fieldtype": "Select",
+   "label": "Level",
+   "default": "All Levels",
+   "options": "All Levels\nBeginner\nIntermediate\nAdvanced"
+  },
+  {
+   "fieldname": "language",
+   "fieldtype": "Select",
+   "label": "Language",
+   "reqd": 1,
+   "default": "English",
+   "options": "English\nArabic\nOther"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description",
+   "reqd": 1
+  },
+  {
+   "fieldname": "source_section",
+   "fieldtype": "Section Break",
+   "label": "YouTube source"
+  },
+  {
+   "fieldname": "playlist_url",
+   "fieldtype": "Data",
+   "label": "YouTube Playlist URL",
+   "reqd": 1,
+   "description": "HTTPS playlist URL; not a single video or channel"
+  },
+  {
+   "fieldname": "playlist_id",
+   "fieldtype": "Data",
+   "label": "Validated Playlist ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_source",
+   "fieldtype": "Column Break",
+   "label": ""
+  },
+  {
+   "fieldname": "published",
+   "fieldtype": "Check",
+   "label": "Published",
+   "default": "0",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "sort_order",
+   "fieldtype": "Int",
+   "label": "Display Order",
+   "default": "100"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "create": 1,
+   "write": 1,
+   "delete": 1,
+   "print": 1
+  },
+  {
+   "role": "Website Manager",
+   "read": 1,
+   "report": 1,
+   "create": 1,
+   "write": 1,
+   "delete": 1,
+   "print": 1
+  }
+ ],
+ "track_changes": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "title",
+ "search_fields": "title",
+ "links": [],
+ "states": []
+}
