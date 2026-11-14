@@ -1,13 +1,14 @@
 """Reusable Frappe website context for public ERP Developers pages."""
 from erpdevelopers.branding import (
     APP_NAME, DESK_SIGNIN_URL, FAVICON_URL, LOGO_URL, EXPECTED_SITE,
-    homepage_stylesheet_url,
+    homepage_stylesheet_url, versioned_public_asset,
 )
 
 PUBLIC_BASE = f"https://{EXPECTED_SITE}"
-PORTAL_CSS = "/assets/erpdevelopers/css/portal.css"
-CATALOG_JS = "/assets/erpdevelopers/js/catalog.js"
-ASSISTANT_JS = "/assets/erpdevelopers/js/assistant.js"
+PORTAL_CSS = versioned_public_asset("css/portal.css")
+CATALOG_JS = versioned_public_asset("js/catalog.js")
+ASSISTANT_JS = versioned_public_asset("js/assistant.js")
+CONSULTATION_JS = versioned_public_asset("js/consultation.js")
 
 
 def set_public_context(context, *, slug, title, description):
@@ -29,4 +30,5 @@ def set_public_context(context, *, slug, title, description):
     context.portal_css_url = PORTAL_CSS
     context.catalog_js_url = CATALOG_JS
     context.assistant_js_url = ASSISTANT_JS
+    context.consultation_js_url = CONSULTATION_JS
     context.no_cache = 1

@@ -74,3 +74,17 @@ def desk_navbar_settings_values():
     then falls back to app_logo_url hooks.
     """
     return {"app_logo": LOGO_URL}
+
+
+@lru_cache(maxsize=8)
+def versioned_public_asset(relative_path):
+    """Hash site-specific CSS/JS to avoid stale assets after deployment."""
+    allowed = {
+        "css/portal.css", "js/catalog.js", "js/assistant.js",
+        "js/consultation.js",
+    }
+    if relative_path not in allowed:
+        raise ValueError("Unexpected public asset")
+    asset = Path(__file__).resolve().parent / "public" / relative_path
+    digest = sha256(asset.read_bytes()).hexdigest()[:16]
+    return f"/assets/erpdevelopers/{relative_path}?v={digest}"

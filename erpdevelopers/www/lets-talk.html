@@ -31,7 +31,10 @@
     </div>
     <div class="ed-form-card">
       {% if booking_enabled %}
-      <form id="ed-consultation-form">
+      <form id="ed-consultation-form"
+            data-success="{{ _('Request received. Our team will confirm availability before a meeting is booked.') | e }}"
+            data-failure="{{ _('Unable to send your request. Please review the details and retry.') | e }}"
+            data-offline="{{ _('The connection is unavailable. Please retry later.') | e }}">
         <div class="ed-form-grid">
           <div class="ed-field">
             <label for="ed-contact-name">{{ _("Your name") }} *</label>
@@ -90,7 +93,7 @@
           {{ _("Send appointment request") }}
         </button>
       </form>
-      <script defer src="/assets/erpdevelopers/js/consultation.js"></script>
+      <script defer src="{{ consultation_js_url | e }}"></script>
       {% else %}
       <div class="ed-empty ed-closed-booking" role="status">
         <strong>{{ _("Appointment requests are being prepared.") }}</strong>

@@ -28,7 +28,7 @@
       event.preventDefault();
       if (!form.reportValidity() || submit.disabled) return;
       if (!window.frappe || typeof frappe.call !== "function") {
-        feedback.textContent = "Connection is unavailable. Please retry.";
+        feedback.textContent = form.dataset.offline || "Connection is unavailable. Please retry.";
         return;
       }
       submit.disabled = true;
@@ -41,15 +41,14 @@
         callback: (response) => {
           if (response && response.message && response.message.accepted) {
             form.reset();
-            feedback.textContent = form.dataset.success ||
-              "Request received. A meeting is not confirmed until our team responds.";
+            feedback.textContent = form.dataset.success || "Request received. A meeting is not confirmed until our team responds.";
           } else {
-            feedback.textContent = "Unable to submit your request. Please try again.";
+            feedback.textContent = form.dataset.failure || "Unable to submit your request. Please try again.";
           }
           submit.disabled = false;
         },
         error: () => {
-          feedback.textContent = "Unable to submit your request. Please review the details.";
+          feedback.textContent = form.dataset.failure || "Unable to submit your request. Please review the details.";
           submit.disabled = false;
         },
       });
