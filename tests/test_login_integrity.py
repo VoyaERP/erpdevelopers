@@ -170,9 +170,11 @@ class TestNativeLogin(unittest.TestCase):
         self.assertIn("{% block navbar %}{% endblock %}", home)
         self.assertIn("{% block footer %}{% endblock %}", home)
         self.assertIn("{% block page_container %}", home)
-        self.assertEqual(home.count('href="{{ desk_signin_url | e }}"'), 2)
-        self.assertEqual(home.count('{{ _("Desk sign in") }}'), 2)
-        self.assertNotIn('href="/login"', home)
+        nav = (APP / "templates/includes/erpdevelopers_nav.html").read_text()
+        footer = (APP / "templates/includes/erpdevelopers_footer.html").read_text()
+        self.assertEqual((nav + footer).count('href="{{ desk_signin_url | e }}"'), 2)
+        self.assertEqual((nav + footer).count('{{ _("Team Login") }}'), 2)
+        self.assertNotIn('href="/login"', nav + footer + home)
         self.assertFalse((APP / "www/index.html").exists())
 
     def test_existing_site_installer_never_recreates_site(self):
