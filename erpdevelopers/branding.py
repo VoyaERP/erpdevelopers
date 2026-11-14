@@ -16,8 +16,26 @@ HOME_ROUTE = "erp-developers-home"
 # The original customer-selected PNG is deliberately not regenerated or re-encoded.
 LOGO_URL = "/assets/erpdevelopers/images/erpdevelopers-selected-logo.png"
 FAVICON_URL = "/assets/erpdevelopers/images/erpdevelopers-selected-favicon.png"
+# Frappe Standard Navbar trusts this administrator-controlled HTML setting.
+# Its image and Frappe's native login-logo resolve to the SAME approved PNG.
+NAVBAR_BRAND_HTML = (
+    f'<img src="{LOGO_URL}" alt="{APP_NAME} — {TAGLINE}" '
+    'width="210" height="70">'
+)
+LOGIN_STYLESHEET_URL = "/assets/erpdevelopers/css/login.css"
+LOGIN_STYLESHEET_FILE = Path(__file__).resolve().parent / "public" / "css" / "login.css"
 HOME_STYLESHEET_URL = "/assets/erpdevelopers/css/brand.css"
 HOME_STYLESHEET_FILE = Path(__file__).resolve().parent / "public" / "css" / "brand.css"
+
+
+@lru_cache(maxsize=1)
+def login_stylesheet_url():
+    """Version the render-blocking, CSS-only native login theme by file bytes.
+
+    Gunicorn web reload is required after updating hooks, like all Frappe hooks.
+    """
+    digest = sha256(LOGIN_STYLESHEET_FILE.read_bytes()).hexdigest()[:16]
+    return f"{LOGIN_STYLESHEET_URL}?v={digest}"
 
 
 @lru_cache(maxsize=1)
@@ -37,6 +55,8 @@ def website_settings_values():
         "home_page": HOME_ROUTE,
         "app_name": APP_NAME,
         "app_logo": LOGO_URL,
+        "brand_html": NAVBAR_BRAND_HTML,
+        "banner_image": LOGO_URL,
         "favicon": FAVICON_URL,
         "title_prefix": APP_NAME,
         "show_language_picker": 1,

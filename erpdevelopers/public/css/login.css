@@ -1,151 +1,337 @@
-/* Native Frappe 16 /login with one visible site header, one story and one auth view. */
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website {
+/* ERP Developers native Frappe 16 login: styled in <head> on FIRST PAINT.
+ * No custom DOM insertion, no additional login form, navbar or JavaScript.
+ * /login remains Frappe-owned, including passwords, recovery, SSO and 2FA.
+ */
+:is(body[data-path="login"],body[data-path="/login"]) {
   --ed-login-navy:#071c3c;
   --ed-login-blue:#1269dc;
   --ed-login-teal:#05b9ac;
-  --ed-login-edge:#dce7f1;
-  display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;
-  color:var(--ed-login-navy);background:linear-gradient(140deg,#f4faff,#fff);
+  --ed-login-border:#dbe6f0;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+  min-height:100dvh;
+  background:linear-gradient(115deg,#f3f9ff 0%,#ffffff 74%);
+  color:var(--ed-login-navy);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
 }
-.ed-login-website * {box-sizing:border-box}
-.ed-login-website a:focus-visible,.ed-login-website button:focus-visible,
-.ed-login-website select:focus-visible {outline:3px solid var(--ed-login-teal);outline-offset:2px}
-.ed-login-skip {position:fixed;top:-100px;inset-inline-start:12px;z-index:1000;padding:9px 13px;background:#fff;border:2px solid var(--ed-login-blue);border-radius:8px}
-.ed-login-skip:focus {top:12px}
+:is(body[data-path="login"],body[data-path="/login"]) * {
+  box-sizing:border-box;
+}
+:is(body[data-path="login"],body[data-path="/login"]) a:focus-visible,
+:is(body[data-path="login"],body[data-path="/login"]) button:focus-visible,
+:is(body[data-path="login"],body[data-path="/login"]) select:focus-visible {
+  outline:3px solid var(--ed-login-teal);
+  outline-offset:3px;
+}
 
-/* Frappe v16's login.html renders a native NAV when show_language_picker=1.
-   The former CSS hid header.navbar but NOT <nav class="navbar">, creating 2 headers.
-   Hide the native chrome ONLY AFTER the branded one is initialized. */
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website nav.navbar,
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website header.navbar,
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website .web-header,
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website .web-footer {
+/* One, ORIGINAL Frappe navbar from first paint. The site-specific Brand HTML
+ * supplies the exact approved logo URL; no JS logo swap is necessary.
+ */
+:is(body[data-path="login"],body[data-path="/login"]) > nav.navbar {
+  display:block;
+  flex-shrink:0;
+  min-height:74px;
+  padding:5px 0;
+  background:#ffffff;
+  border-bottom:1px solid #e1ebf4;
+  box-shadow:0 2px 16px #16456b09;
+}
+:is(body[data-path="login"],body[data-path="/login"]) > nav.navbar > .container {
+  width:min(1160px,calc(100% - 42px));
+  max-width:none;
+  min-height:63px;
+  margin-inline:auto;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:nowrap;
+  gap:16px;
+}
+:is(body[data-path="login"],body[data-path="/login"]) > nav.navbar .navbar-brand {
+  display:flex;
+  align-items:center;
+  min-width:0;
+  max-width:225px;
+  padding:0;
+  margin:0;
+  color:var(--ed-login-navy);
+  font-weight:780;
+}
+:is(body[data-path="login"],body[data-path="/login"]) > nav.navbar .navbar-brand img {
+  display:block;
+  width:min(100%,210px);
+  max-height:69px;
+  height:auto;
+  object-fit:contain;
+}
+:is(body[data-path="login"],body[data-path="/login"]) > nav.navbar .navbar-toggler,
+:is(body[data-path="login"],body[data-path="/login"]) > nav.navbar .navbar-collapse {
   display:none!important;
 }
-.ed-login-header {width:100%;background:#fff;border-bottom:1px solid #e5edf5;flex-shrink:0;z-index:3}
-.ed-login-header-inner {width:min(1160px,100%);min-height:73px;padding:4px 23px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.ed-login-brand {display:flex;align-items:center;flex-shrink:0}
-.ed-login-brand-image {display:block;width:206px;height:auto;object-fit:contain}
-.ed-login-nav {display:flex;align-items:center;gap:clamp(12px,1.8vw,24px);justify-content:center}
-.ed-login-nav a {color:#36516f!important;font-size:13px;font-weight:680;text-decoration:none!important;white-space:nowrap}
-.ed-login-nav a:hover {color:#1269dc!important}
-.ed-login-current {flex-shrink:0;padding:8px 12px;border:1px solid #c9e2eb;border-radius:9px;background:#edfafb;color:#0a6e82;font-size:12px;font-weight:750}
-.ed-login-language {flex-shrink:0;margin:0!important}
-.ed-login-language.hide {display:none!important}
-.ed-login-language select {max-width:120px;width:105px;min-height:37px;padding:5px 7px;border:1px solid #d8e5ee;border-radius:9px;background:#fff;color:#284867;font-size:12px}
+/* Frappe populates the SAME picker. Reserve its space while loading language
+ * choices so the header does not shift when Frappe removes class "hide".
+ */
+:is(body[data-path="login"],body[data-path="/login"]) > nav.navbar #language-switcher {
+  display:block!important;
+  flex-shrink:0;
+  min-width:112px;
+  margin:0!important;
+}
+:is(body[data-path="login"],body[data-path="/login"]) > nav.navbar #language-switcher.hide {
+  visibility:hidden;
+}
+:is(body[data-path="login"],body[data-path="/login"]) > nav.navbar #language-switcher select {
+  width:112px;
+  max-width:128px;
+  min-height:39px;
+  padding:7px 10px;
+  background:#fff;
+  border:1px solid #d1e2ef;
+  border-radius:9px;
+  color:#244765;
+  font-size:12px;
+  font-weight:680;
+}
+:is(body[data-path="login"],body[data-path="/login"]) > footer.web-footer {
+  display:none!important;
+}
 
-/* Compact original split-panel look: native Frappe main remains intact. */
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login {width:100%;min-width:0;flex:1 0 auto}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper {
-  display:grid;grid-template-columns:minmax(0,1.04fr) minmax(340px,.96fr);
-  align-items:stretch;width:min(1070px,calc(100% - 36px));max-width:none;
-  min-height:430px;margin:17px auto 21px;padding:0;border:1px solid #dce8f3;
-  border-radius:20px;overflow:hidden;background:#fff;box-shadow:0 17px 43px #12416f17;
+/* Frappe's original login template appears in the FINAL layout immediately. */
+:is(body[data-path="login"],body[data-path="/login"]) #page-login {
+  flex:1 0 auto;
+  width:100%;
+  min-width:0;
 }
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper > main {
-  grid-column:2;grid-row:1;display:flex;align-items:center;justify-content:center;
-  width:100%;max-width:none;min-width:0;margin:0;padding:26px clamp(18px,3vw,40px);
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper {
+  display:grid;
+  position:relative;
+  grid-template-columns:minmax(0,1.04fr) minmax(345px,.96fr);
+  align-items:stretch;
+  width:min(1070px,calc(100% - 38px));
+  max-width:none;
+  min-height:448px;
+  margin:clamp(18px,3.5vh,38px) auto;
+  padding:0;
+  overflow:hidden;
+  border:1px solid var(--ed-login-border);
+  border-radius:21px;
+  background:#fff;
+  box-shadow:0 18px 49px #17466e17;
 }
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-breadcrumbs,
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-header-wrapper,
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-footer {display:none!important}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page_content,
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page_content > div {
-  width:100%;max-width:none;margin:0;padding:0;
-}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .login-content.page-card {
-  background:transparent;border:0;box-shadow:none;padding:0;margin:auto;width:100%;max-width:100%;
-}
-/* The approved full logo already appears in our header: avoid another login logo. */
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head .app-logo {display:none!important}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head {margin:0 0 13px}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-head h4 {color:#071c3c;font-size:clamp(24px,2.8vw,31px);font-weight:810;letter-spacing:-.025em}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-card-subtitle {color:#61768b}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-group {width:100%}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-control {
-  width:100%;min-height:47px;border:1px solid #d8e5f0;
-  border-radius:9px;background:#fff;color:#071c3c;
-  padding:10px 12px;direction:ltr;text-align:start;font-size:14px;
-}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .form-control:focus-visible {
-  outline:2px solid #167ac9;outline-offset:1px;box-shadow:none;
-}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .es-button[data-variant="solid"] {
-  min-height:45px;border-radius:9px;background:#1269dc!important;
-  color:#fff!important;border:1px solid #1269dc!important;font-weight:760;
-}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .es-button[data-variant="solid"]:hover {background:#0e54b4!important}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .es-button[data-variant="solid"]:disabled {opacity:.5;cursor:not-allowed}
-:is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login a {color:#1269dc}
 
-/* Story is a sibling of the native <main>, not a second login form. */
-.ed-login-story {
-  position:relative;isolation:isolate;grid-column:1;grid-row:1;
-  display:flex;align-items:center;min-width:0;padding:clamp(27px,3vw,43px);
-  background:
-    linear-gradient(120deg,#061b39b8,#0a3e7566),
-    url("/assets/erpdevelopers/images/login-network.svg") center/cover no-repeat,
-    linear-gradient(130deg,#071c3c,#125c9f);
+/* Decorative story is CSS-only: it cannot duplicate or replace any Frappe
+ * form or alter focus order. Login text and native translations remain HTML.
+ */
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {
+  content:"A connected space for people and technology.";
+  grid-column:1;
+  grid-row:1;
+  display:flex;
+  align-items:center;
+  padding:clamp(34px,4.8vw,61px) clamp(26px,4.2vw,51px) 92px;
+  min-height:448px;
   color:#fff;
+  font-weight:820;
+  font-size:clamp(29px,3.1vw,42px);
+  line-height:1.19;
+  letter-spacing:-.038em;
+  background:
+    radial-gradient(circle at 92% 24%,#2ae5dd36 0%,transparent 32%),
+    linear-gradient(120deg,#071c3cdd,#0b356bc7),
+    url("/assets/erpdevelopers/images/login-network.svg") center/cover no-repeat,
+    linear-gradient(135deg,#071c3c,#125c9f);
+  text-wrap:balance;
+  pointer-events:none;
 }
-.ed-login-story::before {
-  content:"";position:absolute;inset:12px;z-index:-1;opacity:.18;pointer-events:none;
-  background-image:linear-gradient(#b5e6ff55 1px,transparent 1px),linear-gradient(90deg,#b5e6ff55 1px,transparent 1px);
-  background-size:31px 31px;mask-image:radial-gradient(circle at 60% 50%,#000,transparent 85%);
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::after {
+  content:"Engage.   Reason.   Progress.";
+  position:absolute;
+  bottom:41px;
+  inset-inline-start:clamp(26px,4.2vw,51px);
+  z-index:1;
+  font-size:13px;
+  letter-spacing:.055em;
+  font-weight:750;
+  color:#8bf0e6;
+  pointer-events:none;
 }
-.ed-login-story-content {max-width:460px}
-.ed-login-story-eyebrow {font-size:11px;letter-spacing:.13em;color:#88e8e5;font-weight:820;margin:0 0 16px}
-.ed-login-story-title {font-size:clamp(28px,3.1vw,40px);line-height:1.2;letter-spacing:-.035em;font-weight:820;color:#fff;margin:0 0 13px}
-.ed-login-story-description {font-size:14px;line-height:1.82;color:#d1e4f4;margin:0 0 24px}
-.ed-login-values {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.ed-login-value {padding:11px 9px;border:1px solid #ffffff2d;background:#ffffff12;border-radius:10px;min-width:0}
-.ed-login-value strong {display:block;color:#fff;font-size:12px}
-.ed-login-value small {display:block;color:#d4e7f4;font-size:10px;margin-top:5px}
-.ed-login-footer {background:#071c3c;color:#bfd4e8;flex-shrink:0}
-.ed-login-footer-inner {max-width:1160px;min-height:65px;padding:6px 23px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:15px}
-.ed-login-footer-logo {display:block;width:154px;height:auto;object-fit:contain}
-.ed-login-footer-summary,.ed-login-footer-rights {margin:0;color:#c8dbea;font-size:11px}
-html[lang^="ar"] .ed-login-website {font-family:"Noto Sans Arabic",Tahoma,Arial,sans-serif}
-html[lang^="ar"] .ed-login-website #page-login .login-content {direction:rtl;text-align:right}
-html[lang^="ar"] .ed-login-website #page-login .form-control {direction:ltr;text-align:left}
-html[lang^="ar"] .ed-login-story-eyebrow {letter-spacing:0}
-@media(max-width:980px) {
-  .ed-login-header-inner {gap:12px}
-  .ed-login-nav {gap:13px}
-  .ed-login-brand-image {width:178px}
-  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper {
+html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {
+  content:"مساحة تجمع الأشخاص والخبرات والتقنيات.";
+  direction:rtl;
+  text-align:start;
+  font-family:"Noto Sans Arabic",Tahoma,Arial,sans-serif;
+  letter-spacing:0;
+}
+html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::after {
+  direction:ltr;
+  letter-spacing:0;
+}
+
+/* The native <main>, login panel and every Frappe auth state are unchanged.
+ * Only presentation is refined; do not style .for-login/.for-signup visibility.
+ */
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper > main {
+  grid-column:2;
+  grid-row:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  max-width:none;
+  min-width:0;
+  margin:0;
+  padding:29px clamp(21px,3vw,40px);
+}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login :is(
+  .page-breadcrumbs,.page-header-wrapper,.page-footer
+) {
+  display:none!important;
+}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .page_content,
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .page_content > div {
+  width:100%;
+  min-width:0;
+  max-width:none;
+  padding:0;
+  margin:0;
+}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .login-content.page-card {
+  width:100%;
+  max-width:100%;
+  padding:0;
+  margin:0 auto;
+  border:0;
+  box-shadow:none;
+  background:transparent;
+}
+/* Only ONE brand logo, in the server-rendered navbar. */
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .page-card-head .app-logo {
+  display:none!important;
+}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .page-card-head {
+  margin:0 0 18px;
+}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .page-card-head h4 {
+  color:var(--ed-login-navy);
+  font-size:clamp(25px,2.6vw,31px);
+  line-height:1.2;
+  font-weight:820;
+  letter-spacing:-.025em;
+}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .page-card-subtitle {
+  color:#647b90;
+  line-height:1.55;
+}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .form-group {
+  width:100%;
+  max-width:100%;
+}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .form-control {
+  width:100%;
+  min-height:47px;
+  background:#fff;
+  border:1px solid #d4e2ee;
+  border-radius:9px;
+  color:var(--ed-login-navy);
+  padding:11px 13px;
+  font-size:14px;
+}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login :is(
+  #login_email,#login_password,#forgot_email,#login_with_email_link_email
+) {
+  direction:ltr;
+  text-align:start;
+}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .es-button[data-variant="solid"] {
+  min-height:46px;
+  border:1px solid var(--ed-login-blue)!important;
+  border-radius:9px;
+  background:var(--ed-login-blue)!important;
+  color:#fff!important;
+  font-weight:760;
+}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .es-button[data-variant="solid"]:hover {
+  background:#0b57b7!important;
+}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login a {
+  color:var(--ed-login-blue);
+}
+html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) {
+  font-family:"Noto Sans Arabic",Tahoma,Arial,sans-serif;
+}
+html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) #page-login .login-content {
+  direction:rtl;
+  text-align:start;
+}
+
+/* Keep mobile login usable; still no DOM-based rearrangement or page flash. */
+@media(max-width:900px) {
+  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper {
     grid-template-columns:minmax(0,1fr) minmax(315px,1fr);
   }
-  .ed-login-story {padding:29px}
-}
-@media(max-width:760px) {
-  .ed-login-header-inner {display:flex;flex-wrap:wrap;padding:7px 16px 10px;gap:8px}
-  .ed-login-brand-image {width:164px}
-  .ed-login-nav {order:3;width:100%;justify-content:flex-start;overflow-x:auto;white-space:nowrap;gap:18px}
-  .ed-login-current {margin-inline-start:auto}
-  .ed-login-language select {width:93px}
-  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper {
-    grid-template-columns:1fr;width:min(545px,calc(100% - 26px));min-height:0;
-    margin:14px auto 20px;border-radius:17px;
+  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {
+    font-size:clamp(26px,3.6vw,33px);
+    padding:31px 25px 90px;
   }
-  .ed-login-story {grid-column:1;grid-row:1;min-height:184px;padding:22px}
-  .ed-login-story-title {font-size:27px;margin-bottom:9px}
-  .ed-login-story-description {font-size:13px;margin-bottom:9px}
-  .ed-login-values {display:none}
-  :is(body[data-path="login"],body[data-path="/login"]).ed-login-website #page-login .page-content-wrapper > main {
-    grid-column:1;grid-row:2;padding:24px 20px 29px;
+  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::after {
+    inset-inline-start:25px;
   }
-  .ed-login-footer-inner {flex-wrap:wrap;gap:8px;padding-block:10px}
 }
-@media(max-width:425px) {
-  .ed-login-brand-image {width:147px}
-  .ed-login-nav {gap:10px}
-  .ed-login-nav a {font-size:12px}
-  .ed-login-current {font-size:11px;padding:7px 8px}
-  .ed-login-story {padding:19px;min-height:165px}
-  .ed-login-story-title {font-size:24px}
-  .ed-login-footer-logo {width:138px}
+@media(max-width:720px) {
+  :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar > .container {
+    width:calc(100% - 26px);
+  }
+  :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar .navbar-brand img {
+    max-width:168px;
+    max-height:55px;
+  }
+  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper {
+    grid-template-columns:minmax(0,1fr);
+    width:min(540px,calc(100% - 24px));
+    min-height:0;
+    margin:15px auto 23px;
+    border-radius:17px;
+  }
+  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {
+    grid-column:1;
+    grid-row:1;
+    min-height:169px;
+    padding:19px 23px 56px;
+    font-size:clamp(24px,5.4vw,28px);
+  }
+  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::after {
+    bottom:auto;
+    top:130px;
+    inset-inline-start:23px;
+    font-size:11px;
+  }
+  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper > main {
+    grid-column:1;
+    grid-row:2;
+    padding:25px 20px 28px;
+  }
+}
+@media(max-width:390px) {
+  :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar .navbar-brand img {
+    max-width:145px;
+  }
+  :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar #language-switcher {
+    min-width:95px;
+  }
+  :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar #language-switcher select {
+    width:95px;
+    font-size:11px;
+  }
+  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {
+    min-height:160px;
+    padding-inline:17px;
+  }
 }
 @media(prefers-reduced-motion:reduce) {
-  .ed-login-website * {transition:none!important;scroll-behavior:auto}
+  :is(body[data-path="login"],body[data-path="/login"]) * {
+    scroll-behavior:auto;
+    transition:none!important;
+  }
 }
