@@ -1,6 +1,6 @@
 /* ERP Developers native Frappe 16 login: styled in <head> on FIRST PAINT.
- * No custom DOM insertion, no additional login form, navbar or JavaScript.
- * /login remains Frappe-owned, including passwords, recovery, SSO and 2FA.
+ * Frappe owns the forms, routing, SSO, recovery, email links and 2FA.
+ * No authentication template duplication, text replacement or injected JS.
  */
 :is(body[data-path="login"],body[data-path="/login"]) {
   --ed-login-navy:#071c3c;
@@ -15,323 +15,163 @@
   color:var(--ed-login-navy);
   font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
 }
-:is(body[data-path="login"],body[data-path="/login"]) * {
-  box-sizing:border-box;
-}
-:is(body[data-path="login"],body[data-path="/login"]) a:focus-visible,
-:is(body[data-path="login"],body[data-path="/login"]) button:focus-visible,
-:is(body[data-path="login"],body[data-path="/login"]) select:focus-visible {
-  outline:3px solid var(--ed-login-teal);
-  outline-offset:3px;
+:is(body[data-path="login"],body[data-path="/login"]) * {box-sizing:border-box}
+:is(body[data-path="login"],body[data-path="/login"]) :is(a,button,select):focus-visible {
+  outline:3px solid var(--ed-login-teal);outline-offset:3px;
 }
 
-/* One, ORIGINAL Frappe navbar from first paint. The site-specific Brand HTML
- * supplies the exact approved logo URL; no JS logo swap is necessary.
- */
+/* Keep one original navbar and the approved, unchanged logo. */
 :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar {
-  display:block;
-  flex-shrink:0;
-  min-height:74px;
-  padding:5px 0;
-  background:#ffffff;
-  border-bottom:1px solid #e1ebf4;
-  box-shadow:0 2px 16px #16456b09;
+  display:block;flex-shrink:0;min-height:74px;padding:5px 0;background:#fff;
+  border-bottom:1px solid #e1ebf4;box-shadow:0 2px 16px #16456b09;
 }
 :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar > .container {
-  width:min(1160px,calc(100% - 42px));
-  max-width:none;
-  min-height:63px;
-  margin-inline:auto;
-  padding:0;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  flex-wrap:nowrap;
-  gap:16px;
+  width:min(1160px,calc(100% - 42px));max-width:none;min-height:63px;
+  margin-inline:auto;padding:0;display:flex;align-items:center;
+  justify-content:space-between;flex-wrap:nowrap;gap:16px;
 }
 :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar .navbar-brand {
-  display:flex;
-  align-items:center;
-  min-width:0;
-  max-width:225px;
-  padding:0;
-  margin:0;
-  color:var(--ed-login-navy);
-  font-weight:780;
+  display:flex;align-items:center;min-width:0;max-width:225px;padding:0;margin:0;
+  color:var(--ed-login-navy);font-weight:780;
 }
 :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar .navbar-brand img {
-  display:block;
-  width:min(100%,210px);
-  max-height:69px;
-  height:auto;
-  object-fit:contain;
+  display:block;width:min(100%,210px);max-height:69px;height:auto;object-fit:contain;
 }
-:is(body[data-path="login"],body[data-path="/login"]) > nav.navbar .navbar-toggler,
-:is(body[data-path="login"],body[data-path="/login"]) > nav.navbar .navbar-collapse {
+:is(body[data-path="login"],body[data-path="/login"]) > nav.navbar :is(.navbar-toggler,.navbar-collapse) {
   display:none!important;
 }
-/* Frappe populates the SAME picker. Reserve its space while loading language
- * choices so the header does not shift when Frappe removes class "hide".
- */
 :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar #language-switcher {
-  display:block!important;
-  flex-shrink:0;
-  min-width:112px;
-  margin:0!important;
+  display:block!important;flex-shrink:0;min-width:112px;margin:0!important;
 }
-:is(body[data-path="login"],body[data-path="/login"]) > nav.navbar #language-switcher.hide {
-  visibility:hidden;
-}
+:is(body[data-path="login"],body[data-path="/login"]) > nav.navbar #language-switcher.hide {visibility:hidden}
 :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar #language-switcher select {
-  width:112px;
-  max-width:128px;
-  min-height:39px;
-  padding:7px 10px;
-  background:#fff;
-  border:1px solid #d1e2ef;
-  border-radius:9px;
-  color:#244765;
-  font-size:12px;
-  font-weight:680;
+  width:112px;max-width:128px;min-height:39px;padding:7px 10px;background:#fff;
+  border:1px solid #d1e2ef;border-radius:9px;color:#244765;font-size:12px;font-weight:680;
 }
-:is(body[data-path="login"],body[data-path="/login"]) > footer.web-footer {
-  display:none!important;
-}
+:is(body[data-path="login"],body[data-path="/login"]) > footer.web-footer {display:none!important}
 
-/* Frappe's original login template appears in the FINAL layout immediately. */
+/* The grid follows the document direction; story and tagline share ONE cell.
+ * Avoid absolute logical insets on a differently directed pseudo-element:
+ * direction:ltr used to place the English tagline over the Arabic form.
+ */
 :is(body[data-path="login"],body[data-path="/login"]) #page-login {
-  flex:1 0 auto;
-  width:100%;
-  min-width:0;
+  flex:1 0 auto;width:100%;min-width:0;
 }
 :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper {
-  display:grid;
-  position:relative;
+  display:grid;position:relative;
   grid-template-columns:minmax(0,1.04fr) minmax(345px,.96fr);
-  align-items:stretch;
-  width:min(1070px,calc(100% - 38px));
-  max-width:none;
-  min-height:448px;
-  margin:clamp(18px,3.5vh,38px) auto;
-  padding:0;
-  overflow:hidden;
-  border:1px solid var(--ed-login-border);
-  border-radius:21px;
-  background:#fff;
+  align-items:stretch;width:min(1070px,calc(100% - 38px));max-width:none;
+  min-height:448px;margin:clamp(18px,3.5vh,38px) auto;padding:0;overflow:hidden;
+  border:1px solid var(--ed-login-border);border-radius:21px;background:#fff;
   box-shadow:0 18px 49px #17466e17;
 }
-
-/* Decorative story is CSS-only: it cannot duplicate or replace any Frappe
- * form or alter focus order. Login text and native translations remain HTML.
- */
 :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {
   content:"A connected space for people and technology.";
-  grid-column:1;
-  grid-row:1;
-  display:flex;
-  align-items:center;
-  padding:clamp(34px,4.8vw,61px) clamp(26px,4.2vw,51px) 92px;
-  min-height:448px;
-  color:#fff;
-  font-weight:820;
-  font-size:clamp(29px,3.1vw,42px);
-  line-height:1.19;
-  letter-spacing:-.038em;
-  background:
-    radial-gradient(circle at 92% 24%,#2ae5dd36 0%,transparent 32%),
+  grid-column:1;grid-row:1;display:flex;align-items:center;
+  padding:clamp(34px,4.8vw,61px) clamp(26px,4.2vw,51px) 100px;
+  min-height:448px;color:#fff;font-weight:820;font-size:clamp(29px,3.1vw,42px);
+  line-height:1.25;letter-spacing:-.038em;
+  background:radial-gradient(circle at 92% 24%,#2ae5dd36 0%,transparent 32%),
     linear-gradient(120deg,#071c3cdd,#0b356bc7),
     url("/assets/erpdevelopers/images/login-network.svg") center/cover no-repeat,
     linear-gradient(135deg,#071c3c,#125c9f);
-  text-wrap:balance;
-  pointer-events:none;
+  text-wrap:balance;pointer-events:none;
 }
 :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::after {
   content:"Engage.   Reason.   Progress.";
-  position:absolute;
-  bottom:41px;
-  inset-inline-start:clamp(26px,4.2vw,51px);
-  z-index:1;
-  font-size:13px;
-  letter-spacing:.055em;
-  font-weight:750;
-  color:#8bf0e6;
-  pointer-events:none;
+  position:relative;grid-column:1;grid-row:1;align-self:end;justify-self:stretch;
+  margin:0 clamp(26px,4.2vw,51px) 32px;z-index:1;min-width:0;
+  font-size:13px;line-height:1.7;letter-spacing:.055em;font-weight:750;
+  text-align:start;color:#8bf0e6;pointer-events:none;overflow-wrap:break-word;
 }
 html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {
   content:"مساحة تجمع الأشخاص والخبرات والتقنيات.";
-  direction:rtl;
-  text-align:start;
-  font-family:"Noto Sans Arabic",Tahoma,Arial,sans-serif;
-  letter-spacing:0;
+  direction:rtl;text-align:start;font-family:"Tajawal",Arial,sans-serif;letter-spacing:0;
 }
 html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::after {
-  direction:ltr;
-  letter-spacing:0;
+  content:"نتواصل. نفكّر. نتقدّم.";
+  direction:rtl;font-family:"Tajawal",Arial,sans-serif;letter-spacing:0;
 }
 
-/* The native <main>, login panel and every Frappe auth state are unchanged.
- * Only presentation is refined; do not style .for-login/.for-signup visibility.
- */
+/* Presentation only: never override visibility of Frappe authentication states. */
 :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper > main {
-  grid-column:2;
-  grid-row:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:100%;
-  max-width:none;
-  min-width:0;
-  margin:0;
-  padding:29px clamp(21px,3vw,40px);
+  grid-column:2;grid-row:1;display:flex;align-items:center;justify-content:center;
+  width:100%;max-width:none;min-width:0;margin:0;padding:29px clamp(21px,3vw,40px);
 }
-:is(body[data-path="login"],body[data-path="/login"]) #page-login :is(
-  .page-breadcrumbs,.page-header-wrapper,.page-footer
-) {
-  display:none!important;
-}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login :is(.page-breadcrumbs,.page-header-wrapper,.page-footer) {display:none!important}
 :is(body[data-path="login"],body[data-path="/login"]) #page-login .page_content,
 :is(body[data-path="login"],body[data-path="/login"]) #page-login .page_content > div {
-  width:100%;
-  min-width:0;
-  max-width:none;
-  padding:0;
-  margin:0;
+  width:100%;min-width:0;max-width:none;padding:0;margin:0;
 }
 :is(body[data-path="login"],body[data-path="/login"]) #page-login .login-content.page-card {
-  width:100%;
-  max-width:100%;
-  padding:0;
-  margin:0 auto;
-  border:0;
-  box-shadow:none;
-  background:transparent;
+  width:100%;max-width:100%;padding:0;margin:0 auto;border:0;box-shadow:none;background:transparent;
 }
-/* Only ONE brand logo, in the server-rendered navbar. */
-:is(body[data-path="login"],body[data-path="/login"]) #page-login .page-card-head .app-logo {
-  display:none!important;
-}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .page-card-head .app-logo {display:none!important}
 :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-card-head {
-  margin:0 0 18px;
+  margin:0 0 18px;text-align:start;
 }
 :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-card-head h4 {
-  color:var(--ed-login-navy);
-  font-size:clamp(25px,2.6vw,31px);
-  line-height:1.2;
-  font-weight:820;
-  letter-spacing:-.025em;
+  color:var(--ed-login-navy);font-size:clamp(25px,2.6vw,31px);
+  line-height:1.35;font-weight:820;letter-spacing:-.025em;
 }
 :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-card-subtitle {
-  color:#647b90;
-  line-height:1.55;
+  color:#647b90;line-height:1.7;overflow-wrap:break-word;
 }
-:is(body[data-path="login"],body[data-path="/login"]) #page-login .form-group {
-  width:100%;
-  max-width:100%;
-}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .form-group {width:100%;max-width:100%}
 :is(body[data-path="login"],body[data-path="/login"]) #page-login .form-control {
-  width:100%;
-  min-height:47px;
-  background:#fff;
-  border:1px solid #d4e2ee;
-  border-radius:9px;
-  color:var(--ed-login-navy);
-  padding:11px 13px;
-  font-size:14px;
+  width:100%;min-height:47px;background:#fff;border:1px solid #d4e2ee;
+  border-radius:9px;color:var(--ed-login-navy);padding:11px 13px;font-size:14px;
 }
-:is(body[data-path="login"],body[data-path="/login"]) #page-login :is(
-  #login_email,#login_password,#forgot_email,#login_with_email_link_email
-) {
-  direction:ltr;
-  text-align:start;
+:is(body[data-path="login"],body[data-path="/login"]) #page-login :is(#login_email,#login_password,#forgot_email,#login_with_email_link_email,#signup_email,#login_token) {
+  direction:ltr;text-align:start;
+}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .password-field {
+  position:relative;direction:ltr;width:100%;
+}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .password-field input {
+  padding-inline-start:13px;padding-inline-end:44px;
+}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .password-field .toggle-password {
+  position:absolute;left:auto;right:12px;inset-inline-start:auto;inset-inline-end:12px;
+  top:50%;transform:translateY(-50%);cursor:pointer;
+}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .page-card-actions .es-button {
+  min-height:46px;height:auto;padding:10px 14px;white-space:normal;
+  text-align:center;line-height:1.6;overflow-wrap:break-word;
 }
 :is(body[data-path="login"],body[data-path="/login"]) #page-login .es-button[data-variant="solid"] {
-  min-height:46px;
-  border:1px solid var(--ed-login-blue)!important;
-  border-radius:9px;
-  background:var(--ed-login-blue)!important;
-  color:#fff!important;
-  font-weight:760;
+  min-height:46px;border:1px solid var(--ed-login-blue)!important;border-radius:9px;
+  background:var(--ed-login-blue)!important;color:#fff!important;font-weight:760;
 }
-:is(body[data-path="login"],body[data-path="/login"]) #page-login .es-button[data-variant="solid"]:hover {
-  background:#0b57b7!important;
-}
-:is(body[data-path="login"],body[data-path="/login"]) #page-login a {
-  color:var(--ed-login-blue);
-}
-html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) {
-  font-family:"Noto Sans Arabic",Tahoma,Arial,sans-serif;
-}
-html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) #page-login .login-content {
-  direction:rtl;
-  text-align:start;
-}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .es-button[data-variant="solid"]:hover {background:#0b57b7!important}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login a {color:var(--ed-login-blue)}
+html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) {font-family:"Tajawal",Arial,sans-serif}
+html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) #page-login .login-content {direction:rtl;text-align:start}
+:is(body[data-path="login"],body[data-path="/login"]) #page-login .form-group > .text-right {text-align:end}
 
-/* Keep mobile login usable; still no DOM-based rearrangement or page flash. */
 @media(max-width:900px) {
-  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper {
-    grid-template-columns:minmax(0,1fr) minmax(315px,1fr);
-  }
-  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {
-    font-size:clamp(26px,3.6vw,33px);
-    padding:31px 25px 90px;
-  }
-  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::after {
-    inset-inline-start:25px;
-  }
+  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper {grid-template-columns:minmax(0,1fr) minmax(315px,1fr)}
+  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {font-size:clamp(26px,3.6vw,33px);padding:31px 25px 100px}
+  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::after {margin-inline:25px}
 }
 @media(max-width:720px) {
-  :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar > .container {
-    width:calc(100% - 26px);
-  }
-  :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar .navbar-brand img {
-    max-width:168px;
-    max-height:55px;
-  }
+  :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar > .container {width:calc(100% - 26px)}
+  :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar .navbar-brand img {max-width:168px;max-height:55px}
   :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper {
-    grid-template-columns:minmax(0,1fr);
-    width:min(540px,calc(100% - 24px));
-    min-height:0;
-    margin:15px auto 23px;
-    border-radius:17px;
+    grid-template-columns:minmax(0,1fr);width:min(540px,calc(100% - 24px));min-height:0;margin:15px auto 23px;border-radius:17px;
   }
   :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {
-    grid-column:1;
-    grid-row:1;
-    min-height:169px;
-    padding:19px 23px 56px;
-    font-size:clamp(24px,5.4vw,28px);
+    min-height:169px;padding:22px 23px 65px;font-size:clamp(24px,5.4vw,28px);
   }
-  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::after {
-    bottom:auto;
-    top:130px;
-    inset-inline-start:23px;
-    font-size:11px;
-  }
-  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper > main {
-    grid-column:1;
-    grid-row:2;
-    padding:25px 20px 28px;
-  }
+  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::after {margin:0 23px 20px;font-size:12px}
+  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper > main {grid-column:1;grid-row:2;padding:25px 20px 28px}
 }
 @media(max-width:390px) {
-  :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar .navbar-brand img {
-    max-width:145px;
-  }
-  :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar #language-switcher {
-    min-width:95px;
-  }
-  :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar #language-switcher select {
-    width:95px;
-    font-size:11px;
-  }
-  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {
-    min-height:160px;
-    padding-inline:17px;
-  }
+  :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar .navbar-brand img {max-width:145px}
+  :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar #language-switcher {min-width:95px}
+  :is(body[data-path="login"],body[data-path="/login"]) > nav.navbar #language-switcher select {width:95px;font-size:11px}
+  :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {min-height:160px;padding-inline:17px}
 }
 @media(prefers-reduced-motion:reduce) {
-  :is(body[data-path="login"],body[data-path="/login"]) * {
-    scroll-behavior:auto;
-    transition:none!important;
-  }
+  :is(body[data-path="login"],body[data-path="/login"]) * {scroll-behavior:auto;transition:none!important}
 }

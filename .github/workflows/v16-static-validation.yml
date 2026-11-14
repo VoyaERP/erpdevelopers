@@ -24,6 +24,7 @@ jobs:
           bash -n scripts/install_erptest_lightnode.sh
           bash -n scripts/install_existing_site_erptest_lightnode.sh
           bash -n scripts/update_erptest_lightnode.sh
+          bash -n scripts/deploy_erptest_lightnode.sh
           bash -n scripts/verify_frontend.sh
           bash -n scripts/install_local_v16.sh
       - name: Contract tests
@@ -57,6 +58,8 @@ jobs:
         run: python scripts/test_discovery_browser.py
       - name: Test Event cover and gallery in Chromium and Firefox
         run: python scripts/test_event_media_browser.py
+      - name: Test native Arabic login copy and RTL layout
+        run: python scripts/test_login_browser.py
       - name: Retain vision screenshots
         if: always()
         uses: actions/upload-artifact@v4
@@ -71,5 +74,13 @@ jobs:
         with:
           name: event-media-browser-previews
           path: test-artifacts/event-media/*.png
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Retain native login screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: login-browser-previews
+          path: test-artifacts/login/*.png
           if-no-files-found: ignore
           retention-days: 7

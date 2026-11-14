@@ -398,3 +398,158 @@ msgstr "يحتوي معرض الفعالية على الصورة نفسها أك
 
 msgid "Choose an existing public image up to 5 MB; private or missing files cannot be displayed."
 msgstr "اختر صورة عامة موجودة بحجم لا يتجاوز 5 ميجابايت؛ لا يمكن عرض الملفات الخاصة أو غير الموجودة."
+
+# Exact native Frappe v16 login strings, including recovery, email links and OTP.
+# Only presentation is translated. Authentication responses/permission rules are unchanged.
+msgid "Sign In"
+msgstr "تسجيل الدخول"
+
+msgid "Welcome! Please sign in to continue."
+msgstr "مرحباً بك! يُرجى تسجيل الدخول للمتابعة."
+
+msgid "Email"
+msgstr "البريد الإلكتروني"
+
+msgid "Password"
+msgstr "كلمة المرور"
+
+msgid "Continue"
+msgstr "متابعة"
+
+msgid "Forgot password?"
+msgstr "هل نسيت كلمة المرور؟"
+
+msgid "Forgot Password?"
+msgstr "هل نسيت كلمة المرور؟"
+
+msgid "Login with Email Link"
+msgstr "تسجيل الدخول عبر رابط بالبريد الإلكتروني"
+
+msgid "Login with LDAP"
+msgstr "تسجيل الدخول باستخدام LDAP"
+
+msgid "Login with {0}"
+msgstr "تسجيل الدخول باستخدام {0}"
+
+msgid "Don't have an account?"
+msgstr "ليس لديك حساب؟"
+
+msgid "Sign up"
+msgstr "إنشاء حساب"
+
+msgid "Sign Up"
+msgstr "إنشاء حساب"
+
+msgid "Let's setup your account."
+msgstr "لنُنشئ حسابك."
+
+msgid "Signup Disabled"
+msgstr "إنشاء الحسابات غير متاح"
+
+msgid "Signups have been disabled for this website."
+msgstr "إنشاء حسابات جديدة غير متاح على هذا الموقع."
+
+msgid "Home"
+msgstr "الرئيسية"
+
+msgid "Please enter your email, we'll send you password reset link"
+msgstr "أدخل بريدك الإلكتروني لإرسال رابط إعادة تعيين كلمة المرور."
+
+msgid "Send Link"
+msgstr "إرسال الرابط"
+
+msgid "Back to sign in"
+msgstr "العودة إلى تسجيل الدخول"
+
+msgid "Please check your email."
+msgstr "يُرجى التحقق من بريدك الإلكتروني."
+
+msgid "Didn't receive the link?"
+msgstr "لم يصلك الرابط؟"
+
+msgid "Resend"
+msgstr "إعادة الإرسال"
+
+msgid "Send login link"
+msgstr "إرسال رابط تسجيل الدخول"
+
+msgid "Login with password"
+msgstr "تسجيل الدخول بكلمة المرور"
+
+msgid "Javascript is disabled on your browser"
+msgstr "JavaScript معطّل في متصفحك"
+
+msgid "You need to enable JavaScript for your app to work."
+msgstr "يجب تفعيل JavaScript ليعمل التطبيق."
+
+msgid "To enable it follow the instructions in the following link: {0}"
+msgstr "لتفعيله، اتبع التعليمات الواردة في الرابط التالي: {0}"
+
+msgid "Email is required."
+msgstr "يُرجى إدخال البريد الإلكتروني."
+
+msgid "Password is required."
+msgstr "يُرجى إدخال كلمة المرور."
+
+msgid "Please enter a valid email."
+msgstr "يُرجى إدخال بريد إلكتروني صحيح."
+
+msgid "Invalid Email."
+msgstr "البريد الإلكتروني غير صحيح."
+
+msgid "Full name is required."
+msgstr "يُرجى إدخال الاسم الكامل."
+
+msgid "Full Name"
+msgstr "الاسم الكامل"
+
+msgid "Create Account"
+msgstr "إنشاء حساب"
+
+msgid "Sent"
+msgstr "تم الإرسال"
+
+msgid "Both login and password required"
+msgstr "يجب إدخال بيانات الدخول وكلمة المرور."
+
+msgid "Success"
+msgstr "تم بنجاح"
+
+msgid "Reset link emailed"
+msgstr "تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني"
+
+msgid "Invalid credentials, try again."
+msgstr "بيانات الدخول غير صحيحة. يُرجى المحاولة مجدداً."
+
+msgid "Oops! Something went wrong."
+msgstr "عذراً، حدث خطأ."
+
+msgid "Too many requests. Please try again later."
+msgstr "تجاوزت عدد المحاولات المسموح به. يُرجى المحاولة لاحقاً."
+
+msgid "Something went wrong."
+msgstr "حدث خطأ."
+
+msgid "Login token required"
+msgstr "يُرجى إدخال رمز التحقق لتسجيل الدخول"
+
+msgid "Verification"
+msgstr "التحقق"
+
+msgid "Verification Code"
+msgstr "رمز التحقق"
+
+msgid "Verify"
+msgstr "تحقّق"
+
+msgid "Enter Code displayed in OTP App."
+msgstr "أدخل الرمز الظاهر في تطبيق المصادقة."
+
+msgid "OTP setup using OTP App was not completed. Please contact Administrator."
+msgstr "لم يكتمل إعداد تطبيق المصادقة. يُرجى التواصل مع مسؤول النظام."
+
+msgid "SMS was not sent. Please contact Administrator."
+msgstr "لم تُرسل الرسالة النصية. يُرجى التواصل مع مسؤول النظام."
+
+msgid "Verification code email not sent. Please contact Administrator."
+msgstr "لم تُرسل رسالة رمز التحقق. يُرجى التواصل مع مسؤول النظام."
