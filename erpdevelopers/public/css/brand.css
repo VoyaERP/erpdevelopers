@@ -2,7 +2,7 @@
 .ed-site {
   --ed-navy:#071c3c;--ed-blue:#1269dc;--ed-teal:#05b9ac;--ed-muted:#5c6e85;--ed-border:#e2eaf3;
   background:#fff;color:var(--ed-navy);font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
-  line-height:1.6;font-size:15px;overflow:hidden;width:100%;
+  line-height:1.6;font-size:15px;overflow-x:clip;overflow-y:visible;width:100%;
 }
 .ed-site *{box-sizing:border-box}
 .ed-site :is(h1,h2,h3,p,small,strong){min-width:0;overflow-wrap:break-word}
@@ -215,7 +215,7 @@
   .ed-link-card:hover,.ed-btn:hover{transform:none}
 }
 /* Arabic glyphs need additional vertical clearance, including long headings. */
-html[lang^="ar"] .ed-site{font-family:"Noto Sans Arabic",Tahoma,Arial,sans-serif;line-height:1.85}
+html[lang^="ar"] .ed-site{font-family:"Noto Sans Arabic",Tahoma,Arial,sans-serif;direction:rtl;line-height:1.85}
 html[lang^="ar"] .ed-site :is(h1,h2,h3){line-height:1.5;letter-spacing:0;font-weight:790}
 html[lang^="ar"] .ed-site :is(.ed-eyebrow,.ed-kicker,.ed-card-topline,.ed-booking-overline,.ed-meeting-eyebrow){letter-spacing:0;text-transform:none}
 html[lang^="ar"] .ed-site :is(.ed-hero h1,.ed-meeting-story h1){font-size:clamp(36px,4.5vw,60px);line-height:1.48}
