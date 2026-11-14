@@ -4,6 +4,7 @@
 <link rel="canonical" href="{{ canonical_home_url | e }}">
 <link rel="stylesheet" href="{{ homepage_css_url | e }}">
 <link rel="stylesheet" href="{{ portal_css_url | e }}">
+<link rel="stylesheet" href="{{ discovery_css_url | e }}">
 <script type="application/ld+json">{{ structured_data_json | safe }}</script>
 {% endblock %}
 {% block navbar %}{% endblock %}
@@ -77,15 +78,37 @@
       </div>
     </section>
 
-    <section id="vision" class="ed-section ed-vision" aria-labelledby="ed-vision-heading">
+    <section id="vision" class="ed-section ed-vision ed-vision-immersive" aria-labelledby="ed-vision-heading">
+      <img class="ed-vision-image" src="/assets/erpdevelopers/images/login-network.svg"
+           width="960" height="800" alt="" aria-hidden="true" loading="lazy" decoding="async">
       <div class="ed-shell ed-intro">
         <div>
           <p class="ed-kicker">{{ _("BUILT AROUND PEOPLE") }}</p>
           <h2 id="ed-vision-heading">{{ _("Technology is better") }} <span>{{ _("when we build it together.") }}</span></h2>
+          <div class="ed-principles" aria-label="{{ _('Brand values') }}">
+            {% for value in values_items %}<span>{{ _(value.title) | e }}</span>{% endfor %}
+          </div>
         </div>
         <div class="ed-intro-copy">
           <p>{{ _("We're bringing different minds into one conversation: engineers, decision-makers, learners and business teams. The goal is practical knowledge and better outcomes, not another vendor-centric portal.") }}</p>
           <a href="/lets-talk#meeting-start" class="ed-text-link">{{ _("Tell us what you're working on") }} <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="ed-section ed-guide-discovery" aria-labelledby="ed-guides-heading">
+      <div class="ed-shell">
+        <div class="ed-section-head">
+          <div><p class="ed-kicker">{{ _("EXPLORE & LEARN") }}</p><h2 id="ed-guides-heading">{{ _("ERP & Business Applications") }}</h2></div>
+          <p>{{ (guide_intro.ar if boot.lang.startswith('ar') else guide_intro.en) | e }}</p>
+        </div>
+        <div class="ed-resource-grid">
+          {% for item in guide_links %}
+          <a class="ed-resource-card" href="/{{ item.slug | e }}?_lang={{ 'ar' if boot.lang.startswith('ar') else 'en' }}">
+            <h3>{{ (item.title_ar if boot.lang.startswith('ar') else item.title) | e }}</h3>
+            <p>{{ (item.summary_ar if boot.lang.startswith('ar') else item.summary) | e }}</p>
+          </a>
+          {% endfor %}
         </div>
       </div>
     </section>

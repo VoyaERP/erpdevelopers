@@ -53,3 +53,13 @@ jobs:
           python -m playwright install --with-deps chromium firefox
       - name: Test Training and Events in Chromium and Firefox
         run: python scripts/test_training_browser.py
+      - name: Test Vision and ERP guides in Chromium and Firefox
+        run: python scripts/test_discovery_browser.py
+      - name: Retain vision screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vision-browser-previews
+          path: test-artifacts/discovery/*.png
+          if-no-files-found: ignore
+          retention-days: 7

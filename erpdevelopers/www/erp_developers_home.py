@@ -1,9 +1,10 @@
 """Page controller for /erp-developers-home (hyphens are scrubbed by Frappe)."""
 
-from erpdevelopers.branding import DESK_SIGNIN_URL, FAVICON_URL, LOGO_URL, homepage_stylesheet_url
+from erpdevelopers.branding import DESK_SIGNIN_URL, FAVICON_URL, LOGO_URL, homepage_stylesheet_url, versioned_public_asset
 from erpdevelopers.content import ECOSYSTEM, VALUES
 from erpdevelopers.seo import homepage_seo_context
 from erpdevelopers.public_pages import PORTAL_CSS, ASSISTANT_JS
+from erpdevelopers.guide_content import INTRO, guide_links
 
 
 def get_context(context):
@@ -17,5 +18,8 @@ def get_context(context):
     context.homepage_css_url = homepage_stylesheet_url()
     context.portal_css_url = PORTAL_CSS
     context.assistant_js_url = ASSISTANT_JS
+    context.discovery_css_url = versioned_public_asset("css/discovery.css")
+    context.guide_links = guide_links()
+    context.guide_intro = dict(INTRO)
     context.values_items = VALUES
     context.ecosystem_items = ECOSYSTEM

@@ -46,13 +46,13 @@ def desk_navbar_settings_values():
     return {"app_logo": LOGO_URL}
 
 
-@lru_cache(maxsize=8)
+@lru_cache(maxsize=16)
 def versioned_public_asset(relative_path):
     """Hash only explicitly permitted site assets, never arbitrary paths."""
     allowed = {
         "css/portal.css", "js/catalog.js", "js/assistant.js",
         "js/consultation.js", "css/meeting.css", "js/meeting.js",
-        "css/arabic_typography.css", "css/events.css",
+        "css/arabic_typography.css", "css/events.css", "css/discovery.css",
     }
     if relative_path not in allowed:
         raise ValueError("Unexpected public asset")
