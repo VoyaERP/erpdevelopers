@@ -1,5 +1,13 @@
 # ERP Developers — deployment on erptest-lightnode
 
+## Bilingual UI and login duplication regression (2026-11-14)
+
+The initial orbit-based layout and original bilingual story login have been restored, with compact spacing and the exact approved logo. The earlier doubled header arose because Frappe 16's `login.html` renders a native navbar for the language picker and the custom script also added a header; CSS hid `header.navbar` but not the actual `nav.navbar`.
+
+A reviewed deployment must confirm after the **web-only** Gunicorn reload: the homepage is styled (skip link visible only on focus); the English/Arabic picker changes the homepage translations and direction; `/login` shows **one** website header, **one** picker, and the native sign-in form beside a single story panel; forgotten-password, signup/LDAP/social login and 2FA retain Frappe's native behavior where enabled. Confirm there is no duplicate footer and all shared-Bench sites remain functional.
+
+Run the pinned existing-site update below, then the read-only `scripts/verify_frontend.sh` for real Origin English/Arabic/CSS and public asset checks. Static CI and HTTP 200 do not replace browser/auth UAT.
+
 ## Current update procedure (existing site, not a new installation)
 
 **Current state (2026-11-14):** `erp-developers.com` already exists and `erpdevelopers` was installed on it. Earlier site-creation and missing-module/app-registration sections below are preserved as **incident history only**. Never run a new-site installer, `bench get-app`, `bench update`, `drop-site` or any database reset on this existing site.

@@ -10,14 +10,23 @@ The `version-16` branch is a **website-only MVP**, not a deployed community/LMS/
 |---|---|
 | `erpdevelopers/branding.py` | Canonical approved logo/favicons, exactly one allowed site, homepage route, pure settings mapping and content-hashed CSS URL |
 | `erpdevelopers/content.py` | Immutable, typed public site values, planned capabilities, AI steps and roadmap content |
+| `erpdevelopers/translations/ar.csv` | Arabic equivalents of homepage strings; Frappe's built-in locale resolver and language picker are authoritative |
 | `erpdevelopers/site_setup.py` | Explicit, idempotent CLI-only changes to the approved site's Website Settings; never an install hook |
 | `erpdevelopers/www/erp_developers_home.py` | Route controller, SEO context and safe asset URLs supplied to Jinja |
 | `erpdevelopers/www/erp-developers-home.html` | Public semantic page and one linked stylesheet through Frappe's supported head block |
 | `erpdevelopers/public/css/brand.css` | Scoped homepage style variables, layout and responsive rules |
 | `erpdevelopers/public/css/login.css` | Login-page scoped visuals, no auth implementation |
-| `erpdevelopers/public/js/login_chrome.js` | Decorative header/footer for native Frappe login, locale-aware copy and official language picker |
+| `erpdevelopers/public/js/login_chrome.js` | Idempotent decorative header, original bilingual story and footer; reuses original native language picker and keeps the Frappe form untouched |
 | `scripts/update_erptest_lightnode.sh` | Safe backup, pinned source update, pre-migration tests and target-site operations |
 | `scripts/verify_frontend.sh` | Non-mutating HTTP+asset consistency smoke tests, direct-origin and public |
+
+## Original visual direction and Frappe multilingual behavior
+
+The approved original hero uses the open background and orbit illustration, with a compact two-column composition instead of excessive whitespace. The orbit center displays the **icon crop from the customer's approved PNG**, never a placeholder or a replacement wordmark. The same unmodified full PNG stays in header, footer and login.
+
+The homepage header contains the native Frappe `#language-switcher` markup. Frappe's `frappe.website.show_language_picker()` populates the select and persists `preferred_language` for Guest users; server-side `{{ _("...") }}` and `{{ _(item.title) }}` use `translations/ar.csv`. Logged-in users' language is governed by their Frappe user preferences. Supported custom site-copy localizations for this release: **English and Arabic**. Browser UAT must confirm RTL and keyboard navigation.
+
+Frappe v16 `www/login.html` emits its own navbar when `show_language_picker` is enabled. Before the fix the enhancement inserted a separate header while CSS missed the actual `nav.navbar`. The corrected login styles hide **only that duplicated native navbar once the branded header is present**, transfer its existing picker (not a cloned select), and hide the redundant form-logo image. A new decorative, bilingual story aside sits beside the untouched Frappe native login `<main>`, preserving alternate Frappe auth views. Node DOM tests assert a single chrome and original form even if the script executes twice.
 
 ## Styling and caching
 

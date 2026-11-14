@@ -31,6 +31,16 @@ The canonical ERP Developers brand asset is the **exact original image uploaded 
 
 `erpdevelopers/public/images/erpdevelopers-selected-favicon.png` is an icon-only crop of the same approved image, supplied for favicon use. All active website, native login branding, and site-specific Website Settings point to these assets. The old unrelated Neural Intelligence SVG concept was removed.
 
+## Original-design restoration and bilingual login (2026-11-14)
+
+The original human-collaboration/orbit hero composition has been restored with **less whitespace**, the original customer-approved shield icon extracted from the same PNG, and no alternate/generated logo. Home includes six planned modules, focused vision, AI and roadmap, with compact desktop/mobile/RTL spacing.
+
+**English + Arabic** site content is translated through `erpdevelopers/translations/ar.csv`; Frappe's native `#language-switcher` appears in the custom homepage header and uses the framework's own locale cookie. For any language without supplied product-copy translations, website copy falls back to English. The literal approved logo and its tagline are not redrawn or reworded.
+
+Frappe 16 [login.html](https://github.com/frappe/frappe/blob/v16.56.0/frappe/www/login.html) renders its standard navbar while `show_language_picker` is enabled. The previous enhancement added another navbar, resulting in **two headers**. The scoped new CSS hides Frappe's navbar and footer **only when** the custom login header/footer have been added, while moving the **same native picker** to that header. Original split-panel styling returns as a sibling aside to the original Frappe `<main>`. No login/signup/reset/2FA form or endpoint is duplicated or replaced. A zero-dependency Node DOM test executes the login script twice and verifies idempotence and native form preservation.
+
+`scripts/verify_frontend.sh` now checks Origin CSS bytes, exact logo/favicons, six rendered modules, English/Arabic server responses, the native login's language picker and public asset routes. This is distinct from visual browser UAT.
+
 ## Refactored website architecture
 
 - `erpdevelopers/branding.py`: one pure-Python source of truth for identity, site targeting, uploaded PNG and favicon, and a content-hashed homepage CSS URL.
