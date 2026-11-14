@@ -73,7 +73,7 @@
 .ed-assistant-questions button:hover{background:#f1f8fc}
 .ed-assistant-roadmap{font-size:11px;color:#687e93;line-height:1.6;margin-top:12px}
 html[lang^="ar"] .ed-page-hero-aside span,html[lang^="ar"] .ed-link-card small{letter-spacing:0}
-@media(max-width:1100px){.ed-nav nav{gap:10px}.ed-nav nav a{font-size:12px}.ed-nav-inner{gap:11px}.ed-resource-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:1100px){.ed-resource-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:960px){.ed-page-hero-inner{grid-template-columns:minmax(0,1fr);gap:20px}.ed-page-hero{padding-block:38px}.ed-form-layout{grid-template-columns:1fr;gap:24px}}
 @media(max-width:540px){.ed-page-hero h1{font-size:clamp(34px,8.5vw,40px)}.ed-resource-grid{grid-template-columns:1fr}.ed-form-grid{grid-template-columns:1fr}.ed-form-card{padding:20px}.ed-path-callout{flex-direction:column;align-items:flex-start;padding:21px}.ed-catalog-count{margin-inline-start:0}.ed-assistant{inset-inline-end:10px;bottom:10px}}
 @media(prefers-reduced-motion:reduce){.ed-link-card{transition:none}.ed-link-card:hover{transform:none}}
