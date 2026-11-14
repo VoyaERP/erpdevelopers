@@ -1,130 +1,170 @@
-/* ERP Developers: live ERPNext appointment page, not a lecture-style landing. */
+/* ERP Developers | Book a Meeting — Greenbox-inspired Frappe 16 flow.
+ * Page-scoped. Reuses the native ERPNext booking API; no global Desk rules.
+ */
 .ed-site .ed-meeting-stage{
-  padding:clamp(38px,5vw,80px) 0;
-  min-height:min(790px,calc(100vh - 75px));
-  background:radial-gradient(ellipse at 12% 20%,#173a8a 0%,transparent 51%),
-    radial-gradient(ellipse at 90% 95%,#087f8c 0%,transparent 45%),
-    linear-gradient(130deg,#061937,#0a2752 65%,#063e56);
-  color:#fff;overflow:hidden;position:relative;isolation:isolate;
+  position:relative;isolation:isolate;overflow:hidden;color:#fff;
+  background:radial-gradient(ellipse at 76% 43%,#17759a 0%,transparent 48%),
+    radial-gradient(ellipse at 10% 110%,#183d86 0%,transparent 49%),
+    linear-gradient(116deg,#071831,#0b2c61 76%,#084f68);
+  padding:clamp(38px,5vw,65px) 0;
 }
 .ed-site .ed-meeting-stage:before{
-  content:"";position:absolute;inset:0;opacity:.16;pointer-events:none;
-  background-image:radial-gradient(#d4ecff 1px,transparent 1px);background-size:28px 28px;
-  mask-image:linear-gradient(90deg,#000,transparent 70%);
+  content:"";position:absolute;inset:0;z-index:-1;opacity:.23;
+  background-image:radial-gradient(#bbe3ff 1px,transparent 1px);background-size:32px 32px;
+  mask-image:linear-gradient(90deg,transparent,#000 80%);
 }
-.ed-site .ed-meeting-layout{
-  display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);
-  gap:clamp(28px,5vw,70px);align-items:center;position:relative;z-index:1;
-}
-.ed-meeting-layout>*{min-width:0}
-.ed-meeting-story{position:relative;min-width:0}
-.ed-meeting-eyebrow{display:inline-flex;align-items:center;flex-wrap:wrap;gap:11px;font-size:10px;letter-spacing:.13em;font-weight:800;line-height:1.6;color:#b1dcf4}
-.ed-meeting-signal{width:8px;height:8px;border-radius:100%;background:#56e3ce;box-shadow:0 0 0 7px #5ae7d41b}
-.ed-meeting-story h1{font-size:clamp(40px,4.25vw,65px);line-height:1.22;letter-spacing:-.04em;margin:23px 0 19px;color:#fff;font-weight:825;overflow-wrap:break-word}
-.ed-meeting-story h1 em{font-style:normal;color:#8be1e4}
-.ed-meeting-story>p:not(.ed-meeting-note){font-size:15px;line-height:1.85;max-width:540px;color:#d1e4f6}
-.ed-meeting-topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:25px}
-.ed-meeting-topics span{display:inline-flex;max-width:100%;padding:8px 12px;border-radius:100px;border:1px solid #ffffff30;background:#ffffff0e;color:#e1f6ff;font-size:11px;font-weight:700;line-height:1.7;white-space:normal}
-.ed-meeting-orbit{height:180px;width:min(100%,390px);margin:20px auto 0;position:relative;display:grid;place-items:center}
-.ed-meeting-orbit img{position:relative;z-index:2;width:100px;height:100px;object-fit:contain;background:#fff;border:1px solid #9bcde7;border-radius:25px;padding:9px;box-shadow:0 13px 40px #0005}
-.ed-meeting-orbit-ring,.ed-meeting-orbit-halo{position:absolute;border:1px solid #73b8d566;border-radius:50%;inset:12px 69px;transform:rotate(29deg)}
-.ed-meeting-orbit-halo{inset:37px 25px;transform:rotate(-31deg);border-style:dashed;opacity:.7}
-.ed-meeting-node{position:absolute;width:10px;height:10px;border-radius:50%;background:#48e2d6;box-shadow:0 0 0 7px #52e8d62b}
-.ed-meeting-node-one{top:20px;left:28%}.ed-meeting-node-two{right:20%;bottom:29px}
-.ed-meeting-note{margin:5px 0 0;color:#9dcae5;font-size:12px;font-weight:650}
-.ed-booking-card{min-width:0;background:#fff;border-radius:22px;box-shadow:0 25px 84px #030b273f;border:1px solid #dfeaf5;padding:clamp(22px,3vw,34px);color:#092b4f}
-.ed-booking-head{display:flex;align-items:start;justify-content:space-between;flex-wrap:wrap;gap:10px 15px;padding-bottom:18px;border-bottom:1px solid #e5edf4}
-.ed-booking-head>div{min-width:0;flex:1 1 220px}
-.ed-booking-overline{color:#088d9e;font-size:10px;font-weight:850;letter-spacing:.12em}
-.ed-booking-head h2{font-size:clamp(22px,2.4vw,30px);letter-spacing:-.025em;line-height:1.34;margin:6px 0 0;color:#0b2949}
-.ed-booking-duration{flex:0 1 auto;max-width:100%;font-size:11px;font-weight:710;line-height:1.55;text-align:center;color:#426885;background:#eaf7fb;border-radius:50px;padding:7px 10px}
-.ed-meeting-progress{display:flex;gap:7px;margin:19px 0 22px}
-.ed-meeting-progress span{width:35px;height:4px;border-radius:4px;background:#e3ecf3}
-.ed-meeting-progress span.is-active{background:linear-gradient(90deg,#116ddd,#0bb8b2)}
+.ed-meet-hero-grid{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:clamp(25px,5vw,75px);align-items:center}
+.ed-meet-hero-copy{min-width:0;position:relative;z-index:2}
+.ed-meeting-eyebrow{display:inline-flex;align-items:center;gap:12px;max-width:100%;padding:8px 14px;border:1px solid #ffffff35;border-radius:50px;background:#ffffff14;color:#c4f0f8;font-size:11px;font-weight:790;letter-spacing:.08em;line-height:1.5}
+.ed-meeting-signal{width:8px;height:8px;flex:none;border-radius:50%;background:#58e2cf;box-shadow:0 0 0 5px #4dd7c622}
+.ed-meet-hero-copy h1{margin:18px 0 17px;max-width:730px;color:white;font-size:clamp(42px,5.25vw,70px);font-weight:840;letter-spacing:-.045em;line-height:1.18}
+.ed-meet-hero-copy h1 em{font-style:normal;color:#82e9e5}
+.ed-meet-hero-copy>p{max-width:600px;margin:0 0 25px;color:#d2e6f7;font-size:15px;line-height:1.9}
+.ed-meet-hero-button{background:#fff;border-color:#fff;color:#12345d!important;box-shadow:0 16px 30px #0019323c}
+.ed-meet-hero-button:hover{background:#e8f8fb;box-shadow:0 18px 35px #0019324a}
+.ed-meet-hero-visual{height:310px;min-width:0;position:relative;display:grid;place-items:center}
+.ed-meet-hero-ring{position:absolute;left:50%;top:50%;border:1px solid #aae7f656;border-radius:50%;transform:translate(-50%,-50%)}
+.ed-meet-hero-ring-one{width:290px;height:290px;max-width:100%}
+.ed-meet-hero-ring-two{width:206px;height:206px;max-width:75%;border-style:dashed}
+.ed-meet-hero-symbol{z-index:1;display:grid;place-items:center;width:158px;height:158px;border-radius:38px;border:1px solid #a6dfed8a;background:#fff;box-shadow:0 22px 50px #0004}
+.ed-meet-hero-symbol img{width:116px;height:116px;object-fit:contain}
+.ed-meet-hero-label{position:absolute;z-index:2;display:inline-flex;align-items:center;max-width:43%;padding:10px 14px;background:#ffffffeb;border:1px solid #fff;color:#1a5270;border-radius:12px;box-shadow:0 10px 30px #0003;font-size:12px;font-weight:770;line-height:1.5;text-align:center}
+.ed-meet-hero-label-top{top:30px;inset-inline-start:0}
+.ed-meet-hero-label-bottom{bottom:28px;inset-inline-end:0}
+
+/* Exactly one main booking form. Content on the right remains informational. */
+.ed-meet-booking-section{padding:clamp(43px,5vw,72px) 0 88px;background:linear-gradient(180deg,#f5f9fe,#fff)}
+.ed-meet-section-heading{display:flex;justify-content:space-between;align-items:end;gap:32px;margin-bottom:30px}
+.ed-meet-section-heading>div{min-width:0}
+.ed-meet-section-heading h2{margin:8px 0 0!important;max-width:750px;font-size:clamp(28px,3vw,42px);font-weight:820;line-height:1.34}
+.ed-meet-section-heading h2 em{color:#0c89aa;font-style:normal}
+.ed-meet-section-heading>p{max-width:350px;min-width:0;flex:0 1 350px;color:#60768d;font-size:13px;line-height:1.8;margin:0}
+.ed-meet-booking-layout{display:grid;grid-template-columns:minmax(0,1.47fr) minmax(0,.72fr);gap:clamp(19px,2.6vw,32px);align-items:start}
+.ed-meet-booking-layout>*{min-width:0}
+.ed-booking-card{background:#fff;padding:clamp(22px,3.2vw,37px);border:1px solid #dbe6f0;border-radius:22px;box-shadow:0 21px 55px #163e6715;scroll-margin-top:25px}
+.ed-booking-head{display:flex;align-items:start;justify-content:space-between;flex-wrap:wrap;gap:12px;border-bottom:1px solid #e5edf4;padding-bottom:22px;margin-bottom:22px}
+.ed-booking-head>div{min-width:0;flex:1 1 230px}
+.ed-booking-overline{font-size:10px;font-weight:830;letter-spacing:.09em;color:#057d9b;line-height:1.6}
+.ed-booking-head h3{margin:6px 0 0;color:#0b2b4a;font-size:clamp(22px,2.2vw,29px);line-height:1.35;font-weight:810}
+.ed-booking-duration{flex:0 1 auto;padding:7px 10px;border-radius:30px;background:#e8f8fc;color:#2c7089;font-size:11px;font-weight:760;line-height:1.5}
+.ed-meet-fields{min-width:0;padding:0;margin:0;border:0}
+.ed-meet-fields:disabled{cursor:default}
 .ed-booking-pane[hidden]{display:none!important}
-.ed-booking-pane h3{font-size:20px;font-weight:810;line-height:1.4;letter-spacing:-.02em;color:#0d2c4c;margin:0 0 17px}
-.ed-meeting-label{display:block;font-weight:740;font-size:12px;line-height:1.6;color:#385672;margin:0 0 8px}
-.ed-booking-pane select,.ed-booking-pane :is(input,textarea){background:#fff;color:#113453;border:1px solid #cfdfe9;min-width:0;border-radius:10px;padding:11px 12px;font-size:13px;line-height:1.55;min-height:44px;width:100%}
-.ed-booking-pane :is(input,select,textarea):focus-visible{outline:2px solid #0c79b3;outline-offset:1px}
-.ed-meeting-picker{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:17px;margin-top:18px}
-.ed-meeting-calendar{background:#f8fbfe;border-radius:14px;padding:14px 12px;border:1px solid #e1ebf4;min-width:0}
+.ed-booking-pane h4{font-size:20px;line-height:1.5;font-weight:810;color:#133858;margin:0 0 14px}
+.ed-meeting-label{display:block;color:#2d506d;font-size:13px;line-height:1.6;font-weight:760;margin:17px 0 8px}
+.ed-booking-pane select,.ed-booking-pane :is(input:not([type="checkbox"]),textarea){display:block;background:#fff;border:1px solid #c9dbe8;border-radius:10px;color:#143750;min-height:46px;padding:10px 12px;font:inherit;font-size:14px;line-height:1.6;width:100%;max-width:100%;min-width:0}
+.ed-booking-pane select:disabled,.ed-booking-pane :is(input,textarea):disabled{background:#f7f9fc;color:#7990a4;opacity:1}
+.ed-booking-pane :is(input,select,textarea,button):focus-visible{outline:2px solid #1281be;outline-offset:2px}
+.ed-meeting-picker{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:17px;margin-top:16px}
+.ed-meeting-picker>div{min-width:0}
+.ed-meeting-calendar{padding:14px;border:1px solid #e0eaf3;border-radius:14px;background:#f8fbff}
+.ed-meeting-calendar>.ed-meeting-label{margin:1px 0 11px}
 .ed-meeting-calendar-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
-.ed-meeting-calendar-top strong{flex:1 1 auto;min-width:0;font-size:14px;line-height:1.6;font-weight:790;color:#163958}
-.ed-meeting-month-controls{display:flex;gap:4px;flex:none}
-.ed-meeting-month-controls button{width:30px;height:30px;border:1px solid #d6e5ed;border-radius:8px;background:#fff;color:#1b5e7e;font-size:22px;line-height:1;cursor:pointer}
-.ed-meeting-month-controls button:disabled{opacity:.3;cursor:not-allowed}
+.ed-meeting-calendar-top strong{min-width:0;flex:1;text-align:center;color:#19445f;font-size:14px;font-weight:780;line-height:1.6}
+.ed-meeting-month-button{width:30px;height:30px;flex:none;display:grid;place-items:center;border:1px solid #d5e4ef;background:#fff;border-radius:8px;color:#276b94;font-size:23px;cursor:pointer;line-height:1}
+.ed-meeting-month-button:disabled{opacity:.35;cursor:not-allowed}
 .ed-meeting-weekdays,.ed-meeting-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;text-align:center}
-.ed-meeting-weekdays span{font-size:10px;font-weight:780;color:#8295a9;padding:5px 0 8px}
-.ed-meeting-day{display:grid;place-items:center;aspect-ratio:1;min-width:0;border:0;background:transparent;border-radius:8px;font-size:12px;font-weight:740;color:#235272;cursor:pointer}
-.ed-meeting-day:hover:not(:disabled){background:#e4f4fc;color:#11669c}
-.ed-meeting-day.is-today{outline:1px solid #89bad6;outline-offset:-2px}
-.ed-meeting-day.is-selected{background:#1272ce!important;color:white!important}
-.ed-meeting-day:disabled{color:#b1bfcb;cursor:not-allowed}
-.ed-meeting-slot-area{min-width:0}
-.ed-meeting-slot-label{font-size:12px;color:#375977;font-weight:740;margin:19px 0 8px}
-.ed-meeting-slots{min-height:156px;max-height:196px;overflow:auto;display:grid;align-content:start;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.ed-meeting-slot{padding:10px 5px;background:#fff;color:#136298;border:1px solid #bad5e7;border-radius:9px;cursor:pointer;font-size:12px;font-weight:760}
-.ed-meeting-slot:hover:not(:disabled){background:#f1f9fe;border-color:#1a87b7}
-.ed-meeting-slot[aria-pressed="true"]{background:#0d71d2!important;border-color:#0d71d2!important;color:#fff!important}
+.ed-meeting-weekdays span{padding:4px 0 8px;font-size:10px;font-weight:770;color:#718ca1;line-height:1.5}
+.ed-meeting-day{width:100%;aspect-ratio:1;min-width:0;display:grid;place-items:center;border:0;background:transparent;border-radius:8px;color:#1d5078;font-size:12px;line-height:1.5;font-weight:700;cursor:pointer}
+.ed-meeting-day:hover:not(:disabled){background:#e5f4fb;color:#036d9a}
+.ed-meeting-day.is-today{outline:1px solid #a1c4d9;outline-offset:-2px}
+.ed-meeting-day.is-selected{background:#0e71cd!important;color:#fff!important}
+.ed-meeting-day:disabled{color:#a7b7c6;cursor:not-allowed}
+.ed-meeting-slot-area>.ed-meeting-label{margin-top:0}
+.ed-meeting-slot-label{font-size:13px;font-weight:760;color:#345974;margin:19px 0 9px;line-height:1.6}
+.ed-meeting-slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:8px;min-height:155px;max-height:220px;overflow:auto}
+.ed-meeting-slot{padding:10px 5px;min-height:42px;background:#fff;color:#126da3;border:1px solid #bcd7e9;border-radius:9px;font-size:13px;font-weight:750;cursor:pointer}
+.ed-meeting-slot:hover:not(:disabled){background:#edf8ff;border-color:#208fb4}
+.ed-meeting-slot[aria-pressed="true"]{background:#096bc4;color:#fff;border-color:#096bc4}
 .ed-meeting-slot:disabled{opacity:.35;cursor:not-allowed}
-.ed-meeting-slot-placeholder{grid-column:1/-1;padding:18px 6px;margin:0;color:#778da2;font-size:12px;line-height:1.8}
-.ed-meeting-selection{display:flex;align-items:center;gap:10px;min-height:45px;margin:18px 0 14px;padding:10px 12px;border-radius:10px;background:#eef8fb;color:#2e667e;font-size:12px;font-weight:730;line-height:1.75}
+.ed-meeting-slot-placeholder{grid-column:1/-1;padding:15px 5px;margin:0;color:#71899a;font-size:12px;line-height:1.8}
+.ed-meeting-selection{display:flex;align-items:center;gap:10px;background:#edf8fc;border:1px solid #def0f5;border-radius:10px;margin:18px 0 0;padding:10px 12px;color:#215e77;font-size:12px;font-weight:750;line-height:1.7;min-height:43px}
+.ed-meeting-selection-dot{width:7px;height:7px;border-radius:50%;background:#0cb2a8;flex:none}
 .ed-meeting-selection>span:last-child{min-width:0;flex:1;overflow-wrap:break-word}
-.ed-meeting-selection-dot{width:7px;height:7px;border-radius:50%;background:#0cbbb4;flex:none}
-.ed-meeting-main-action{width:100%;border:0;justify-content:center;flex-wrap:wrap;cursor:pointer;min-height:48px}
-.ed-meeting-main-action:disabled{opacity:.45;cursor:not-allowed}
-.ed-meeting-contact-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.ed-meet-contact-pane{margin-top:27px;padding-top:24px;border-top:1px solid #e0e8f1}
+.ed-meet-form-intro{margin:0 0 17px;color:#647a8b;font-size:13px;line-height:1.85}
+.ed-meeting-contact-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .ed-meeting-contact-grid .ed-field{min-width:0}
-.ed-meeting-contact-grid .ed-field label{display:block;margin:0 0 6px;color:#47627d;font-size:12px;line-height:1.65;font-weight:720}
+.ed-meeting-contact-grid .ed-field label{display:block;margin:0 0 7px;color:#31536e;font-size:12px;font-weight:730;line-height:1.6}
 .ed-meeting-contact-grid .ed-field-full{grid-column:1/-1}
-.ed-meeting-contact-grid textarea{resize:vertical;min-height:100px}
-.ed-meeting-back{border:0;background:transparent;color:#116f99;cursor:pointer;font-size:12px;font-weight:730;margin:0 0 17px;padding:0}
-.ed-meeting-consent{display:flex;gap:10px;align-items:flex-start;line-height:1.65;margin:17px 0 7px;color:#4d6780;font-size:12px;cursor:pointer}
-.ed-meeting-consent input{margin:4px 0 0;width:auto;min-height:auto;flex:none}
-.ed-meeting-consent a{color:#1269dc;text-decoration:underline!important}
-.ed-meeting-mail-note{font-size:11px;color:#71869a;margin:13px 0;line-height:1.6}
-.ed-meeting-feedback{font-size:12px;line-height:1.75;min-height:16px;color:#137e76;font-weight:720;margin:12px 0 0;overflow-wrap:break-word}
-.ed-meeting-feedback.is-error{color:#b22f43}
-.ed-meeting-honeypot{position:absolute;clip-path:inset(50%);width:1px;height:1px;overflow:hidden}
-.ed-meeting-done{text-align:center;padding:40px 6px 23px}
-.ed-meeting-done-mark{display:grid;place-items:center;margin:0 auto 20px;background:#dcf8f0;color:#13866c;width:64px;height:64px;border-radius:50%;font-size:30px;font-weight:850}
-.ed-meeting-done p{color:#62798d;line-height:1.75;max-width:410px;margin:0 auto 25px;font-size:14px}
-.ed-meeting-unavailable{text-align:center;padding:35px 10px}
-.ed-meeting-unavailable-icon{display:grid;place-items:center;background:#e6f7fb;color:#0a7d9d;border-radius:16px;width:62px;height:62px;font-size:32px;margin:0 auto 20px}
-.ed-meeting-unavailable h3{font-size:22px;color:#153753}
-.ed-meeting-unavailable p{color:#657c90;line-height:1.7;max-width:420px;margin:10px auto 21px;font-size:13px}
-/* RTL/Arabic inherits the shared typography from brand.css. */
-html[dir="rtl"] .ed-meeting-month-controls button{transform:scaleX(-1)}
-html[dir="rtl"] .ed-meeting-main-action span,
-html[dir="rtl"] .ed-meeting-back span{display:inline-block;transform:scaleX(-1)}
-@media(max-width:1050px){
-  .ed-meeting-layout{grid-template-columns:minmax(0,1fr) minmax(0,1.18fr);gap:27px}
+.ed-meeting-contact-grid textarea{resize:vertical;min-height:105px}
+.ed-meeting-consent{display:flex;align-items:flex-start;gap:10px;margin:17px 0 11px;color:#587088;font-size:12px;line-height:1.75;cursor:pointer}
+.ed-meeting-consent input{width:auto!important;min-height:auto!important;flex:none;margin-top:5px}
+.ed-meeting-consent a{color:#116dc3;text-decoration:underline!important}
+.ed-meeting-mail-note{margin:12px 0;color:#698398;font-size:12px;line-height:1.7}
+.ed-meeting-main-action{width:100%;min-height:49px;border:0;cursor:pointer;gap:12px}
+.ed-meeting-main-action:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;transform:none}
+.ed-meeting-feedback{margin:12px 0 0;min-height:15px;color:#108377;font-size:12px;line-height:1.75;font-weight:710;overflow-wrap:break-word}
+.ed-meeting-feedback.is-error{color:#bd4151}
+.ed-meeting-honeypot{position:absolute;width:1px;height:1px;clip-path:inset(50%);overflow:hidden}
+.ed-meet-offline-notice{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;margin-bottom:22px;border:1px solid #cfe5f2;border-radius:12px;background:#eff8fd;color:#194867}
+.ed-meet-notice-mark{height:9px;width:9px;flex:none;border-radius:100%;background:#3091bb;margin-top:7px}
+.ed-meet-offline-notice strong{font-size:13px;line-height:1.65}
+.ed-meet-offline-notice p{margin:4px 0 0;font-size:12px;line-height:1.75;color:#52718a}
+.ed-meeting-done{text-align:center;padding:36px 10px}
+.ed-meeting-done-mark{display:grid;place-items:center;width:58px;height:58px;border-radius:100%;background:#def8ee;color:#138e70;font-size:27px;font-weight:850;margin:0 auto 19px}
+.ed-meeting-done h3{font-size:23px;color:#133a56;margin:0 0 13px}
+.ed-meeting-done p{color:#5e798e;font-size:14px;line-height:1.8}
+
+/* Greenbox-inspired side panel: supporting information, never a second form. */
+.ed-meet-aside{display:grid;gap:19px}
+.ed-meet-aside-card{position:relative;overflow:hidden;padding:clamp(23px,2.8vw,34px);border-radius:20px;background:radial-gradient(circle at 100% 0%,#1b86a5 0%,transparent 53%),linear-gradient(145deg,#102f69,#092447 95%);color:white;box-shadow:0 20px 48px #0e39662b}
+.ed-meet-aside-card:before{content:"";position:absolute;top:-86px;inset-inline-end:-88px;width:245px;height:245px;border:1px solid #ffffff29;border-radius:100%;box-shadow:0 0 0 32px #ffffff09,0 0 0 65px #ffffff05;pointer-events:none}
+.ed-meet-aside-card>*{position:relative}
+.ed-meet-aside-card .ed-booking-overline{color:#87e5e0}
+.ed-meet-aside-card h3{margin:14px 0;color:white;font-size:clamp(21px,2vw,27px);font-weight:820;line-height:1.4}
+.ed-meet-aside-card>p{font-size:13px;color:#d2e5f6;line-height:1.85;margin:0}
+.ed-meet-highlights{display:grid;gap:14px;margin:27px 0 0}
+.ed-meet-highlights>div{display:flex;align-items:center;gap:12px;color:#e0f3fc;font-size:12px;font-weight:720;line-height:1.65}
+.ed-meet-highlight-icon{display:grid;place-items:center;width:33px;height:33px;flex:none;border:1px solid #ffffff45;border-radius:10px;background:#ffffff14;font-size:18px;color:#78ecdf}
+.ed-meet-aside-summary{margin-top:27px;padding:15px 16px;border:1px solid #ffffff28;border-radius:12px;background:#ffffff12}
+.ed-meet-aside-summary small{display:block;color:#91cde0;font-size:10px;letter-spacing:.06em;font-weight:800}
+.ed-meet-aside-summary strong{display:block;margin-top:6px;color:#fff;font-size:13px;line-height:1.75;font-weight:720;overflow-wrap:break-word}
+.ed-meet-aside-note{padding:22px 24px;border-radius:16px;background:#ecf8f7;border:1px solid #d9ede9}
+.ed-meet-aside-note strong{display:block;color:#185169;font-size:14px;font-weight:810;line-height:1.65}
+.ed-meet-aside-note p{color:#587789;font-size:12px;line-height:1.8;margin:8px 0 0}
+.ed-meeting-main-action span{flex:none}
+html[dir="rtl"] .ed-meeting-month-button{transform:scaleX(-1)}
+html[dir="rtl"] .ed-meeting-main-action span{display:inline-block;transform:scaleX(-1)}
+html[lang^="ar"] .ed-meet-hero-copy h1{line-height:1.5;letter-spacing:0}
+html[lang^="ar"] .ed-meet-section-heading h2,
+html[lang^="ar"] .ed-booking-head h3{line-height:1.56;letter-spacing:0}
+html[lang^="ar"] .ed-meeting-eyebrow,
+html[lang^="ar"] .ed-booking-overline{letter-spacing:0}
+@media(max-width:1100px){
+  .ed-meet-booking-layout{grid-template-columns:minmax(0,1.4fr) minmax(0,.82fr)}
   .ed-meeting-picker{grid-template-columns:1fr}
-  .ed-meeting-slots{min-height:60px;max-height:150px;grid-template-columns:repeat(3,minmax(0,1fr))}
-  .ed-meeting-orbit{height:145px}
+  .ed-meeting-slots{grid-template-columns:repeat(3,minmax(0,1fr));min-height:70px;max-height:150px}
 }
-@media(max-width:960px){
-  .ed-meeting-layout{grid-template-columns:1fr}
-  .ed-meeting-stage{padding:37px 0}
-  .ed-meeting-story h1{font-size:clamp(40px,6.2vw,55px);max-width:650px}
-  .ed-meeting-story{max-width:680px}
-  .ed-meeting-orbit{display:none}
-  .ed-booking-card{width:100%}
-  .ed-meeting-picker{grid-template-columns:minmax(0,1fr) minmax(0,.85fr)}
+@media(max-width:900px){
+  .ed-meet-hero-grid{grid-template-columns:minmax(0,1fr) minmax(0,.7fr);gap:18px}
+  .ed-meet-hero-visual{height:260px}
+  .ed-meet-hero-ring-one{width:220px;height:220px}
+  .ed-meet-hero-symbol{width:132px;height:132px}
+  .ed-meet-hero-symbol img{width:94px;height:94px}
+  .ed-meet-hero-label{font-size:10px;padding:8px;max-width:49%}
+  .ed-meet-booking-layout{grid-template-columns:1fr}
+  .ed-meet-aside{grid-template-columns:minmax(0,1fr) minmax(0,.72fr);align-items:start}
+  .ed-meeting-picker{grid-template-columns:minmax(0,1fr) minmax(0,.87fr)}
+  .ed-meet-section-heading{display:block}
+  .ed-meet-section-heading>p{max-width:630px;margin-top:12px}
 }
 @media(max-width:700px){
-  .ed-meeting-picker{grid-template-columns:1fr;gap:17px}
-  .ed-meeting-slots{grid-template-columns:repeat(3,minmax(0,1fr));min-height:75px;max-height:190px}
+  .ed-meet-hero-grid{grid-template-columns:1fr}
+  .ed-meet-hero-visual{display:none}
+  .ed-meeting-picker{grid-template-columns:1fr}
+  .ed-meeting-slots{grid-template-columns:repeat(3,minmax(0,1fr));max-height:170px}
+  .ed-meet-aside{grid-template-columns:1fr}
 }
 @media(max-width:540px){
+  .ed-site .ed-meeting-stage{padding:35px 0 40px}
+  .ed-meet-hero-copy h1{font-size:clamp(36px,9vw,48px)}
   .ed-booking-card{padding:20px 15px}
   .ed-booking-duration{display:none}
   .ed-meeting-contact-grid{grid-template-columns:1fr}
-  .ed-meeting-stage{padding:24px 0 45px}
-  .ed-meeting-story h1{font-size:clamp(35px,9vw,43px)}
+  .ed-meeting-contact-grid .ed-field-full{grid-column:auto}
   .ed-booking-pane :is(input,select,textarea){font-size:16px}
-  .ed-meeting-slots{gap:6px}
+  .ed-meet-booking-section{padding:40px 0 60px}
+  .ed-meet-aside-card{padding:22px}
 }
-@media(prefers-reduced-motion:reduce){
-  .ed-meeting-stage *{scroll-behavior:auto!important;transition:none!important}
-}
+@media(prefers-reduced-motion:reduce){.ed-meet-hero-button{transition:none}.ed-meet-hero-button:hover{transform:none}}
