@@ -31,3 +31,4 @@ jobs:
           node --check erpdevelopers/public/js/meeting.js
           node --check erpdevelopers/public/js/assistant.js
           node --check erpdevelopers/public/js/catalog.js
+          node --check erpdevelopers/erp_developers/doctype/erp_developers_playlist/erp_developers_playlist.js

@@ -384,3 +384,5 @@
 "Private: stored for authorized Desk curators only, never shown on the public Training page. This does not bypass YouTube video privacy.","خاص: تُحفظ القائمة للمحررين المخوّلين داخل Desk فقط ولا تظهر في صفحة التدريب العامة. هذا لا يتجاوز إعدادات خصوصية الفيديو في يوتيوب."
 "Public website publication. Private playlists remain unpublished regardless of this switch.","النشر على الموقع العام. تظل القوائم الخاصة غير منشورة حتى مع تغيير هذا الخيار."
 "Choose Public or Private playlist visibility.","اختر مستوى ظهور قائمة التشغيل: عام أو خاص."
+"Private playlists remain available to authorized Desk curators only.","تظل قوائم التشغيل الخاصة متاحة للمحررين المخوّلين في Desk فقط."
+"Enable only after approving the content for the public Training page.","فعّل النشر فقط بعد اعتماد المحتوى لصفحة التدريب العامة."

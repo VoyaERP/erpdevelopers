@@ -106,6 +106,11 @@ class TestPlaylistBackend(TestCase):
         self.assertEqual(len(results), 1)
         self.assertTrue(results[0]["watch_url"].startswith("https://www.youtube.com/playlist?list="))
         self.assertEqual(results[0]["visibility"], "Public")
+        client = (PLAYLIST / "erp_developers_playlist.js").read_text()
+        self.assertIn('frm.set_df_property("published", "read_only"', client)
+        self.assertIn('frm.set_value("published", 0)', client)
+        self.assertIn('frm.doc.visibility === "Private"', client)
+
 
 
 class TestProtectedPlaylistDialog(TestCase):
