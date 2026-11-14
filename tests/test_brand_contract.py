@@ -79,6 +79,13 @@ class TestBrandContract(TestCase):
         setup = (APP / "site_setup.py").read_text()
         self.assertEqual(nav.count("{{ brand_logo_url | e }}"), 1)
         self.assertEqual(footer.count("{{ brand_logo_url | e }}"), 1)
+        self.assertNotIn("Building a smarter, more connected technology community.", footer)
+        for section in (home, nav, footer):
+            self.assertNotIn('Book a Meeting', section)
+            self.assertNotIn('Book a meeting', section)
+            self.assertIn('{{ _("Let\'s Talk") }}', section)
+        self.assertIn('href="/lets-talk#meeting-start"', nav)
+        self.assertIn('href="/lets-talk#meeting-start"', footer)
         self.assertEqual(home.count("{{ brand_icon_url | e }}"), 1)
         self.assertIn('include "templates/includes/erpdevelopers_nav.html"', home)
         self.assertIn('include "templates/includes/erpdevelopers_footer.html"', home)

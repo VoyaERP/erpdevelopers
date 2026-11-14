@@ -115,7 +115,7 @@ class TestBookingPageContext(unittest.TestCase):
         with patch.dict(sys.modules, {"frappe": frappe, "frappe.utils": utils}):
             lets_talk.get_context(ctx)
         self.assertFalse(ctx.booking_enabled)
-        self.assertEqual(ctx.title, "ERP Developers | Book a Meeting")
+        self.assertEqual(ctx.title, "ERP Developers | Let's Talk")
         self.assertTrue(ctx.topic_options)
         self.assertIn("meeting.css?v=", ctx.meeting_css_url)
         self.assertIn("meeting.js?v=", ctx.meeting_js_url)

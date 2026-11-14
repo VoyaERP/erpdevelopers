@@ -92,6 +92,33 @@ existing ERPNext logic, and no names, tokens or booking IDs are returned to
 anonymous browsers. Check Guest/CRM/System Manager permissions and
 rate limits; no workflows can be approved by the guest endpoint.
 
+### Adding a YouTube playlist from Frappe Desk (v16)
+
+The site supports an editorial directory, **not YouTube syncing**.
+A user with **Website Manager** or **System Manager** can publish multiple
+independent playlist records without code changes or API keys:
+
+1. Sign into the system Desk at `/login?redirect-to=/desk` and search for
+   **ERP Developers Playlist**, or visit `/app/erp-developers-playlist`.
+2. Select **New**. Enter **Title** (required), optional **Arabic Title**,
+   **Topic**, **Level**, **Language**, and **Description** (required).
+   There is no need to enter a Playlist ID manually.
+3. On YouTube, open the actual playlist and copy its playlist URL,
+   beginning `https://www.youtube.com/playlist?list=`, into
+   **YouTube Playlist URL**. A single video watch URL, `youtu.be`
+   shortcut, or channel homepage is rejected.
+4. Set **Display Order** (lower values display first), check
+   **Published**, and **Save**. The validator normalizes the URL and
+   extracts the read-only **Validated Playlist ID**.
+5. Visit `/training` as a Guest to verify the published playlist card.
+   If missing, check Published, source URL, permissions and whether the
+   app's migration installed the DocType.
+
+Add further playlists as separate records; do not duplicate application
+code or embed videos. Leave Published unchecked until editorial review.
+The public page displays at most 60 published playlists, ordered by
+Display Order then most recently modified.
+
 ## Training catalogue: ideas and curation
 
 Recommended learning tracks, **not seeded as invented playlists**:
