@@ -1,5 +1,4 @@
 """Stable ERP Developers identity and explicit website asset configuration."""
-from functools import lru_cache
 from hashlib import sha256
 from pathlib import Path
 
@@ -20,18 +19,22 @@ HOME_STYLESHEET_URL = "/assets/erpdevelopers/css/brand.css"
 HOME_STYLESHEET_FILE = Path(__file__).resolve().parent / "public" / "css" / "brand.css"
 
 
-@lru_cache(maxsize=1)
+def _fingerprinted_asset_url(file_path: Path, public_url: str) -> str:
+    """One content-hash implementation for all ERP Developers website assets.
+
+    Recalculate on use so updated CSS obtains a fresh URL without retaining a
+    previous deployment's fingerprint in a long-running web process.
+    """
+    digest = sha256(file_path.read_bytes()).hexdigest()[:16]
+    return f"{public_url}?v={digest}"
+
+
 def login_stylesheet_url():
-    """Content fingerprint. Reload web processes after deploying new assets."""
-    digest = sha256(LOGIN_STYLESHEET_FILE.read_bytes()).hexdigest()[:16]
-    return f"{LOGIN_STYLESHEET_URL}?v={digest}"
+    return _fingerprinted_asset_url(LOGIN_STYLESHEET_FILE, LOGIN_STYLESHEET_URL)
 
 
-@lru_cache(maxsize=1)
 def homepage_stylesheet_url():
-    """Content fingerprint, computed once per Python web process."""
-    digest = sha256(HOME_STYLESHEET_FILE.read_bytes()).hexdigest()[:16]
-    return f"{HOME_STYLESHEET_URL}?v={digest}"
+    return _fingerprinted_asset_url(HOME_STYLESHEET_FILE, HOME_STYLESHEET_URL)
 
 
 def website_settings_values():
@@ -46,7 +49,6 @@ def desk_navbar_settings_values():
     return {"app_logo": LOGO_URL}
 
 
-@lru_cache(maxsize=16)
 def versioned_public_asset(relative_path):
     """Hash only explicitly permitted site assets, never arbitrary paths."""
     allowed = {
@@ -58,5 +60,4 @@ def versioned_public_asset(relative_path):
     if relative_path not in allowed:
         raise ValueError("Unexpected public asset")
     asset = Path(__file__).resolve().parent / "public" / relative_path
-    digest = sha256(asset.read_bytes()).hexdigest()[:16]
-    return f"/assets/erpdevelopers/{relative_path}?v={digest}"
+    return _fingerprinted_asset_url(asset, f"/assets/erpdevelopers/{relative_path}")
