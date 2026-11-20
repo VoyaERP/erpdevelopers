@@ -1,0 +1,26 @@
+{# Only validated public File URLs reach this partial; raw attachment fields are never rendered. #}
+{% if item.media and item.media.cover %}
+{% set photo = item.media.cover %}
+{% set caption = photo.caption_ar if boot.lang.startswith('ar') and photo.caption_ar else photo.caption %}
+{% set event_title = item.title_ar if boot.lang.startswith('ar') and item.title_ar else item.title %}
+<figure class="ed-event-cover">
+  <img src="{{ photo.url | e }}" alt="{{ (caption or event_title) | e }}"
+       width="960" height="540" loading="lazy" decoding="async">
+  {% if caption %}<figcaption>{{ caption | e }}</figcaption>{% endif %}
+</figure>
+{% if item.media.gallery %}
+<details class="ed-event-gallery">
+  <summary>{{ _("Event photos") }} <span>({{ item.media.gallery | length }})</span></summary>
+  <div class="ed-event-gallery-grid">
+    {% for photo in item.media.gallery %}
+    {% set caption = photo.caption_ar if boot.lang.startswith('ar') and photo.caption_ar else photo.caption %}
+    <figure>
+      <img src="{{ photo.url | e }}" alt="{{ (caption or event_title) | e }}"
+           width="640" height="480" loading="lazy" decoding="async">
+      {% if caption %}<figcaption>{{ caption | e }}</figcaption>{% endif %}
+    </figure>
+    {% endfor %}
+  </div>
+</details>
+{% endif %}
+{% endif %}

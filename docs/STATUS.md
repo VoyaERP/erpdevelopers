@@ -1,5 +1,9 @@
 # ERP Developers — Execution Status / متابعة التنفيذ
 
+> **Branch policy update — 2026-11-21:** The current four-branch source and deployment policy is maintained in [BRANCH_STRATEGY.md](BRANCH_STRATEGY.md). Older branch names and deployment statements below are historical; where they differ, follow that policy and current CI/production evidence.
+
+
+
 **Snapshot:** 2026-11-14 · **Repository:** VoyaERP/erpdevelopers
 **Plan:** [ED-MP-001 v1.1](MASTER_PLAN.md) · **Ideas:** [Deferred, not implemented](DEFERRED_IDEAS.md)
 

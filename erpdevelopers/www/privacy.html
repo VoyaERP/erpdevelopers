@@ -1,0 +1,24 @@
+{% extends "templates/includes/erpdevelopers_page_base.html" %}
+{% block ed_content %}
+<section class="ed-page-hero" aria-labelledby="ed-privacy-title">
+  <div class="ed-shell">
+    <p class="ed-kicker">{{ _("DATA RESPONSIBILITY") }}</p>
+    <h1 id="ed-privacy-title">{{ _("Meeting privacy notice") }}</h1>
+    <p>{{ _("Your meeting details belong in a secure workflow, not an open directory.") }}</p>
+  </div>
+</section>
+<section class="ed-section">
+  <div class="ed-shell ed-legal">
+    <h2>{{ _("What we collect") }}</h2>
+    <p>{{ _("When booking is enabled, we collect your name, email, optional phone and company, selected topic, meeting date and time zone, and any notes you choose to share.") }}</p>
+    <h2>{{ _("How the meeting works") }}</h2>
+    <p>{{ _("ERPNext initially records an unverified Appointment and emails a confirmation link. After verification, ERPNext may create or link a CRM Lead or Customer, assign a team member and create a Calendar Event.") }}</p>
+    <h2>{{ _("Who can access it") }}</h2>
+    <p>{{ _("Authorized staff access meeting and CRM information according to ERPNext permissions. Meeting details are never published on this website or sent to LinkedIn or an AI assistant.") }}</p>
+    <h2>{{ _("Your choice and security") }}</h2>
+    <p>{{ _("Booking requires your consent, uses rate limiting and email verification, and is optional. Please avoid entering confidential information in your notes.") }}</p>
+    <p class="ed-small-note">{{ _("This is an operational privacy draft. The site administrator must approve a privacy contact, retention period and final policy before enabling public bookings.") }}</p>
+    <a href="/lets-talk" class="ed-btn ed-btn-secondary">{{ _("Return to meeting booking") }}</a>
+  </div>
+</section>
+{% endblock %}

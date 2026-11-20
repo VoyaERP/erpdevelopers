@@ -1,0 +1,42 @@
+{% extends "templates/includes/erpdevelopers_page_base.html" %}
+{% block ed_head %}
+<link rel="stylesheet" href="{{ discovery_css_url | e }}">
+{% for alternate in language_alternates %}<link rel="alternate" hreflang="{{ alternate.lang | e }}" href="{{ alternate.href | e }}">{% endfor %}
+<script type="application/ld+json">{{ guide_schema_json | safe }}</script>
+{% endblock %}
+{% block ed_content %}
+<section class="ed-page-hero" aria-labelledby="ed-guide-title">
+  <div class="ed-shell">
+    <nav class="ed-guide-breadcrumb" aria-label="{{ guide_labels.home | e }}"><a href="/">{{ guide_labels.home | e }}</a><span aria-hidden="true">/</span><span aria-current="page">{{ guide.title | e }}</span></nav>
+    <p class="ed-kicker">{{ guide_labels.eyebrow | e }}</p>
+    <h1 id="ed-guide-title">{{ guide.heading | e }}</h1>
+    <p>{{ guide.lead | e }}</p>
+  </div>
+</section>
+<section class="ed-section">
+  <div class="ed-shell ed-guide-layout">
+    <article class="ed-guide-article" aria-labelledby="ed-guide-title">
+      {% for heading, body in guide.sections %}
+      <section><h2>{{ heading | e }}</h2><p>{{ body | e }}</p></section>
+      {% endfor %}
+      <p class="ed-guide-note">{{ guide_labels.note | e }}</p>
+      {% if guide_references %}
+      <section><h2>{{ guide_labels.references | e }}</h2>
+        {% for label, href in guide_references %}<p><a href="{{ href | e }}" rel="noopener noreferrer">{{ label | e }}</a></p>{% endfor %}
+      </section>
+      {% endif %}
+      <nav class="ed-guide-languages" aria-label="{{ guide_labels.language | e }}">
+        <span>{{ guide_labels.language | e }}</span>
+        {% for alternate in language_alternates %}<a href="{{ alternate.href | e }}" lang="{{ alternate.lang | e }}" hreflang="{{ alternate.lang | e }}">{{ "العربية" if alternate.lang == "ar" else "English" }}</a>{% endfor %}
+      </nav>
+    </article>
+    <aside class="ed-guide-aside"><h2>{{ guide_labels.related | e }}</h2>
+      {% for link in guide_links %}<a href="{{ link.href | e }}">{{ link.title | e }}</a>{% endfor %}
+      <a href="/training">{{ _("Training") }}</a>
+      <a href="/events">{{ _("Events") }}</a>
+      <a href="/insights">{{ _("Insights") }}</a>
+      <a href="/lets-talk#meeting-start">{{ _("Let's Talk") }}</a>
+    </aside>
+  </div>
+</section>
+{% endblock %}

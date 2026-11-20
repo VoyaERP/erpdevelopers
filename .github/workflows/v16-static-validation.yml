@@ -1,0 +1,96 @@
+name: ERP Developers source validation
+on:
+  push:
+    branches: [main, dev, version-15, version-16, "feat/**", "fix/**", "refactor/**"]
+  pull_request:
+    branches: [main, dev, version-15, version-16]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Install pure translation and image test dependencies
+        run: python -m pip install Babel==2.17.0 Pillow==12.0.0
+      - name: Shared source, schema, JavaScript and translation checks
+        run: bash scripts/check_source.sh
+  schema-upgrade:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    services:
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: schema-test-only
+          MARIADB_DATABASE: erpdevelopers_schema_test
+        ports:
+          - 3307:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Install isolated database test driver
+        run: python -m pip install PyMySQL==1.1.2
+      - name: Reproduce old schema failure and verify existing-table URL conversion
+        env:
+          ERPDEV_SCHEMA_TEST: "1"
+          SCHEMA_TEST_PASSWORD: schema-test-only
+        run: python scripts/test_schema_upgrade.py
+  training-browser:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Install isolated browser-test dependencies
+        run: |
+          python -m pip install Babel==2.17.0 Jinja2==3.1.6 Pillow==12.0.0 playwright==1.57.0
+          python -m playwright install --with-deps chromium firefox
+      - name: Test Training and Events in Chromium and Firefox
+        run: python scripts/test_training_browser.py
+      - name: Test Vision and ERP guides in Chromium and Firefox
+        run: python scripts/test_discovery_browser.py
+      - name: Test Event cover and gallery in Chromium and Firefox
+        run: python scripts/test_event_media_browser.py
+      - name: Test native Arabic login copy and RTL layout
+        run: python scripts/test_login_browser.py
+      - name: Retain vision screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vision-browser-previews
+          path: test-artifacts/discovery/*.png
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Retain event photo screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: event-media-browser-previews
+          path: test-artifacts/event-media/*.png
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Retain native login screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: login-browser-previews
+          path: test-artifacts/login/*.png
+          if-no-files-found: ignore
+          retention-days: 7

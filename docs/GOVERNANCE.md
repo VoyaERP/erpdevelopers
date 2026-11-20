@@ -1,5 +1,9 @@
 # ERP Developers — Delivery Governance / قواعد التنفيذ
 
+> **Branch policy update — 2026-11-21:** The current four-branch source and deployment policy is maintained in [BRANCH_STRATEGY.md](BRANCH_STRATEGY.md). Older branch names and deployment statements below are historical; where they differ, follow that policy and current CI/production evidence.
+
+
+
 ## Source of truth
 
 - **docs/MASTER_PLAN.md on main:** roadmap, release scope, approved constraints and gates.

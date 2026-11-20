@@ -1,0 +1,210 @@
+#!/usr/bin/env bash
+# Deploy the ERP Developers Frappe v16 app to an EXISTING, dedicated site.
+# Never create/drop sites, change existing core apps, reconfigure Nginx or restart services.
+(
+  set -Eeuo pipefail
+  trap 'echo "INSTALL STOPPED at line $LINENO; inspect the partial state. Never auto-delete the site or DB." >&2' ERR
+
+  export PATH="$HOME/.local/bin:$PATH"
+  export GIT_TERMINAL_PROMPT=0
+
+  SITE="erp-developers.com"
+  BENCH="/data/frappe/frappe-bench"
+  if [ -n "${ERPDEV_BENCH:-}" ]; then BENCH="$ERPDEV_BENCH"; fi
+  APP="$BENCH/apps/erpdevelopers"
+  REPO="https://github.com/VoyaERP/erpdevelopers.git"
+  REF="version-16"
+
+  echo "=== Host / identity / site safety ==="
+  case "$(uname -n)" in
+    erptest-lightnode|erptest-lightnode.*) ;;
+    *) echo "STOP: wrong server (expected erptest-lightnode)"; exit 2 ;;
+  esac
+  test "$(id -u)" -ne 0 || { echo "STOP: never run as root"; exit 2; }
+  command -v bench >/dev/null || { echo "STOP: bench CLI unavailable"; exit 2; }
+  command -v git >/dev/null || { echo "STOP: git unavailable"; exit 2; }
+  test -d "$BENCH/apps/frappe" && test -d "$BENCH/sites" || {
+    echo "STOP: expected Frappe Bench not found at $BENCH"; exit 2;
+  }
+  test -f "$BENCH/sites/$SITE/site_config.json" || {
+    echo "STOP: target site's site_config.json missing. This is for an EXISTING site only."; exit 2;
+  }
+
+  cd "$BENCH"
+  bench version
+  bench version | grep -Eq '^frappe[[:space:]]+16\.' || {
+    echo "STOP: Frappe version 16 required"; exit 2;
+  }
+
+  echo "=== Installed apps (before) ==="
+  installed_apps="$(bench --site "$SITE" list-apps)"
+  printf '%s\n' "$installed_apps"
+  if printf '%s\n' "$installed_apps" | grep -Eq '^erpdevelopers([[:space:]]|$)'; then
+    echo "STOP: erpdevelopers already installed; use update_erptest_lightnode.sh instead."
+    exit 2
+  fi
+
+  free_kib="$(df -Pk "$BENCH" | awk 'NR==2 {print $4}')"
+  test -n "$free_kib" && test "$free_kib" -ge $((4 * 1024 * 1024)) || {
+    echo "STOP: less than 4 GiB disk free before backup/app install"; exit 2;
+  }
+
+  echo "=== Verify anonymous public GitHub access ==="
+  remote_sha="$(git ls-remote --exit-code "$REPO" "refs/heads/$REF" | awk 'NR==1 {print $1}')"
+  test -n "$remote_sha" || { echo "STOP: public version-16 branch unavailable"; exit 2; }
+  echo "Desired source commit: $remote_sha"
+
+  if [ -e "$APP" ]; then
+    test -d "$APP/.git" || { echo "STOP: app directory exists but is not Git"; exit 2; }
+    test -z "$(git -C "$APP" status --porcelain)" || {
+      echo "STOP: app checkout is dirty. Preserve local changes."; exit 2;
+    }
+    test "$(git -C "$APP" branch --show-current)" = "$REF" || {
+      echo "STOP: existing app checkout is not on version-16"; exit 2;
+    }
+    # Bench default clone uses 'upstream'; manual clones usually use 'origin'.
+    # Verify either without rewriting remote settings.
+    source_remote=""
+    for name in upstream origin; do
+      if [ "$(git -C "$APP" remote get-url "$name" 2>/dev/null || true)" = "$REPO" ]; then
+        source_remote="$name"
+        break
+      fi
+    done
+    test -n "$source_remote" || {
+      echo "STOP: no approved public HTTPS remote found on the app checkout"; exit 2;
+    }
+    test "$(git -C "$APP" rev-parse HEAD)" = "$remote_sha" || {
+      echo "STOP: existing app checkout is not at public branch HEAD; inspect before changing"; exit 2;
+    }
+  fi
+
+  echo "=== Back up existing site's database + public/private files ==="
+  bench --site "$SITE" backup --with-files
+  test -d "$BENCH/sites/$SITE/private/backups" || {
+    echo "STOP: backup directory not found"; exit 3;
+  }
+  find "$BENCH/sites/$SITE/private/backups" -maxdepth 1 -type f -name '*.sql.gz' -print -quit | grep -q . || {
+    echo "STOP: database backup file not found"; exit 3;
+  }
+  echo "Backup available under sites/$SITE/private/backups"
+  free_kib="$(df -Pk "$BENCH" | awk 'NR==2 {print $4}')"
+  test -n "$free_kib" && test "$free_kib" -ge $((2 * 1024 * 1024)) || {
+    echo "STOP: less than 2 GiB remaining after backup; abort app install"; exit 3;
+  }
+
+  echo "=== Install public app checkout if absent ==="
+  if [ ! -e "$APP" ]; then
+    bench get-app --branch "$REF" "$REPO"
+  fi
+  test -d "$APP/.git" || { echo "STOP: app checkout missing after get-app"; exit 3; }
+  test "$(git -C "$APP" rev-parse HEAD)" = "$remote_sha" || {
+    echo "STOP: checkout SHA differs from verified remote branch"; exit 3;
+  }
+
+  echo "=== Source-only regression checks ==="
+  "$BENCH/env/bin/python" -m unittest discover -s "$APP/tests" -v
+  if command -v node >/dev/null 2>&1; then
+    node --check "$APP/erpdevelopers/public/js/login_chrome.js"
+  fi
+
+  echo "=== Register recovered app with the Bench (without touching other sites) ==="
+  # A previous bench get-app failure occurred before patches.txt existed.
+  # The checkout is now valid, but the failed install may have omitted it from
+  # sites/apps.txt. Frappe install-app requires that Bench registration.
+  bench_cli="$(command -v bench)"
+  bench_python="$(sed -n '1s/^#!//p' "$bench_cli")"
+  case "$bench_python" in
+    /*) test -x "$bench_python" || {
+          echo "STOP: Bench Python executable missing"; exit 3;
+        } ;;
+    *) echo "STOP: Bench launcher has an unsupported interpreter; inspect manually."; exit 3 ;;
+  esac
+
+  "$bench_python" - "$BENCH" "$SITE" <<'PY'
+from pathlib import Path
+import datetime
+import shutil
+import sys
+from bench.bench import Bench
+
+root, site_name = Path(sys.argv[1]).resolve(), sys.argv[2]
+app_name = "erpdevelopers"
+apps_txt = root / "sites" / "apps.txt"
+apps_json = root / "sites" / "apps.json"
+backup_dir = root / "sites" / site_name / "private" / "backups"
+app_path = root / "apps" / app_name / app_name
+
+if site_name != "erp-developers.com":
+    raise SystemExit("STOP: registration site mismatch")
+if not apps_txt.is_file():
+    raise SystemExit("STOP: Bench apps.txt missing")
+if not all((app_path / x).is_file() for x in ("hooks.py", "modules.txt", "patches.txt")):
+    raise SystemExit("STOP: Frappe app discovery markers missing")
+
+old = [x.strip() for x in apps_txt.read_text(encoding="utf-8").splitlines() if x.strip()]
+if not old or "frappe" not in old or len(old) != len(set(old)):
+    raise SystemExit("STOP: Bench apps.txt appears invalid; no changes made")
+bench = Bench(str(root))
+candidate = list(bench.apps)
+expected = set(old) | {app_name}
+if set(candidate) != expected or len(candidate) != len(expected):
+    raise SystemExit(
+        "STOP: Bench discovery differs from existing apps.txt beyond erpdevelopers. "
+        "Review apps.txt and app discovery before editing."
+    )
+if app_name in old:
+    print("App already registered in apps.txt; no Bench-wide sync required")
+else:
+    if not backup_dir.is_dir():
+        raise SystemExit("STOP: backup directory missing")
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    for source in (apps_txt, apps_json):
+        if source.is_file():
+            destination = backup_dir / (source.name + ".before-erpdevelopers-" + stamp + ".bak")
+            shutil.copy2(source, destination)
+            print("Preserved Bench registry:", destination)
+    # Standard Bench API, not a manual global configuration rewrite.
+    bench.apps.sync(app_name=app_name, app_dir=app_name, branch="version-16")
+
+after = [x.strip() for x in apps_txt.read_text(encoding="utf-8").splitlines() if x.strip()]
+if set(after) != expected or len(after) != len(expected):
+    raise SystemExit("STOP: Unexpected apps.txt change; inspect saved registry backups")
+print("Bench app registration OK:", app_name)
+PY
+
+  echo "=== Verify that every declared Frappe module imports ==="
+  "$BENCH/env/bin/python" - <<'PY'
+from importlib import import_module
+from pathlib import Path
+from frappe import scrub
+
+declared = Path("apps/erpdevelopers/erpdevelopers/modules.txt")
+for line in declared.read_text(encoding="utf-8").splitlines():
+    title = line.strip()
+    if not title or title.startswith("#"):
+        continue
+    dotted = "erpdevelopers." + scrub(title)
+    loaded = import_module(dotted)
+    if not getattr(loaded, "__file__", None):
+        raise SystemExit(f"STOP: module {dotted} is not a Python package")
+    print("Frappe module OK:", dotted)
+PY
+
+  echo "=== Install ERP Developers on existing site ==="
+  bench --site "$SITE" install-app erpdevelopers
+  bench --site "$SITE" migrate
+
+  echo "=== Apply requested ERP Developers website/home branding ==="
+  # WARNING: intentional site-specific edit to Website Settings (home_page, logo, favicon).
+  bench --site "$SITE" execute erpdevelopers.site_setup.configure_website
+  bench build --app erpdevelopers
+  bench --site "$SITE" clear-cache
+  bench --site "$SITE" clear-website-cache
+
+  echo "=== Installed apps (after) ==="
+  bench --site "$SITE" list-apps
+  echo "Source commit: $(git -C "$APP" rev-parse HEAD)"
+  echo "Installed on existing site: $SITE"
+  echo "Nginx, HTTPS, DNS and shared service reloads are NOT handled here."
+)

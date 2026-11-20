@@ -1,5 +1,9 @@
 # ERP Developers — Master Implementation Plan / الخطة الرئيسية
 
+> **Branch policy update — 2026-11-21:** The current four-branch source and deployment policy is maintained in [BRANCH_STRATEGY.md](BRANCH_STRATEGY.md). Older branch names and deployment statements below are historical; where they differ, follow that policy and current CI/production evidence.
+
+
+
 **Plan ID:** ED-MP-001 · **Baseline:** v1.1 · **Updated:** 2026-11-14
 **Repository:** VoyaERP/erpdevelopers · **Status:** Current planning and release-control baseline
 

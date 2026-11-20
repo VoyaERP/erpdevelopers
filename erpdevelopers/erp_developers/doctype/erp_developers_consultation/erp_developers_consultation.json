@@ -1,0 +1,178 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "doctype": "DocType",
+ "module": "ERP Developers",
+ "name": "ERP Developers Consultation",
+ "engine": "InnoDB",
+ "field_order": [
+  "contact_section",
+  "contact_name",
+  "email",
+  "company",
+  "contact_col",
+  "topic",
+  "preferred_date",
+  "preferred_window",
+  "time_zone",
+  "details_section",
+  "message",
+  "contact_consent",
+  "review_section",
+  "status",
+  "lead",
+  "event",
+  "review_col",
+  "internal_notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "contact_section",
+   "fieldtype": "Section Break",
+   "label": "Contact information"
+  },
+  {
+   "fieldname": "contact_name",
+   "fieldtype": "Data",
+   "label": "Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "reqd": 1,
+   "options": "Email",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Data",
+   "label": "Company"
+  },
+  {
+   "fieldname": "contact_col",
+   "fieldtype": "Column Break",
+   "label": ""
+  },
+  {
+   "fieldname": "topic",
+   "fieldtype": "Select",
+   "label": "Consultation Topic",
+   "reqd": 1,
+   "options": "ERP & Digital Transformation\nSolution Architecture\nTraining & Mentorship\nDevelopment & Integrations\nPartnerships\nOther"
+  },
+  {
+   "fieldname": "preferred_date",
+   "fieldtype": "Date",
+   "label": "Preferred Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "preferred_window",
+   "fieldtype": "Select",
+   "label": "Preferred Time",
+   "reqd": 1,
+   "options": "Flexible\nMorning\nAfternoon",
+   "default": "Flexible"
+  },
+  {
+   "fieldname": "time_zone",
+   "fieldtype": "Data",
+   "label": "Time Zone",
+   "reqd": 1,
+   "default": "UTC"
+  },
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "Request details"
+  },
+  {
+   "fieldname": "message",
+   "fieldtype": "Small Text",
+   "label": "Your Requirements",
+   "reqd": 1
+  },
+  {
+   "fieldname": "contact_consent",
+   "fieldtype": "Check",
+   "label": "Contact Consent",
+   "reqd": 1
+  },
+  {
+   "fieldname": "review_section",
+   "fieldtype": "Section Break",
+   "label": "Internal CRM Review"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "read_only": 0,
+   "default": "Requested",
+   "options": "Requested\nContacted\nConfirmed\nClosed\nRejected",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "lead",
+   "fieldtype": "Link",
+   "label": "ERPNext Lead",
+   "options": "Lead",
+   "read_only": 1
+  },
+  {
+   "fieldname": "event",
+   "fieldtype": "Link",
+   "label": "Confirmed Meeting Event",
+   "options": "Event"
+  },
+  {
+   "fieldname": "review_col",
+   "fieldtype": "Column Break",
+   "label": ""
+  },
+  {
+   "fieldname": "internal_notes",
+   "fieldtype": "Small Text",
+   "label": "Internal Notes"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "create": 1,
+   "write": 1,
+   "delete": 1,
+   "print": 1
+  },
+  {
+   "role": "Sales Manager",
+   "read": 1,
+   "report": 1,
+   "create": 1,
+   "write": 1,
+   "delete": 0,
+   "print": 1
+  },
+  {
+   "role": "Sales User",
+   "read": 1,
+   "report": 1
+  }
+ ],
+ "track_changes": 1,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "title_field": "contact_name",
+ "search_fields": "contact_name,email,company",
+ "links": [],
+ "states": [],
+ "creation": "2026-11-14 00:00:00",
+ "modified": "2026-11-14 00:00:00",
+ "modified_by": "Administrator",
+ "owner": "Administrator"
+}

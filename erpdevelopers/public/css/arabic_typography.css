@@ -1,0 +1,39 @@
+/* Match Greenbox's Tajawal family and readable Arabic weights.
+ * Google Fonts delivery matches Greenbox; no font binary is redistributed.
+ * Only Arabic website/login content is affected. Never style Frappe Desk.
+ */
+@import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap");
+
+html[lang^="ar"] .ed-site,
+html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) {
+  font-family:"Tajawal",Arial,sans-serif;
+  font-weight:400;
+  letter-spacing:0;
+}
+html[lang^="ar"] .ed-site :is(h1,h2,h3,h4,h5,h6,p,a,button,input,select,textarea,label,small,strong),
+html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) :is(h1,h2,h3,h4,p,a,button,input,select,textarea,label) {
+  font-family:"Tajawal",Arial,sans-serif;
+  letter-spacing:0;
+}
+html[lang^="ar"] .ed-site :is(h1,h2,h3,h4) {
+  font-weight:800;
+  line-height:1.45;
+}
+html[lang^="ar"] .ed-site :is(.ed-btn,.ed-playlist-watch,.ed-nav nav a) {
+  font-weight:700;
+}
+html[lang^="ar"] .ed-site :is(.ed-hero-lead,.ed-intro-copy p,.ed-resource-card>p) {
+  line-height:1.9;
+}
+html[lang^="ar"] .ed-site .ed-resource-card>p {font-size:15px;}
+html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-content-wrapper::before {
+  font-family:"Tajawal",Arial,sans-serif;
+  font-weight:800;
+  line-height:1.45;
+  letter-spacing:0;
+}
+html[lang^="ar"] :is(body[data-path="login"],body[data-path="/login"]) #page-login .page-card-head h4 {
+  font-weight:800;
+  line-height:1.45;
+  letter-spacing:0;
+}
