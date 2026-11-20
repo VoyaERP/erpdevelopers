@@ -1,9 +1,9 @@
-name: Frappe v16 static checks
+name: ERP Developers source validation
 on:
   push:
-    branches: [version-16, production-v16, "feat/**", "fix/**", "refactor/**"]
+    branches: [main, dev, version-15, version-16, "feat/**", "fix/**", "refactor/**"]
   pull_request:
-    branches: [version-16, production-v16]
+    branches: [main, dev, version-15, version-16]
 jobs:
   validate:
     runs-on: ubuntu-latest
