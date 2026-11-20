@@ -18,7 +18,7 @@ class TestResponsiveWebsite(TestCase):
         self.assertIn("text-wrap:balance", BRAND)
 
     def test_mobile_navigation_has_separate_rows(self):
-        self.assertIn("@media(max-width:1100px){", BRAND)
+        self.assertIn("@media(max-width:1180px){", BRAND)
         self.assertIn("overflow-x:auto;scrollbar-width:thin", BRAND)
         self.assertIn("@media(max-width:480px){", BRAND)
         self.assertIn("grid-row:2;grid-column:1/-1", BRAND)
@@ -38,8 +38,9 @@ class TestResponsiveWebsite(TestCase):
     def test_header_is_sticky_and_in_page_links_clear_it(self):
         self.assertIn(".ed-nav{position:sticky;top:0;z-index:110", BRAND)
         self.assertIn(".ed-skip{position:fixed;top:-100px;inset-inline-start:12px;z-index:300", BRAND)
-        self.assertIn("--ed-header-anchor-offset:95px", BRAND)
+        self.assertIn("--ed-header-anchor-offset:82px", BRAND)
         self.assertIn("scroll-margin-top:var(--ed-header-anchor-offset)", BRAND)
+        self.assertIn("--ed-header-anchor-offset:138px", BRAND)
         self.assertIn("--ed-header-anchor-offset:145px", BRAND)
         nav = (APP / "templates/includes/erpdevelopers_nav.html").read_text()
         self.assertIn('<header class="ed-nav" lang="{{ boot.lang | e }}"', nav)
