@@ -43,6 +43,21 @@ class TestBrandContract(TestCase):
         self.assertNotIn('login_chrome.js', hooks)
         self.assertEqual(branding.login_stylesheet_url(), "/assets/erpdevelopers/css/login.css?v=" + sha256((APP / "public/css/login.css").read_bytes()).hexdigest()[:16])
 
+    def test_header_stylesheet_fingerprint_tracks_asset_changes(self):
+        from tempfile import TemporaryDirectory
+
+        with TemporaryDirectory() as directory:
+            stylesheet = Path(directory) / "brand.css"
+            stylesheet.write_text("first", encoding="utf-8")
+            with mock.patch.object(branding, "HOME_STYLESHEET_FILE", stylesheet):
+                first = branding.homepage_stylesheet_url()
+                stylesheet.write_text("updated stylesheet", encoding="utf-8")
+                second = branding.homepage_stylesheet_url()
+
+        self.assertNotEqual(first, second)
+        self.assertEqual(second, "/assets/erpdevelopers/css/brand.css?v=" +
+                         sha256(b"updated stylesheet").hexdigest()[:16])
+
     def test_page_controller_binds_frappe_hyphenated_route(self):
         self.assertTrue((APP / "www" / (branding.HOME_ROUTE + ".html")).is_file())
         self.assertTrue((APP / "www" / (branding.HOME_ROUTE.replace("-", "_") + ".py")).is_file())
