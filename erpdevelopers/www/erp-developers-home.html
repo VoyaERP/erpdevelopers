@@ -3,6 +3,7 @@
 {{ super() }}
 <script data-cfasync="false" defer src="{{ language_js_url | e }}"></script>
 <link rel="canonical" href="{{ canonical_home_url | e }}">
+{% for alternate in language_alternates %}<link rel="alternate" hreflang="{{ alternate.lang | e }}" href="{{ alternate.href | e }}">{% endfor %}
 <link rel="stylesheet" href="{{ homepage_css_url | e }}">
 <link rel="stylesheet" href="{{ portal_css_url | e }}">
 <link rel="stylesheet" href="{{ discovery_css_url | e }}">
@@ -18,8 +19,8 @@
       <div class="ed-shell ed-hero-inner">
         <div class="ed-hero-copy">
           <p class="ed-eyebrow"><span class="ed-pulse" aria-hidden="true"></span>{{ _("PEOPLE. IDEAS. POSSIBILITIES.") }}</p>
-          <h1 id="ed-heading">{{ _("Better technology starts with") }} <em>{{ _("better connections.") }}</em></h1>
-          <p class="ed-hero-lead">{{ _("A space for developers, architects, and curious minds to learn, exchange ideas, and turn real challenges into meaningful progress. Beyond any single ERP or platform.") }}</p>
+          <h1 id="ed-heading">{{ _("ERP Developers: ERP consulting,") }} <em>{{ _("software and technology solutions.") }}</em></h1>
+          <p class="ed-hero-lead">{{ _("We help businesses plan ERP systems, develop ERPNext and Frappe solutions, integrate platforms and make smarter cloud and technology decisions. Discover practical guides and connect with our team.") }}</p>
           <div class="ed-actions">
             <a class="ed-btn ed-btn-primary" href="#discover">{{ _("Explore what's here") }} <span aria-hidden="true">↗</span></a>
             <a class="ed-btn ed-btn-secondary" href="/lets-talk#meeting-start">{{ _("Let's Talk") }} <span aria-hidden="true">↗</span></a>
@@ -97,7 +98,7 @@
     <section class="ed-section ed-guide-discovery" aria-labelledby="ed-guides-heading">
       <div class="ed-shell">
         <div class="ed-section-head">
-          <div><p class="ed-kicker">{{ _("EXPLORE & LEARN") }}</p><h2 id="ed-guides-heading">{{ _("ERP & Business Applications") }}</h2></div>
+          <div><p class="ed-kicker">{{ _("EXPLORE & LEARN") }}</p><h2 id="ed-guides-heading">{{ _("ERP consulting and technology expertise") }}</h2></div>
           <p>{{ (guide_intro.ar if boot.lang.startswith('ar') else guide_intro.en) | e }}</p>
         </div>
         <div class="ed-resource-grid">
