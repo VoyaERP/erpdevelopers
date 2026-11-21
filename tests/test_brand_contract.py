@@ -178,8 +178,8 @@ class TestBrandContract(TestCase):
 
     def test_version_boundary(self):
         config = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-        self.assertIn('frappe = ">=16.0.0,<17.0.0"', config)
-        self.assertIn('erpnext = ">=16.0.0,<17.0.0"', config)
+        self.assertIn('frappe = ">=15.0.0,<16.0.0"', config)
+        self.assertIn('erpnext = ">=15.0.0,<16.0.0"', config)
 
 
 class TestSiteScopedBranding(TestCase):
