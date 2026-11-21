@@ -10,7 +10,7 @@ WEB="frappe-bench-web:frappe-bench-frappe-web"
 EXPECTED_SHA="${EXPECTED_SHA:-}"
 RELEASE_BRANCH="${RELEASE_BRANCH:-version-16}"
 ALLOW_BRANCH_SWITCH="${ALLOW_BRANCH_SWITCH:-0}"
-case "$RELEASE_BRANCH" in version-16|production-v16) ;; *) echo "STOP: unsupported release branch" >&2; exit 2;; esac
+case "$RELEASE_BRANCH" in version-16) ;; *) echo "STOP: this legacy v16 host runner only supports version-16" >&2; exit 2;; esac
 TMP=""
 STAGE="preflight"
 cleanup() { if [ -n "$TMP" ]; then rm -rf "$TMP"; fi; }
