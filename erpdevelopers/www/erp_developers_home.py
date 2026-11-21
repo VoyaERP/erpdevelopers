@@ -9,8 +9,18 @@ from erpdevelopers.language_navigation import set_public_language_context
 
 
 def get_context(context):
+    # Frappe's locale is authoritative; request language supports isolated fixtures.
+    try:
+        import frappe
+    except ModuleNotFoundError:
+        language = "en"
+    else:
+        local = getattr(frappe, "local", None)
+        language = getattr(local, "lang", None) or (
+            getattr(local, "form_dict", {}) or {}
+        ).get("_lang", "en")
     # Frappe MetaTags renders search, OpenGraph and Twitter tags once.
-    for field, value in homepage_seo_context().items():
+    for field, value in homepage_seo_context(language).items():
         setattr(context, field, value)
     context.no_cache = 1
     set_public_language_context(context)
