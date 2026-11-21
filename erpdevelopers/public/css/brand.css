@@ -20,13 +20,13 @@
  * label arrival or enhancement from redistributing navigation links.
  */
 .ed-nav{position:sticky;top:0;z-index:110;border-bottom:1px solid var(--ed-border);background:#fff;box-shadow:0 8px 22px #0c305310}
-.ed-nav-inner{min-height:70px;display:grid;grid-template-columns:190px minmax(0,1fr) 188px;align-items:center;gap:14px;min-width:0;width:min(1540px,calc(100% - 48px))}
+.ed-nav-inner{min-height:70px;display:grid;grid-template-columns:190px minmax(0,1fr) max-content;align-items:center;gap:14px;min-width:0;width:min(1540px,calc(100% - 48px))}
 .ed-brand{display:flex;align-items:center;min-width:0}
 .ed-brand img{display:block;width:190px;height:63px;max-width:100%;object-fit:contain}
 .ed-nav nav{display:flex;align-items:center;justify-content:space-between;gap:clamp(4px,.65vw,12px);min-width:0}
 .ed-nav nav a{display:inline-flex;align-items:center;justify-content:center;min-width:0;min-height:44px;padding:8px 2px;color:#364d66;font-size:clamp(11px,.88vw,13px);line-height:1.4;font-weight:700;white-space:nowrap;word-break:normal;overflow-wrap:normal;text-wrap:nowrap;border-radius:0;transition:color .18s ease}
 .ed-nav nav a:hover{color:var(--ed-blue);background:transparent}
-.ed-nav-tools{display:flex;align-items:center;justify-content:flex-end;gap:12px;width:188px;min-width:0}
+.ed-nav-tools{display:flex;align-items:center;justify-content:flex-end;gap:12px;width:auto;min-width:0}
 .ed-nav .ed-language-switcher{display:inline-flex;align-items:center;justify-content:center;gap:5px;margin:0;width:auto;min-height:44px;min-width:0;padding:6px 2px;border:0;border-radius:0;background:transparent;color:#164a6d;font-size:12px;line-height:1.4;font-weight:700;white-space:nowrap;overflow-wrap:normal}
 .ed-nav .ed-language-switcher:hover{background:transparent;color:var(--ed-blue)}
 .ed-nav .ed-language-switcher svg{flex:none}
