@@ -1,81 +1,78 @@
-# Production-v16 release and promotion
+# ERP Developers — current release and promotion procedure
 
-## Meaning of the production branch
+**Updated: 2026-11-21.** This replaces the former `production-v16` procedure.
+The [four-branch policy](https://github.com/VoyaERP/erpdevelopers/blob/main/docs/BRANCH_STRATEGY.md) is authoritative; older host
+notes are historical and must not be applied to another VM without an audit.
 
-`production-v16` contains a tested source baseline. It is not evidence that a server
-was switched, that every business flow passed UAT, or that branch protection exists.
-`version-16` remains the integration branch. `main` remains canonical governance;
-never merge its older application scaffold into the running code branch.
+## Branch roles
 
-Release flow: isolated change -> code review -> all CI checks -> integration ->
-explicit stable-branch promotion -> staging/owner acceptance -> operator deployment.
-Prefer reviewed fast-forward promotion; never force-push either release branch.
-Configure required checks and reviewer protection in GitHub separately. This work
-does not change repository permissions, protections, secrets or the default branch.
+- `main`: GitHub default branch with current reviewed v16 application and governance.
+- `dev`: v16 integration branch.
+- `version-16`: pinned v16 deploy source.
+- `version-15`: independent v15 deploy source and compatibility tests.
 
-## Existing erptest-lightnode site
+Frappe 15 and 16 use different `pyproject.toml` dependency ranges and hook
+registration. **Never switch a site between major versions by changing Git branch.**
 
-The existing target is `erp-developers.com` in `/data/frappe/frappe-bench`, owned by
-`manakhly`. The complete runner checks hostname, non-root execution, clean checkout,
-expected repository remote, installed app, exact target SHA and fast-forward ancestry.
-It reuses one updater; source checks run before migration, and web restart only follows
-successful update/build. The only managed service is
-`frappe-bench-web:frappe-bench-frappe-web`; other sites share this HTTP process.
+## Existing Azure Frappe 16 VM
 
-**No command in this document has been run on the operator's server by this refactor.**
-Choose an approved full commit SHA, not a moving branch name. Keep the runner outside
-the checkout. For an explicit first promotion, run the following lines one at a time,
-stopping immediately on an error. Replace the SHA placeholder with the reviewed commit.
+- Host: `erpdevelopers`; site: `erp-developers.com`.
+- Bench owner: `frappe`; Bench: `/home/frappe/frappe-bench`.
+- Git remote: `upstream`, `git@github.com:VoyaERP/erpdevelopers.git`.
+- Read-only deploy key: `/home/frappe/.ssh/github_erpdevelopers`.
+- Services: systemd, not the historical erptest-lightnode Supervisor services.
+- Source branch: `version-16` with an exact, operator-reviewed full SHA.
 
-```bash
-APP="/data/frappe/frappe-bench/apps/erpdevelopers"
-SHA="PASTE_REVIEWED_40_CHARACTER_COMMIT"
-RUNNER="$(mktemp /tmp/erpdev-deploy.XXXXXX)"
-git -C "$APP" fetch upstream production-v16
-git -C "$APP" show "${SHA}:scripts/deploy_erptest_lightnode.sh" > "$RUNNER"
-test -s "$RUNNER" && bash -n "$RUNNER" && EXPECTED_SHA="$SHA" RELEASE_BRANCH=production-v16 ALLOW_BRANCH_SWITCH=1 bash "$RUNNER"
-```
+The scripts named `*_erptest_lightnode.sh` are **legacy, host-specific** and
+must not run on this Azure VM. They are retained for older installations and
+refuse unrelated hostnames. Do not rewrite those host constraints to bypass checks.
 
-For later updates on `production-v16`, use the same procedure without
-`ALLOW_BRANCH_SWITCH=1`. On integration keep `RELEASE_BRANCH=version-16`.
-Unknown branches, detached HEAD, missing/invalid pins, unapproved branch switching,
-divergent existing production history and production-to-integration switching fail
-before branch/database mutation. No silent rollback is performed.
+### Deployment checklist (operator-controlled)
 
-If tests or migration fail, preserve the backup and exact state. Do not use
-`--skip-failing`, recreate the site, manually edit DocField types, reset history or
-restore blindly. A transient readiness 502 is retried; sustained failure prints
-web-process diagnostics and stops. Public TLS checks never use an insecure override;
-`-k` remains restricted to the documented localhost origin verification.
+1. Verify all required source, browser navigation, publications, schema-upgrade
+   and Arabic/English CI checks at the **exact target commit**. A pending or
+   failed run is not a passed release gate.
+2. Confirm installed Frappe/ERPNext major version, clean app checkout, enough
+   disk space, database/Redis health, backups with files, and a tested rollback
+   procedure. Verify that `version-16` is a descendant of the deployed SHA.
+3. Fetch `version-16` with the existing deploy key as `frappe`, verify
+   `FETCH_HEAD` equals the approved SHA, and switch using a fast-forward-only
+   update. No `reset --hard`, `--force`, or reinstall.
+4. Execute the application's source checks. Migrate the site only when a
+   schema/hook change requires it and after inspecting the migration impact.
+   Build `erpdevelopers` assets, clear site and website caches.
+5. Restart the exact Frappe **web** systemd unit with the operator's sudo
+   privileges after a successful build. Clear cache alone does not reload
+   Python modules in an existing web process.
+6. Verify `/api/method/ping`, the home page and critical routes at the Azure
+   loopback origin using `curl --resolve erp-developers.com:443:127.0.0.1`.
+   Compare the `brand.css?v=<sha256-prefix>` fingerprint with the deployed
+   file and compare the response bytes to the served CSS.
+7. Repeat checks against the public domain separately. If public and origin
+   differ, investigate DNS/Cloudflare cache before editing CSS again.
+8. Confirm English, Arabic RTL, desktop/tablet/mobile navigation, Team Login,
+   language preservation and owner visual acceptance. Record the site, SHA,
+   CI links, service status, browser evidence, and rollback reference.
 
-## Validation layers
+The last supplied Azure operator evidence was an HTTP 200 and successful asset
+build on the earlier release candidate `4ee493fa`. That is **not** evidence
+that newer commits have been installed or that the public browser sees Azure.
 
-| Layer | What it proves | What it does not prove |
-| --- | --- | --- |
-| `scripts/check_source.sh` | Python/shell/JS checks, unit/contracts, 14 player DOM tests, Arabic compilation | Live Frappe, browser or database integration |
-| Browser workflows | Actual templates/styles with isolated fixtures in Chromium/Firefox, EN/AR and narrow widths | Live fonts, CDN, YouTube playback, actual authentication or upload |
-| Schema-upgrade job | Pinned native Frappe schema validation and repeated isolated MariaDB conversion | Full `bench migrate` against the production database |
-| Operator deployment log | Named site, exact code, migration/build, restart/readiness and HTTP checks | Full interactive or business acceptance |
-| Owner UAT/operations review | Actual editorial/private/auth flows, restore and acceptance | Nothing unless cases/results are recorded |
+## Frappe 15 acceptance
 
-The source snapshot workflow archives only tracked source plus the contemporaneous
-canonical `main` planning revision, with hashes. It contains no runner Git credentials
-or site data. Artifact retention is seven days; retain required release evidence in
-your own approved release records. CI does not deploy automatically.
+Build and migrate `version-15` only on a separate v15-compatible Bench/site;
+validate native v15 login/Desk branding and the publication, event and playlist
+roles there. CI source/browser fixtures are not a replacement for live v15 UAT.
+Keep v15 settings and hooks separate from v16.
 
-## Remaining production acceptance
+## Four-branch cleanup
 
-- Confirm the release on a staging clone, record the exact Frappe/ERPNext/DB versions,
-  and test a full migration before approving a live switch.
-- Publish/unpublish a real event with photos and both publication types, then check
-  Guest/editor behavior and private-file rejection through native Desk and API.
-- Test native login/recovery/MFA, authorized versus unauthorized private playlists,
-  EN/AR first paint, mobile navigation and no cross-site visual regression.
-- Test actual appointment availability and verification mail only after explicitly
-  approved configuration; source presence does not enable bookings.
-- Perform backup restore/recovery drill; review shared-process restart impact,
-  rate limiting, monitoring, data retention, legal text and image/code license rights.
-- Record Search Console/indexing checks separately; do not promise search rankings.
+Before removing any obsolete GitHub branch, switch all live checkouts to one
+of the four maintained branches. Archive old heads as **remote tags** pointing
+to their exact Git commit IDs, verify the archives, and then delete the old
+remote branch refs using exact expected-SHA leases. Divergent old feature
+commits must remain recoverable from tags even when not merged.
 
-Entities (`bedya`/`bdanexus`/`voyatours`), operational development projects, ERPNext
-Project/Task linking and owner/assignee portal remain **Deferred - do not execute**.
+Do not run Git branch deletion from the Azure read-only deploy key. Use a
+write-authorized workstation clone and review PRs and branch-protection rules.
+If any verification fails, stop without deleting the unverified heads.
