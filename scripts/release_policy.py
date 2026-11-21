@@ -2,19 +2,25 @@
 import argparse
 import re
 
-RELEASE_BRANCHES = ("version-16", "production-v16")
+RELEASE_BRANCHES = ("version-15", "version-16")
+LEGACY_V16_BRANCHES = ("production-v16", "release/v16-final-20261121")
 
 
 def validate_transition(current, target, sha, allow_switch=False):
-    """Only an explicit, pinned integration-to-production switch is permitted."""
+    """Permit pinned same-branch updates or an explicit legacy-v16 migration.
+
+    Version 15 and 16 installations are never interchangeable. The caller must
+    independently validate the installed Frappe major version and target site.
+    """
     if not isinstance(sha, str) or not re.fullmatch(r"[0-9a-f]{40}", sha):
         raise ValueError("Supply an exact 40-character EXPECTED_SHA")
-    if current not in RELEASE_BRANCHES or target not in RELEASE_BRANCHES:
-        raise ValueError("Only version-16 and production-v16 are deployment branches")
-    if current != target and not (
-        current == "version-16" and target == "production-v16" and allow_switch
-    ):
-        raise ValueError("Branch switch needs explicit ALLOW_BRANCH_SWITCH=1; production downgrade is refused")
+    if target not in RELEASE_BRANCHES:
+        raise ValueError("Only version-15 and version-16 are release targets")
+    if current == target:
+        return
+    if current in LEGACY_V16_BRANCHES and target == "version-16" and allow_switch:
+        return
+    raise ValueError("Only an explicit legacy-v16 to version-16 switch is permitted")
 
 
 def main():
