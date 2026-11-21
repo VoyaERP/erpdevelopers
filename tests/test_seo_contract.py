@@ -9,7 +9,9 @@ from erpdevelopers.seo import (
     CANONICAL_HOME_URL,
     ROBOTS_TXT,
     SEO_DESCRIPTION,
+    SEO_DESCRIPTION_AR,
     SEO_TITLE,
+    SEO_TITLE_AR,
     SOCIAL_IMAGE_URL,
     homepage_seo_context,
 )
@@ -31,6 +33,36 @@ class TestHomepageSEO(unittest.TestCase):
         self.assertEqual(SOCIAL_IMAGE_URL, f"https://{EXPECTED_SITE}{LOGO_URL}")
         self.assertEqual(meta["image"], SOCIAL_IMAGE_URL)
 
+    def test_bilingual_homepage_metadata_and_language_alternates(self):
+        english = homepage_seo_context("en")
+        arabic = homepage_seo_context("ar")
+        self.assertEqual(english["title"], SEO_TITLE)
+        self.assertEqual(arabic["title"], SEO_TITLE_AR)
+        self.assertEqual(arabic["description"], SEO_DESCRIPTION_AR)
+        self.assertEqual(english["canonical_home_url"], CANONICAL_HOME_URL)
+        self.assertEqual(arabic["canonical_home_url"], CANONICAL_HOME_URL + "?_lang=ar")
+        self.assertEqual(arabic["metatags"]["og:url"], arabic["canonical_home_url"])
+        self.assertEqual(
+            english["language_alternates"], arabic["language_alternates"]
+        )
+        self.assertEqual(
+            {v["lang"] for v in english["language_alternates"]}, {"en", "ar"}
+        )
+        html = HOME.read_text(encoding="utf-8")
+        self.assertIn('hreflang="{{ alternate.lang | e }}"', html)
+        self.assertEqual(html.count('rel="canonical"'), 1)
+        self.assertIn("ERP Developers: ERP consulting,", html)
+        self.assertIn("software and technology solutions.", html)
+
+    def test_organization_schema_has_expertise_without_fabricated_credentials(self):
+        nodes = json.loads(homepage_seo_context()["structured_data_json"])["@graph"]
+        organization = nodes[0]
+        self.assertEqual(organization["name"], "ERP Developers")
+        self.assertIn("ERPNext", organization["knowsAbout"])
+        self.assertIn("System integration", organization["knowsAbout"])
+        self.assertNotIn("sameAs", organization)
+        self.assertNotIn("aggregateRating", organization)
+
     def test_social_metadata_use_native_frappe_metatags(self):
         meta = homepage_seo_context()
         self.assertEqual(meta["metatags"]["og:type"], "website")
@@ -43,7 +75,7 @@ class TestHomepageSEO(unittest.TestCase):
         self.assertNotIn('property="og:title"', html, "Frappe already renders OG meta")
         self.assertIn("{{ structured_data_json | safe }}", html)
         controller = CONTROLLER.read_text(encoding="utf-8")
-        self.assertIn("homepage_seo_context()", controller)
+        self.assertIn("homepage_seo_context(language)", controller)
 
     def test_structured_data_is_valid_and_does_not_claim_future_products(self):
         schema = json.loads(homepage_seo_context()["structured_data_json"])
