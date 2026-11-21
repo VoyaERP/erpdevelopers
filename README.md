@@ -1,29 +1,30 @@
-# ERP Developers - Frappe 16
+# ERP Developers - Frappe 15
 
 **ERP: Engage. Reason. Progress.** Developers is the supporting brand signature.
 
-A bilingual public technology website and editorial application built on Frappe
-16 and ERPNext 16. Existing public pages are not a completed member community,
+A bilingual public technology website and editorial application built for Frappe
+15 and ERPNext 15. Existing public pages are not a completed member community,
 LMS, job aggregator, AI service, or operational project portal.
 
-## Branches and evidence
+## Branches, compatibility, and evidence
 
-| Branch | Purpose |
-| --- | --- |
-| `main` | Canonical plan, decisions and execution status; not application deployment source |
-| `version-16` | Integration and ongoing Frappe 16 development |
-| `production-v16` | Reviewed, commit-pinned release baseline; creation is not deployment or UAT sign-off |
-| `refactor/*`, `feat/*`, `fix/*` | Isolated work, validated before promotion |
+The maintained branches are **main**, **dev**, **version-15**, and **version-16**.
+`main` is the default reviewed Frappe 16 application + governance source;
+`dev` is its integration stream; `version-16` is its release stream;
+`version-15` is a separately compatible Frappe 15 release line.
+These are Git refs, not evidence of installation.
 
-Frappe and ERPNext must remain on 16.x; declared Python runtime is 3.14+.
-No Frappe 15 compatibility is asserted. CI tests Python 3.14 and browser fixtures;
-a real Bench migration, authentication test and operational acceptance are separate.
+This `version-15` source targets Frappe/ERPNext 15. The 16-only boot hook and login context hook remain disabled on the v15 branch; validate native v15 desk and authentication behavior independently. Python minimum: 3.10.
 
-**Last supplied deployment evidence:** `c8cb0deeb4eaeb14b30d3a931f717ad1dfe2bf60`
-on `erp-developers.com`, with completed migration, asset checks and Arabic login
-HTML verification. `3cddab9beb2d4b49427458befc1421bf7e8bcf71` introduced Projects,
-Team Advice and the minimal footer in source; no later operator deployment log
-was supplied during this refactor. Do not turn source/CI status into a live claim.
+The public header is one Jinja include and the public CSS is one `brand.css` file;
+one shared branding helper computes content-fingerprinted asset URLs without
+retaining an old fingerprint in the web process. No duplicate navigation script
+or second header stylesheet is introduced by this refactor.
+
+See [current branch policy](https://github.com/VoyaERP/erpdevelopers/blob/main/docs/BRANCH_STRATEGY.md)
+and the [release checklist](docs/PRODUCTION_RELEASE.md). CI fixture tests and
+source existence do **not** prove Azure DNS, Cloudflare, live authentication,
+Frappe 15 runtime behavior, or owner visual approval.
 
 ## Implemented capabilities
 
@@ -94,22 +95,21 @@ The browser workflows cover Chromium/Firefox and EN/AR desktop/mobile. The isola
 MariaDB job tests native pinned Frappe schema functions, not a full Bench install.
 Production/refactor branches run the same checks as integration branches.
 
-## Deploy or promote
+## Deployment and promotion
 
-Use the existing complete [deployment runner](scripts/deploy_erptest_lightnode.sh),
-staged outside the mutable checkout, with an exact reviewed `EXPECTED_SHA`.
-`RELEASE_BRANCH` defaults to `version-16` for compatibility. A first switch from
-`version-16` to `production-v16` additionally requires `ALLOW_BRANCH_SWITCH=1`.
-Subsequent production updates use `RELEASE_BRANCH=production-v16` without switching.
-Never run an installer against an existing site or bypass a failed migration.
+Run only the version-compatible, commit-pinned release on an independently
+validated site. The existing `scripts/deploy_erptest_lightnode.sh` and
+`scripts/update_erptest_lightnode.sh` target the **historical**
+`erptest-lightnode` host with a different Bench directory and Supervisor service.
+**Do not run those scripts on the current Azure `erpdevelopers` VM.**
 
-The runner backs up database/files, validates the target, refuses divergent history,
-runs source checks before migration, builds and clears caches, then restarts only
-the documented shared web process and verifies origin/public routes and Arabic copy.
-The restart affects other sites sharing that process. Creating a GitHub branch does
-not switch the server, run a migration, configure protection, or prove recovery readiness.
-See the production procedure for commands and the remaining acceptance checklist.
-Historical host troubleshooting remains in [ERPTEST_LIGHTNODE.md](docs/ERPTEST_LIGHTNODE.md).
+The Azure v16 host uses `/home/frappe/frappe-bench` owned by `frappe`,
+a repository-specific SSH key and systemd web service. Deployment requires an
+operator-verified backup, compatible installed Frappe major version, matching
+commit pin, clean checkout, source/build checks, cache clear, controlled web
+process restart, exact CSS fingerprint verification, and localhost-origin versus
+public-CDN comparison. See the [branch strategy](https://github.com/VoyaERP/erpdevelopers/blob/main/docs/BRANCH_STRATEGY.md).
+No code change automatically deploys to that host.
 
 ## Roadmap - not implemented by this refactor
 
