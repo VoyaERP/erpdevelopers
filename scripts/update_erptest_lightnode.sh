@@ -12,7 +12,7 @@
   EXPECTED_SHA="${EXPECTED_SHA:-}"
   RELEASE_BRANCH="${RELEASE_BRANCH:-version-16}"
   ALLOW_BRANCH_SWITCH="${ALLOW_BRANCH_SWITCH:-0}"
-  case "$RELEASE_BRANCH" in version-16|production-v16) ;; *) echo "STOP: unsupported release branch"; exit 2;; esac
+  case "$RELEASE_BRANCH" in version-16) ;; *) echo "STOP: this legacy v16 host runner only supports version-16"; exit 2;; esac
 
   case "$(uname -n)" in erptest-lightnode|erptest-lightnode.*) ;; *) echo "STOP: wrong host"; exit 2;; esac
   test "$(id -u)" -ne 0 || { echo "STOP: do not use root"; exit 2; }
