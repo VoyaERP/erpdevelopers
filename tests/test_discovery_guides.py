@@ -16,7 +16,7 @@ APP = ROOT / "erpdevelopers"
 
 class TestEditorialGuides(TestCase):
     def test_each_guide_has_distinct_substantive_bilingual_content(self):
-        self.assertEqual(set(GUIDES), {"erp-development", "erpnext-development"})
+        self.assertEqual(set(GUIDES), {"erp-development", "erpnext-development", "erp-consulting", "technology-solutions"})
         for slug, page in GUIDES.items():
             for language in ("en", "ar"):
                 with self.subTest(slug=slug, language=language):
