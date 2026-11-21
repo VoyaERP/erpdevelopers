@@ -152,11 +152,11 @@
 @media(max-width:1180px){
   .ed-site{--ed-header-anchor-offset:138px}
   .ed-brand img{width:180px;height:60px}
-  .ed-nav-inner{grid-template-columns:minmax(0,1fr) 188px;gap:0 14px;padding-block:6px}
+  .ed-nav-inner{grid-template-columns:minmax(0,1fr) auto;gap:0 14px;padding-block:6px}
   .ed-brand{grid-column:1;grid-row:1}
   .ed-nav nav{display:flex;flex-wrap:nowrap;grid-row:2;grid-column:1/-1;justify-content:flex-start;gap:clamp(10px,2vw,24px);overflow-x:auto;scrollbar-width:thin;overflow-y:hidden;min-height:49px;padding-block:3px;overscroll-behavior-inline:contain;border-top:1px solid #edf3f8}
   .ed-nav nav a{font-size:13px;flex:0 0 auto;min-height:42px;padding-inline:2px}
-  .ed-nav-tools{grid-row:1;grid-column:2;justify-self:end}
+  .ed-nav-tools{grid-row:1;grid-column:2;justify-self:end;width:auto;max-width:100%}
 }
 @media(max-width:1100px){
   .ed-shell{width:calc(100% - 38px)}
