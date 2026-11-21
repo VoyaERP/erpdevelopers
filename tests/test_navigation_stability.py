@@ -11,7 +11,7 @@ class TestNavigationStability(TestCase):
         self.assertIn('.ed-nav .ed-language-switcher{display:inline-flex', css)
         self.assertIn('padding:6px 2px;border:0;border-radius:0;background:transparent', css)
         self.assertIn('.ed-nav-tools{display:flex', css)
-        self.assertIn('grid-template-columns:190px minmax(0,1fr) 188px', css)
+        self.assertIn('grid-template-columns:190px minmax(0,1fr) max-content', css)
         self.assertNotIn('.ed-language-switcher.hide', css)
         self.assertNotIn('visibility:hidden', css)
         self.assertNotIn('grid-template-columns:112px 120px', css)
