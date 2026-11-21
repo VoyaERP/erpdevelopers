@@ -94,26 +94,34 @@ class TestReleasePolicy(TestCase):
         for branch in POLICY.RELEASE_BRANCHES:
             POLICY.validate_transition(branch, branch, SHA)
 
-    def test_only_explicit_forward_production_switch(self):
+    def test_only_explicit_legacy_v16_to_current_version16_switch(self):
+        for legacy in POLICY.LEGACY_V16_BRANCHES:
+            with self.subTest(legacy=legacy), self.assertRaises(ValueError):
+                POLICY.validate_transition(legacy, 'version-16', SHA)
+            POLICY.validate_transition(legacy, 'version-16', SHA, True)
+            with self.assertRaises(ValueError):
+                POLICY.validate_transition('version-16', legacy, SHA, True)
         with self.assertRaises(ValueError):
-            POLICY.validate_transition('version-16', 'production-v16', SHA)
-        POLICY.validate_transition('version-16', 'production-v16', SHA, True)
+            POLICY.validate_transition('version-15', 'version-16', SHA, True)
         with self.assertRaises(ValueError):
-            POLICY.validate_transition('production-v16', 'version-16', SHA, True)
+            POLICY.validate_transition('version-16', 'version-15', SHA, True)
 
     def test_unknown_detached_or_unpinned_targets_fail(self):
-        for branch in ('', 'main', 'feature/test', '-bad'):
+        for branch in ('', 'main', 'dev', 'feature/test', '-bad'):
             with self.subTest(branch=branch), self.assertRaises(ValueError):
-                POLICY.validate_transition(branch, 'production-v16', SHA, True)
+                POLICY.validate_transition(branch, 'version-16', SHA, True)
         for sha in ('', 'abc123', 'z' * 40, 'a' * 41, None):
             with self.subTest(sha=sha), self.assertRaises(ValueError):
-                POLICY.validate_transition('production-v16', 'production-v16', sha)
+                POLICY.validate_transition('version-16', 'version-16', sha)
+        with self.assertRaises(ValueError):
+            POLICY.validate_transition('version-16', 'production-v16', SHA, True)
 
     def test_cli_denies_switch_and_accepts_opt_in(self):
-        command = [sys.executable, str(ROOT/'scripts/release_policy.py'), 'version-16', 'production-v16', SHA]
+        command = [sys.executable, str(ROOT/'scripts/release_policy.py'),
+                   'release/v16-final-20261121', 'version-16', SHA]
         denied = subprocess.run(command, capture_output=True, text=True)
         self.assertEqual(denied.returncode, 2)
-        self.assertIn('ALLOW_BRANCH_SWITCH', denied.stderr)
+        self.assertIn('STOP:', denied.stderr)
         allowed = subprocess.run(command + ['--allow-switch', '1'], capture_output=True, text=True)
         self.assertEqual(allowed.returncode, 0, allowed.stderr)
 
