@@ -16,6 +16,21 @@ class TestNavigationStability(TestCase):
         self.assertNotIn('visibility:hidden', css)
         self.assertNotIn('grid-template-columns:112px 120px', css)
 
+    def test_navigation_links_use_compact_spacing_instead_of_distribution(self):
+        css = (APP / "public/css/brand.css").read_text()
+        self.assertIn(
+            ".ed-nav nav{display:flex;align-items:center;justify-content:center;gap:clamp(8px,.75vw,14px)",
+            css,
+        )
+        self.assertIn(
+            "justify-content:flex-start;gap:clamp(8px,1vw,14px);overflow-x:auto",
+            css,
+        )
+        self.assertNotIn(
+            ".ed-nav nav{display:flex;align-items:center;justify-content:space-between",
+            css,
+        )
+
     def test_one_header_and_server_rendered_link_no_inline_script(self):
         nav = (APP / "templates/includes/erpdevelopers_nav.html").read_text()
         self.assertEqual(nav.count('<header '), 1)
