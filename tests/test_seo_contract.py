@@ -75,7 +75,7 @@ class TestHomepageSEO(unittest.TestCase):
         self.assertNotIn('property="og:title"', html, "Frappe already renders OG meta")
         self.assertIn("{{ structured_data_json | safe }}", html)
         controller = CONTROLLER.read_text(encoding="utf-8")
-        self.assertIn("homepage_seo_context()", controller)
+        self.assertIn("homepage_seo_context(language)", controller)
 
     def test_structured_data_is_valid_and_does_not_claim_future_products(self):
         schema = json.loads(homepage_seo_context()["structured_data_json"])
