@@ -16,13 +16,14 @@ class TestERPNextDeskBranding(unittest.TestCase):
         with patch.dict(sys.modules, {"frappe": frappe}):
             brand_erpnext_on_boot(payload)
 
-    def test_site_scoped_hook_and_no_global_core_override(self):
+    def test_v15_does_not_register_v16_boot_hook(self):
         from pathlib import Path
 
         hooks = (Path(__file__).resolve().parents[1] / "erpdevelopers/hooks.py").read_text()
-        self.assertIn(
+        self.assertNotIn(
             'boot_session = "erpdevelopers.desk_branding.brand_erpnext_on_boot"', hooks
         )
+        self.assertIn("app_logo_url = LOGO_URL", hooks)
         self.assertNotIn("override_whitelisted_methods", hooks)
 
     def test_only_logo_changes_and_permissions_routes_titles_remain_intact(self):
