@@ -69,7 +69,7 @@ class TestBrandContract(TestCase):
         self.assertEqual(branding.DESK_SIGNIN_URL, "/login?redirect-to=/desk")
         self.assertEqual(context.brand_icon_url, branding.FAVICON_URL)
         self.assertEqual(context.homepage_css_url, branding.homepage_stylesheet_url())
-        self.assertEqual(context.title, "ERP Developers | Developer Community & Technology")
+        self.assertEqual(context.title, "ERP Developers | ERP Consulting & Technology Solutions")
         self.assertEqual(context.no_cache, 1)
 
     def test_brand_assets_have_one_authoritative_source(self):
@@ -178,8 +178,8 @@ class TestBrandContract(TestCase):
 
     def test_version_boundary(self):
         config = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-        self.assertIn('frappe = ">=15.0.0,<16.0.0"', config)
-        self.assertIn('erpnext = ">=15.0.0,<16.0.0"', config)
+        self.assertIn('frappe = ">=16.0.0,<17.0.0"', config)
+        self.assertIn('erpnext = ">=16.0.0,<17.0.0"', config)
 
 
 class TestSiteScopedBranding(TestCase):
