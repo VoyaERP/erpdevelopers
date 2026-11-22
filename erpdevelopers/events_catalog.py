@@ -6,6 +6,7 @@ from erpdevelopers.catalog_support import schema_status as _schema_status, page_
 from erpdevelopers.catalog_rules import event_https_url
 from erpdevelopers.event_rules import FORMATS, TOPICS, _time
 from erpdevelopers.event_media import attach_public_event_media
+from erpdevelopers.event_seo import event_path
 
 DOCTYPE = "ERP Developers Event"
 PAGE_SIZE = 12
@@ -79,6 +80,8 @@ def get_event_directory(params=None, lang="en", now=None):
             continue
         result["event_rows"].append(entry)
     attach_public_event_media(result["event_rows"])
+    for entry in result["event_rows"]:
+        entry["detail_url"] = event_path(entry)
     def page_url(page):
         return "/events?" + urlencode({**{k:v for k,v in selected.items() if v}, "page":page, "_lang":locale})
     if selected["page"] > 1:
