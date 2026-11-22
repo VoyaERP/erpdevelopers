@@ -26,3 +26,6 @@ boot_session = "erpdevelopers.desk_branding.brand_erpnext_on_boot"
 
 # Scope the presentation extension to the target login route inside the hook.
 update_website_context = "erpdevelopers.login_presentation.update_login_context"
+
+# Published event detail pages; the controller enforces publication and source checks.
+website_route_rules = [{"from_route": "/events/<event_key>", "to_route": "events/detail"}]
