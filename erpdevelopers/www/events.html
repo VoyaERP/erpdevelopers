@@ -25,8 +25,9 @@
       <div><p class="ed-kicker">{{ _("EVENT DIRECTORY") }}</p><h2 id="ed-events-heading">{{ _("Find your next connection") }}</h2></div>
       <p>{{ _("Browse by country, topic and attendance format. Event dates and times are shown in the event's local time zone.") }}</p>
     </div>
-    <form class="ed-events-filters" method="get" action="/events" aria-label="{{ _('Event filters') }}">
+    <form class="ed-events-filters" method="get" action="/events" data-events-filter-form aria-label="{{ _('Event filters') }}">
       <input type="hidden" name="_lang" value="{{ boot.lang | e }}">
+      <div class="ed-event-filter"><label for="ed-event-search">{{ _("Search events") }}</label><input id="ed-event-search" type="search" name="q" value="{{ selected.q | e }}" maxlength="80" placeholder="{{ _('Search by event title') | e }}"></div>
       <div class="ed-event-filter"><label for="ed-event-country">{{ _("Country") }}</label><select id="ed-event-country" name="country"><option value="">{{ _("All countries") }}</option>{% for country in countries %}<option value="{{ country | e }}" {% if selected.country == country %}selected{% endif %}>{{ _(country) | e }}</option>{% endfor %}</select></div>
       <div class="ed-event-filter"><label for="ed-event-topic">{{ _("Topic") }}</label><select id="ed-event-topic" name="topic"><option value="">{{ _("All topics") }}</option>{% for topic in topics %}<option value="{{ topic | e }}" {% if selected.topic == topic %}selected{% endif %}>{{ _(topic) | e }}</option>{% endfor %}</select></div>
       <div class="ed-event-filter"><label for="ed-event-format">{{ _("Attendance format") }}</label><select id="ed-event-format" name="event_format"><option value="">{{ _("All formats") }}</option>{% for mode in formats %}<option value="{{ mode | e }}" {% if selected.event_format == mode %}selected{% endif %}>{{ _(mode) | e }}</option>{% endfor %}</select></div>
