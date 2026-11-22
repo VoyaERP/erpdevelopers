@@ -26,6 +26,7 @@ def _query_options(params):
     page = page_number(value("page"), maximum=10000)
     return {
         "topic": value("topic") if value("topic") in TOPICS else "",
+        "q": value("q")[:80],
         "country": value("country")[:140],
         "event_format": value("event_format") if value("event_format") in FORMATS else "",
         "period": "past" if value("period") == "past" else "upcoming", "page": page,
@@ -55,6 +56,8 @@ def get_event_directory(params=None, lang="en", now=None):
     for key in ("topic", "country", "event_format"):
         if selected[key]:
             filters[key] = selected[key]
+    if selected["q"]:
+        filters["title"] = ["like", "%" + selected["q"] + "%"]
     total = frappe.db.count(DOCTYPE, filters=filters)
     pages = max(1, (total + PAGE_SIZE - 1) // PAGE_SIZE)
     selected["page"] = min(selected["page"], pages)
