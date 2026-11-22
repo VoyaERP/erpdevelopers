@@ -22,7 +22,10 @@ def event_path(item):
 
 def event_name_from_path(segment):
     # Match the final ID suffix, never accept raw paths or filters as IDs.
-    name = str(segment or "").rsplit("-", 1)[-1]
+    segment = str(segment or "")
+    if "-" not in segment or "/" in segment or "\\\\" in segment:
+        return None
+    name = segment.rsplit("-", 1)[-1]
     return name if _NAME.fullmatch(name) else None
 
 
