@@ -1,0 +1,23 @@
+{% extends "templates/includes/erpdevelopers_page_base.html" %}
+{% block ed_head %}
+<link rel="stylesheet" href="{{ events_css_url | e }}">
+<script type="application/ld+json">{{ event_jsonld | safe }}</script>
+{% endblock %}
+{% block ed_content %}
+<section class="ed-section ed-page-section ed-events">
+  <div class="ed-shell">
+    <p><a class="ed-text-link" href="/events">{{ _("All events") }}</a></p>
+    {% set item = event %}
+    <article class="ed-resource-card ed-event-card">
+      {% include "templates/includes/erpdevelopers_event_media.html" %}
+      <div class="ed-card-meta"><span>{{ _(item.topic) | e }}</span><span>{{ _(item.event_format) | e }}</span><span>{{ _(item.event_status) | e }}</span></div>
+      <h1>{{ (item.title_ar if boot.lang.startswith('ar') and item.title_ar else item.title) | e }}</h1>
+      <p>{{ item.start_date | e }} — {{ item.end_date | e }} · {{ item.time_zone | e }}</p>
+      <p>{{ item.organizer | e }} · {{ _(item.event_type) | e }}</p>
+      {% if item.event_format != "Online" %}<p>{{ item.venue | e }}, {{ item.city | e }}, {{ _(item.country) | e }}</p>{% endif %}
+      <p>{{ (item.description_ar if boot.lang.startswith('ar') and item.description_ar else item.description) | e }}</p>
+      <p><a class="ed-btn ed-btn-primary" href="{{ item.event_url | e }}" rel="noopener noreferrer" target="_blank">{{ _("Official event page") }}</a></p>
+    </article>
+  </div>
+</section>
+{% endblock %}
