@@ -15,5 +15,5 @@ def get_context(context):
     context.events_css_url = versioned_public_asset("css/events.css")
     context.can_manage_events = bool(getattr(context, "schema_ready", False) and
                                     frappe.session.user != "Guest" and frappe.has_permission(DOCTYPE, "write"))
-    if any(frappe.form_dict.get(key) for key in ("topic", "country", "event_format", "period", "page")):
+    if any(frappe.form_dict.get(key) for key in ("topic", "country", "event_format", "period", "page", "q")):
         context.metatags["robots"] = "noindex, follow"
